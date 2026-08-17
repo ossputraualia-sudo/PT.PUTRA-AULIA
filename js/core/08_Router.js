@@ -8,7 +8,7 @@ PAG.Router = {
     report: "report",
     photo: "photo",
     profile: "profile",
-
+    notification: "notification",
     rfi: "rfi",
     inspection: "inspection",
     inspectionResult: "inspectionResult",
