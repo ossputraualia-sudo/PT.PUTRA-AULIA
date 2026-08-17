@@ -1,0 +1,1 @@
+PAG.Dokumentasi={render(v){v.innerHTML='<div class="card"><h2>Dokumentasi</h2><button class="btn" id="cam">Buka Kamera</button><div id="box"></div></div>';document.getElementById('cam').onclick=()=>PAG.Camera.start()}};

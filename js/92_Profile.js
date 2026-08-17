@@ -1,0 +1,1 @@
+PAG.Profile={render(v){const u=PAG.Auth.get()||{};v.innerHTML=`<div class="card"><h2>Profil</h2><b>${u.name||''}</b><p>${u.role||''}</p><button class="btn" onclick="PAG.Auth.logout()">Keluar</button></div>`}};
