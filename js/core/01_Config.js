@@ -15,7 +15,7 @@ PAG.CONFIG = {
   // =====================================================
 
   FIELD_BACKEND_URL:
-    "PASTE_FIELD_BACKEND_URL_HERE",
+    "https://script.google.com/macros/s/AKfycbzo6SzFdVWCDOc8pFvqIFBF-dwFFpkGJoscLYKR_zjcSUW1Hwcug9VKEtNwGbZ7w6OI-g/exec",
 
 
   // =====================================================
