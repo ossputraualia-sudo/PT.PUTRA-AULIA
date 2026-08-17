@@ -1044,3 +1044,24 @@ video {
   }
 
 }
+
+.nav-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 24px;
+  height: 24px;
+
+  color: #718596;
+
+  transition: .16s ease;
+}
+
+nav button:hover .nav-icon {
+  color: var(--blue);
+}
+
+nav button.active .nav-icon {
+  color: var(--green);
+}
