@@ -16,7 +16,7 @@ PAG.Dashboard = {
 
 
       // ==========================================
-      // TEST AUTH
+      // AUTH
       // ==========================================
 
       const u =
@@ -26,7 +26,7 @@ PAG.Dashboard = {
       if (!u) {
 
         v.innerHTML = `
-          <div style="padding:20px">
+          <div class="card">
             <h2>Login diperlukan</h2>
             <p>Nama personil belum diberikan.</p>
           </div>
@@ -38,11 +38,24 @@ PAG.Dashboard = {
 
 
       // ==========================================
-      // TEST MASTER
+      // MASTER WEB UTAMA
       // ==========================================
 
-      const m =
-        await PAG.WebUtamaSync.getMaster();
+      let m = {};
+
+      try {
+
+        m =
+          await PAG.WebUtamaSync.getMaster();
+
+      } catch (error) {
+
+        console.warn(
+          "Master tidak tersedia:",
+          error
+        );
+
+      }
 
 
       const paket =
@@ -121,10 +134,30 @@ PAG.Dashboard = {
             class="action"
             onclick="PAG.Router.go('profile')"
           >
-            ●
+            👤
             <br>
             Profil
           </button>
+
+        </div>
+
+
+        <div class="card">
+
+          <h3>Status Sistem</h3>
+
+          <p>
+            ${navigator.onLine
+              ? "🟢 Online"
+              : "🔴 Offline"}
+          </p>
+
+          <p>
+            Paket:
+            <b>
+              ${paket.length}
+            </b>
+          </p>
 
         </div>
 
@@ -141,12 +174,7 @@ PAG.Dashboard = {
 
       v.innerHTML = `
 
-        <div style="
-          margin:20px;
-          padding:20px;
-          border-radius:12px;
-          background:#fee2e2;
-        ">
+        <div class="card">
 
           <h3>
             Dashboard gagal dimuat
@@ -159,9 +187,12 @@ PAG.Dashboard = {
             )}
           </p>
 
-          <small>
-            Buka F12 → Console untuk detail.
-          </small>
+          <button
+            class="btn"
+            onclick="PAG.Router.go('home')"
+          >
+            Coba Lagi
+          </button>
 
         </div>
 
