@@ -143,7 +143,15 @@ PAG.UI = {
 
           break;
 
+case "notification":
 
+  await this.module(
+    view,
+    PAG.Notification,
+    "Notifikasi"
+  );
+
+  break;
         // ===============================================
         // ACTIVITY
         // ===============================================
