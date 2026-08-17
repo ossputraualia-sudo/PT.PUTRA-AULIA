@@ -1,0 +1,1 @@
+PAG.Device={gps(){return new Promise((ok,no)=>navigator.geolocation.getCurrentPosition(p=>ok({lat:p.coords.latitude,lng:p.coords.longitude,accuracy:p.coords.accuracy}),no,{enableHighAccuracy:true,timeout:15000}))}};

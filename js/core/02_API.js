@@ -1,0 +1,1 @@
+PAG.API={async get(url,action,data={}){const q=new URLSearchParams({action,...data});const r=await fetch(url+'?'+q,{cache:'no-store'});const j=await r.json();if(j.ok===false)throw Error(j.error);return j},async post(url,action,payload){const r=await fetch(url,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action,payload})});return r.json()}};

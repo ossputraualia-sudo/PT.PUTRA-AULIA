@@ -1,0 +1,1 @@
+PAG.Auth={get(){return JSON.parse(localStorage.getItem('pag_user')||'null')},async ensure(){let u=this.get();if(!u){const n=prompt('Nama personil untuk uji:');if(!n)return null;u={userId:'LOCAL-'+Date.now(),name:n,role:'personil_lapangan'};localStorage.setItem('pag_user',JSON.stringify(u))}return u},logout(){localStorage.removeItem('pag_user');location.reload()}};

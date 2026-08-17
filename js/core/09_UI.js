@@ -1,0 +1,1 @@
+PAG.UI={render(r){let v=document.getElementById('view');if(r==='home')PAG.Dashboard.render(v);if(r==='report')PAG.LaporanHarian.render(v);if(r==='photo')PAG.Dokumentasi.render(v);if(r==='profile')PAG.Profile.render(v)},toast(s){let e=document.getElementById('toast');e.textContent=s;e.style.display='block';setTimeout(()=>e.style.display='none',2500)}};
