@@ -12,7 +12,7 @@ PAG.UI = {
     if (!view) {
 
       console.error(
-        "PAG.UI: #view tidak ditemukan."
+        "PAG.UI: #view tidak ditemukan"
       );
 
       return;
@@ -20,125 +20,389 @@ PAG.UI = {
     }
 
 
-    // Bersihkan tampilan sebelumnya
+    // Loading
 
-    view.innerHTML = "";
+    view.innerHTML = `
 
+      <div class="card">
+
+        <p>
+          Memuat halaman...
+        </p>
+
+      </div>
+
+    `;
+
+
+    // ===================================================
+    // ROUTE → MODULE
+    // ===================================================
 
     try {
 
       switch (route) {
 
-        // =================================================
-        // HOME / DASHBOARD
-        // =================================================
+
+        // ===============================================
+        // HOME
+        // ===============================================
 
         case "home":
 
           if (
-            !PAG.Dashboard ||
-            typeof PAG.Dashboard.render !== "function"
+            PAG.Dashboard &&
+            PAG.Dashboard.render
           ) {
 
-            throw new Error(
-              "Modul Dashboard tidak ditemukan."
+            await PAG.Dashboard.render(view);
+
+          } else {
+
+            this.notReady(
+              view,
+              "Dashboard"
             );
 
           }
 
-          await PAG.Dashboard.render(view);
-
           break;
 
 
-        // =================================================
+        // ===============================================
         // LAPORAN
-        // =================================================
+        // ===============================================
 
         case "report":
 
           if (
-            !PAG.LaporanHarian ||
-            typeof PAG.LaporanHarian.render !== "function"
+            PAG.LaporanHarian &&
+            PAG.LaporanHarian.render
           ) {
 
-            throw new Error(
-              "Modul Laporan Harian tidak ditemukan."
+            await PAG.LaporanHarian.render(view);
+
+          } else {
+
+            this.notReady(
+              view,
+              "Laporan Harian"
             );
 
           }
 
-          await PAG.LaporanHarian.render(view);
-
           break;
 
 
-        // =================================================
-        // DOKUMENTASI / FOTO
-        // =================================================
+        // ===============================================
+        // FOTO / DOKUMENTASI
+        // ===============================================
 
         case "photo":
 
           if (
-            !PAG.Dokumentasi ||
-            typeof PAG.Dokumentasi.render !== "function"
+            PAG.Dokumentasi &&
+            PAG.Dokumentasi.render
           ) {
 
-            throw new Error(
-              "Modul Dokumentasi tidak ditemukan."
+            await PAG.Dokumentasi.render(view);
+
+          } else {
+
+            this.notReady(
+              view,
+              "Dokumentasi"
             );
 
           }
 
-          await PAG.Dokumentasi.render(view);
-
           break;
 
 
-        // =================================================
+        // ===============================================
         // PROFILE
-        // =================================================
+        // ===============================================
 
         case "profile":
 
           if (
-            !PAG.Profile ||
-            typeof PAG.Profile.render !== "function"
+            PAG.Profile &&
+            PAG.Profile.render
           ) {
 
-            throw new Error(
-              "Modul Profile tidak ditemukan."
+            await PAG.Profile.render(view);
+
+          } else {
+
+            this.notReady(
+              view,
+              "Profil"
             );
 
           }
 
-          await PAG.Profile.render(view);
+          break;
+
+
+        // ===============================================
+        // ACTIVITY
+        // ===============================================
+
+        case "activity":
+
+          if (
+            PAG.Activity &&
+            PAG.Activity.render
+          ) {
+
+            await PAG.Activity.render(view);
+
+          } else {
+
+            this.notReady(
+              view,
+              "Aktivitas"
+            );
+
+          }
 
           break;
 
 
-        // =================================================
-        // UNKNOWN ROUTE
-        // =================================================
+        // ===============================================
+        // RFI
+        // ===============================================
+
+        case "rfi":
+
+          await this.module(
+            view,
+            PAG.RFI,
+            "RFI"
+          );
+
+          break;
+
+
+        // ===============================================
+        // INSPECTION
+        // ===============================================
+
+        case "inspection":
+
+          await this.module(
+            view,
+            PAG.Inspection,
+            "Inspection"
+          );
+
+          break;
+
+
+        // ===============================================
+        // INSPECTION RESULT
+        // ===============================================
+
+        case "inspectionResult":
+
+          await this.module(
+            view,
+            PAG.InspectionResult,
+            "Hasil Inspection"
+          );
+
+          break;
+
+
+        // ===============================================
+        // INSTRUKSI
+        // ===============================================
+
+        case "instruksi":
+
+          await this.module(
+            view,
+            PAG.Instruksi,
+            "Instruksi"
+          );
+
+          break;
+
+
+        // ===============================================
+        // MEMO
+        // ===============================================
+
+        case "memo":
+
+          await this.module(
+            view,
+            PAG.Memo,
+            "Memo"
+          );
+
+          break;
+
+
+        // ===============================================
+        // TEMUAN
+        // ===============================================
+
+        case "temuan":
+
+          await this.module(
+            view,
+            PAG.Temuan,
+            "Temuan"
+          );
+
+          break;
+
+
+        // ===============================================
+        // TINDAK LANJUT
+        // ===============================================
+
+        case "tindaklanjut":
+
+          await this.module(
+            view,
+            PAG.TindakLanjut,
+            "Tindak Lanjut"
+          );
+
+          break;
+
+
+        // ===============================================
+        // REVISION
+        // ===============================================
+
+        case "revision":
+
+          await this.module(
+            view,
+            PAG.Revision,
+            "Revision"
+          );
+
+          break;
+
+
+        // ===============================================
+        // APPROVAL
+        // ===============================================
+
+        case "approval":
+
+          await this.module(
+            view,
+            PAG.Approval,
+            "Approval"
+          );
+
+          break;
+
+
+        // ===============================================
+        // SIGNATURE
+        // ===============================================
+
+        case "signature":
+
+          await this.module(
+            view,
+            PAG.Signature,
+            "Signature"
+          );
+
+          break;
+
+
+        // ===============================================
+        // QR VERIFY
+        // ===============================================
+
+        case "qrverify":
+
+          await this.module(
+            view,
+            PAG.QRVerify,
+            "QR Verify"
+          );
+
+          break;
+
+
+        // ===============================================
+        // AUDIT LOG
+        // ===============================================
+
+        case "auditlog":
+
+          await this.module(
+            view,
+            PAG.AuditLog,
+            "Audit Log"
+          );
+
+          break;
+
+
+        // ===============================================
+        // DRIVE
+        // ===============================================
+
+        case "drive":
+
+          await this.module(
+            view,
+            PAG.Drive,
+            "Google Drive"
+          );
+
+          break;
+
+
+        // ===============================================
+        // PDF
+        // ===============================================
+
+        case "pdf":
+
+          await this.module(
+            view,
+            PAG.PDFGenerator,
+            "PDF Generator"
+          );
+
+          break;
+
+
+        // ===============================================
+        // DEFAULT
+        // ===============================================
 
         default:
 
-          console.warn(
-            "Route tidak dikenal:",
-            route
+          await PAG.Router.go(
+            "home"
           );
 
-          await this.render("home");
-
-          return;
-
       }
+
+
+      // =================================================
+      // UPDATE NAVIGATION
+      // =================================================
+
+      this.updateNavigation(route);
 
 
     } catch (error) {
 
       console.error(
-        "PAG.UI.render error:",
+        "UI RENDER ERROR:",
         route,
         error
       );
@@ -146,27 +410,24 @@ PAG.UI = {
 
       view.innerHTML = `
 
-        <div class="pag-error">
+        <div class="card">
 
-          <h2>PAG Docs</h2>
+          <h2>
+            Gagal memuat halaman
+          </h2>
 
           <p>
-            Halaman gagal dimuat.
+            ${escapeUIHtml(
+              error.message ||
+              String(error)
+            )}
           </p>
 
-          <small>
-            ${this.escape(
-              error.message || String(error)
-            )}
-          </small>
-
-          <br><br>
-
           <button
-            type="button"
-            onclick="location.reload()"
+            class="btn"
+            onclick="PAG.Router.go('home')"
           >
-            Muat Ulang
+            Kembali ke Beranda
           </button>
 
         </div>
@@ -179,50 +440,157 @@ PAG.UI = {
 
 
   // =====================================================
-  // TOAST
+  // GENERIC MODULE RENDER
   // =====================================================
 
-  toast(message) {
+  async module(
+    view,
+    module,
+    title
+  ) {
 
-    const element =
-      document.getElementById("toast");
+    if (
+      module &&
+      typeof module.render === "function"
+    ) {
 
-    if (!element) return;
+      await module.render(view);
 
-    element.textContent =
-      message || "";
+      return;
 
-    element.style.display =
-      "block";
+    }
 
-    clearTimeout(
-      this._toastTimer
-    );
 
-    this._toastTimer =
-      setTimeout(() => {
+    // Modul masih placeholder
 
-        element.style.display =
-          "none";
+    view.innerHTML = `
 
-      }, 2500);
+      <div class="card">
+
+        <h2>
+          ${escapeUIHtml(title)}
+        </h2>
+
+        <p>
+          Modul ${escapeUIHtml(title)}
+          siap dikembangkan.
+        </p>
+
+        <button
+          class="btn"
+          onclick="PAG.Router.go('home')"
+        >
+          Kembali ke Beranda
+        </button>
+
+      </div>
+
+    `;
 
   },
 
 
   // =====================================================
-  // ESCAPE HTML
+  // MODULE NOT READY
   // =====================================================
 
-  escape(value) {
+  notReady(view, title) {
 
-    return String(value ?? "")
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#039;");
+    view.innerHTML = `
+
+      <div class="card">
+
+        <h2>
+          ${escapeUIHtml(title)}
+        </h2>
+
+        <p>
+          Modul belum tersedia.
+        </p>
+
+        <button
+          class="btn"
+          onclick="PAG.Router.go('home')"
+        >
+          Kembali ke Beranda
+        </button>
+
+      </div>
+
+    `;
+
+  },
+
+
+  // =====================================================
+  // UPDATE BOTTOM NAV
+  // =====================================================
+
+  updateNavigation(route) {
+
+    document
+      .querySelectorAll(
+        "#bottomNav button"
+      )
+      .forEach(button => {
+
+        const r =
+          button.dataset.r;
+
+        button.classList.toggle(
+          "active",
+          r === route
+        );
+
+      });
+
+  },
+
+
+  // =====================================================
+  // TOAST
+  // =====================================================
+
+  toast(message) {
+
+    const toast =
+      document.getElementById("toast");
+
+    if (!toast) return;
+
+    toast.textContent =
+      message;
+
+    toast.style.display =
+      "block";
+
+    clearTimeout(
+      this.toastTimer
+    );
+
+    this.toastTimer =
+      setTimeout(
+        () => {
+
+          toast.style.display =
+            "none";
+
+        },
+        2500
+      );
 
   }
 
 };
+
+
+function escapeUIHtml(value) {
+
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+
+}
