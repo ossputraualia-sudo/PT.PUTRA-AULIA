@@ -1,1 +1,344 @@
-<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0f172a"><link rel="manifest" href="manifest.json"><link rel="stylesheet" href="css/app.css"><title>PAG Docs Field</title></head><body><div id="app"><header><b>PAG DOCS</b><button id="sync">↻</button></header><main id="view"></main><nav><button data-r="home">⌂<small>Beranda</small></button><button data-r="report">▣<small>Laporan</small></button><button data-r="photo">◉<small>Foto</small></button><button data-r="profile">●<small>Profil</small></button></nav></div><div id="toast"></div><script src="js/core/01_Config.js"></script><script src="js/core/02_API.js"></script><script src="js/core/03_Auth.js"></script><script src="js/core/04_Storage.js"></script><script src="js/core/05_OfflineSync.js"></script><script src="js/core/06_WebUtamaSync.js"></script><script src="js/core/07_SyncState.js"></script><script src="js/core/08_Router.js"></script><script src="js/core/09_UI.js"></script><script src="js/core/10_Device.js"></script><script src="js/20_Absensi.js"></script><script src="js/21_Selfie.js"></script><script src="js/22_GPS.js"></script><script src="js/30_LaporanHarian.js"></script><script src="js/40_Dokumentasi.js"></script><script src="js/41_Camera.js"></script><script src="js/90_Dashboard.js"></script><script src="js/91_Activity.js"></script><script src="js/92_Profile.js"></script><script src="js/app.js"></script></body></html>
+<!doctype html>
+<html lang="id">
+
+<head>
+
+  <meta charset="utf-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width,initial-scale=1,viewport-fit=cover"
+  >
+
+  <meta
+    name="theme-color"
+    content="#0f172a"
+  >
+
+  <meta
+    name="description"
+    content="PAG Docs Field - Dokumentasi dan pelaporan lapangan"
+  >
+
+  <meta
+    name="mobile-web-app-capable"
+    content="yes"
+  >
+
+  <meta
+    name="apple-mobile-web-app-capable"
+    content="yes"
+  >
+
+  <meta
+    name="apple-mobile-web-app-status-bar-style"
+    content="default"
+  >
+
+  <link
+    rel="manifest"
+    href="manifest.json"
+  >
+
+  <link
+    rel="stylesheet"
+    href="css/app.css"
+  >
+
+  <title>PAG Docs Field</title>
+
+</head>
+
+
+<body>
+
+<div id="app">
+
+  <!-- =====================================================
+       HEADER
+       ===================================================== -->
+
+  <header id="appHeader">
+
+    <div class="app-brand">
+
+      <b>PAG DOCS</b>
+
+      <small>FIELD</small>
+
+    </div>
+
+
+    <div class="app-actions">
+
+      <button
+        id="sync"
+        type="button"
+        aria-label="Sinkronisasi"
+        title="Sinkronisasi"
+      >
+        ↻
+      </button>
+
+    </div>
+
+  </header>
+
+
+  <!-- =====================================================
+       MAIN APPLICATION VIEW
+       ===================================================== -->
+
+  <main id="view"></main>
+
+
+  <!-- =====================================================
+       BOTTOM NAVIGATION
+       ===================================================== -->
+
+  <nav
+    id="bottomNav"
+    aria-label="Navigasi utama"
+  >
+
+    <button
+      type="button"
+      data-r="home"
+    >
+
+      <span>⌂</span>
+
+      <small>Beranda</small>
+
+    </button>
+
+
+    <button
+      type="button"
+      data-r="report"
+    >
+
+      <span>▣</span>
+
+      <small>Laporan</small>
+
+    </button>
+
+
+    <button
+      type="button"
+      data-r="photo"
+    >
+
+      <span>◉</span>
+
+      <small>Foto</small>
+
+    </button>
+
+
+    <button
+      type="button"
+      data-r="profile"
+    >
+
+      <span>●</span>
+
+      <small>Profil</small>
+
+    </button>
+
+  </nav>
+
+</div>
+
+
+<!-- =======================================================
+     TOAST / NOTIFICATION
+     ======================================================= -->
+
+<div id="toast"></div>
+
+
+<!-- =======================================================
+     PAG DOCS CORE
+     ======================================================= -->
+
+<script src="js/core/01_Config.js"></script>
+
+<script src="js/core/02_API.js"></script>
+
+<script src="js/core/03_Auth.js"></script>
+
+<script src="js/core/04_Storage.js"></script>
+
+<script src="js/core/05_OfflineSync.js"></script>
+
+<script src="js/core/06_WebUtamaSync.js"></script>
+
+<script src="js/core/07_SyncState.js"></script>
+
+<script src="js/core/08_Router.js"></script>
+
+<script src="js/core/09_UI.js"></script>
+
+<script src="js/core/10_Device.js"></script>
+
+
+<!-- =======================================================
+     ABSENSI / SELFIE / GPS
+     ======================================================= -->
+
+<script src="js/20_Absensi.js"></script>
+
+<script src="js/21_Selfie.js"></script>
+
+<script src="js/22_GPS.js"></script>
+
+
+<!-- =======================================================
+     LAPORAN HARIAN
+     ======================================================= -->
+
+<script src="js/30_LaporanHarian.js"></script>
+
+<script src="js/31_Progress.js"></script>
+
+<script src="js/32_Cuaca.js"></script>
+
+<script src="js/33_TenagaKerja.js"></script>
+
+<script src="js/34_Peralatan.js"></script>
+
+<script src="js/35_Material.js"></script>
+
+<script src="js/36_Kendala.js"></script>
+
+
+<!-- =======================================================
+     DOKUMENTASI / FOTO
+     ======================================================= -->
+
+<script src="js/40_Dokumentasi.js"></script>
+
+<script src="js/41_Camera.js"></script>
+
+<script src="js/42_GPSPhoto.js"></script>
+
+<script src="js/43_Watermark.js"></script>
+
+<script src="js/44_PhotoUpload.js"></script>
+
+
+<!-- =======================================================
+     RFI / INSPECTION
+     ======================================================= -->
+
+<script src="js/50_RFI.js"></script>
+
+<script src="js/51_Inspection.js"></script>
+
+<script src="js/52_InspectionResult.js"></script>
+
+
+<!-- =======================================================
+     INSTRUKSI / MEMO / TEMUAN
+     ======================================================= -->
+
+<script src="js/60_Instruksi.js"></script>
+
+<script src="js/61_Memo.js"></script>
+
+<script src="js/62_Temuan.js"></script>
+
+<script src="js/63_TindakLanjut.js"></script>
+
+
+<!-- =======================================================
+     REVISION / APPROVAL / SIGNATURE
+     ======================================================= -->
+
+<script src="js/70_Revision.js"></script>
+
+<script src="js/71_Approval.js"></script>
+
+<script src="js/72_Signature.js"></script>
+
+
+<!-- =======================================================
+     QR VERIFY / AUDIT LOG
+     ======================================================= -->
+
+<script src="js/73_QRVerify.js"></script>
+
+<script src="js/74_AuditLog.js"></script>
+
+
+<!-- =======================================================
+     GOOGLE DRIVE / PDF
+     ======================================================= -->
+
+<script src="js/80_Drive.js"></script>
+
+<script src="js/81_PDFGenerator.js"></script>
+
+<script src="js/82_PDFTemplate.js"></script>
+
+
+<!-- =======================================================
+     DASHBOARD / ACTIVITY / PROFILE
+     ======================================================= -->
+
+<script src="js/90_Dashboard.js"></script>
+
+<script src="js/91_Activity.js"></script>
+
+<script src="js/92_Profile.js"></script>
+
+
+<!-- =======================================================
+     APPLICATION BOOT
+     ======================================================= -->
+
+<script src="js/app.js"></script>
+
+
+<!-- =======================================================
+     PWA SERVICE WORKER
+     ======================================================= -->
+
+<script>
+
+if ("serviceWorker" in navigator) {
+
+  window.addEventListener("load", function () {
+
+    navigator.serviceWorker
+      .register("./sw.js")
+      .then(function (registration) {
+
+        console.log(
+          "PAG Docs Service Worker aktif:",
+          registration.scope
+        );
+
+      })
+      .catch(function (error) {
+
+        console.error(
+          "PAG Docs Service Worker gagal:",
+          error
+        );
+
+      });
+
+  });
+
+}
+
+</script>
+
+
+</body>
+
+</html>
