@@ -8,6 +8,8 @@
 
     await PAG.Storage.init();
 
+    console.log("PAG Storage siap");
+
 
     // =====================================================
     // REGISTER SERVICE WORKER
@@ -17,9 +19,18 @@
 
       try {
 
-        await navigator.serviceWorker.register("./sw.js");
+        const registration =
+          await navigator.serviceWorker.register(
+            "./sw.js",
+            {
+              scope: "./"
+            }
+          );
 
-        console.log("PAG Docs Service Worker aktif");
+        console.log(
+          "PAG Docs Service Worker aktif:",
+          registration.scope
+        );
 
       } catch (error) {
 
@@ -45,9 +56,12 @@
           "click",
           function () {
 
-            PAG.Router.go(
-              this.dataset.r
-            );
+            const route =
+              this.dataset.r;
+
+            if (!route) return;
+
+            PAG.Router.go(route);
 
           }
         );
@@ -68,15 +82,30 @@
         "click",
         async function () {
 
+          if (
+            syncButton.disabled
+          ) {
+
+            return;
+
+          }
+
           try {
 
             syncButton.disabled = true;
+
+            syncButton.textContent = "⟳";
+
 
             await PAG.WebUtamaSync.pull();
 
             await PAG.OfflineSync.run();
 
-            if (PAG.UI && PAG.UI.toast) {
+
+            if (
+              PAG.UI &&
+              PAG.UI.toast
+            ) {
 
               PAG.UI.toast(
                 "Sinkronisasi selesai"
@@ -84,9 +113,12 @@
 
             }
 
+
             PAG.Router.go(
-              PAG.Router.current || "home"
+              PAG.Router.current ||
+              "home"
             );
+
 
           } catch (error) {
 
@@ -95,7 +127,11 @@
               error
             );
 
-            if (PAG.UI && PAG.UI.toast) {
+
+            if (
+              PAG.UI &&
+              PAG.UI.toast
+            ) {
 
               PAG.UI.toast(
                 "Sinkronisasi gagal"
@@ -106,6 +142,8 @@
           } finally {
 
             syncButton.disabled = false;
+
+            syncButton.textContent = "↻";
 
           }
 
@@ -122,6 +160,10 @@
     window.addEventListener(
       "online",
       async function () {
+
+        console.log(
+          "Koneksi kembali. Menjalankan sync..."
+        );
 
         try {
 
@@ -143,28 +185,58 @@
 
 
     // =====================================================
+    // OPEN DASHBOARD FIRST
+    // =====================================================
+    // PENTING:
+    // Dashboard dibuka SEBELUM sync.
+    // Jadi UI tidak menunggu Apps Script.
+
+    PAG.Router.go("home");
+
+
+    // =====================================================
     // INITIAL SYNC
     // =====================================================
 
-    try {
+    if (navigator.onLine) {
 
-      await PAG.WebUtamaSync.pull();
+      try {
 
-    } catch (error) {
+        await PAG.WebUtamaSync.pull();
 
-      console.warn(
-        "Initial sync dilewati:",
-        error
+        console.log(
+          "Initial sync berhasil"
+        );
+
+
+        // Refresh Dashboard setelah
+        // master berhasil diperbarui.
+
+        if (
+          PAG.Router.current ===
+          "home"
+        ) {
+
+          PAG.Router.go("home");
+
+        }
+
+      } catch (error) {
+
+        console.warn(
+          "Initial sync gagal:",
+          error
+        );
+
+      }
+
+    } else {
+
+      console.log(
+        "Offline - menggunakan data lokal"
       );
 
     }
-
-
-    // =====================================================
-    // OPEN DASHBOARD
-    // =====================================================
-
-    PAG.Router.go("home");
 
 
   } catch (error) {
@@ -174,28 +246,54 @@
       error
     );
 
+
     const view =
       document.getElementById("view");
+
 
     if (view) {
 
       view.innerHTML = `
+
         <div style="
+          margin:20px;
           padding:24px;
-          text-align:center;
+          border-radius:16px;
+          background:#fee2e2;
           font-family:system-ui;
         ">
-          <h2>PAG Docs</h2>
+
+          <h2>
+            PAG Docs
+          </h2>
 
           <p>
             Aplikasi gagal dimuat.
           </p>
 
           <small>
-            ${error.message || error}
+            ${escapeAppError(
+              error.message ||
+              String(error)
+            )}
           </small>
 
+          <br><br>
+
+          <button
+            onclick="location.reload()"
+            style="
+              padding:10px 16px;
+              border:0;
+              border-radius:8px;
+              cursor:pointer;
+            "
+          >
+            Muat Ulang
+          </button>
+
         </div>
+
       `;
 
     }
@@ -203,3 +301,19 @@
   }
 
 })();
+
+
+// =====================================================
+// ESCAPE ERROR
+// =====================================================
+
+function escapeAppError(value) {
+
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+
+}
