@@ -5,19 +5,17 @@ PAG.Dashboard = {
     try {
 
       v.innerHTML = `
-        <div style="
-          padding:20px;
-          font-family:system-ui;
-        ">
-          <h2>PAG Docs Field</h2>
-          <p>Memuat Dashboard...</p>
+        <div class="hero">
+          <small>PERSONIL LAPANGAN</small>
+          <h2>Memuat...</h2>
+          <div>Menyiapkan data proyek</div>
         </div>
       `;
 
 
-      // ==========================================
+      // ==================================================
       // AUTH
-      // ==========================================
+      // ==================================================
 
       const u =
         await PAG.Auth.ensure();
@@ -37,9 +35,9 @@ PAG.Dashboard = {
       }
 
 
-      // ==========================================
+      // ==================================================
       // MASTER WEB UTAMA
-      // ==========================================
+      // ==================================================
 
       let m = {};
 
@@ -68,11 +66,15 @@ PAG.Dashboard = {
         paket[0];
 
 
-      // ==========================================
+      // ==================================================
       // DASHBOARD
-      // ==========================================
+      // ==================================================
 
       v.innerHTML = `
+
+        <!-- ============================================
+             HEADER PERSONIL / PAKET
+             ============================================ -->
 
         <div class="hero">
 
@@ -94,69 +96,217 @@ PAG.Dashboard = {
         </div>
 
 
+        <!-- ============================================
+             MENU UTAMA LAPANGAN
+             ============================================ -->
+
         <div class="grid">
+
+
+          <!-- ABSENSI -->
 
           <button
             class="action"
             onclick="PAG.Absensi.start()"
           >
+
             📍
+
             <br>
+
             Absensi
+
             <br>
+
             <small>
               Selfie + GPS
             </small>
+
           </button>
 
+
+          <!-- LAPORAN -->
 
           <button
             class="action"
             onclick="PAG.Router.go('report')"
           >
+
             📋
+
             <br>
+
             Laporan Harian
+
+            <br>
+
+            <small>
+              Progress & kondisi
+            </small>
+
           </button>
 
 
+          <!-- RFI -->
+
           <button
             class="action"
-            onclick="PAG.Router.go('photo')"
+            onclick="PAG.Router.go('rfi')"
           >
-            📷
+
+            📝
+
             <br>
-            Dokumentasi
+
+            RFI
+
+            <br>
+
+            <small>
+              Request for Information
+            </small>
+
           </button>
 
 
+          <!-- INSPECTION -->
+
           <button
             class="action"
-            onclick="PAG.Router.go('profile')"
+            onclick="PAG.Router.go('inspection')"
           >
-            👤
+
+            🔍
+
             <br>
-            Profil
+
+            Inspection
+
+            <br>
+
+            <small>
+              Pemeriksaan lapangan
+            </small>
+
+          </button>
+
+
+          <!-- TEMUAN -->
+
+          <button
+            class="action"
+            onclick="PAG.Router.go('temuan')"
+          >
+
+            ⚠️
+
+            <br>
+
+            Temuan
+
+            <br>
+
+            <small>
+              Temuan lapangan
+            </small>
+
+          </button>
+
+
+          <!-- INSTRUKSI -->
+
+          <button
+            class="action"
+            onclick="PAG.Router.go('instruksi')"
+          >
+
+            📢
+
+            <br>
+
+            Instruksi
+
+            <br>
+
+            <small>
+              Instruksi pekerjaan
+            </small>
+
+          </button>
+
+
+          <!-- MEMO -->
+
+          <button
+            class="action"
+            onclick="PAG.Router.go('memo')"
+          >
+
+            📄
+
+            <br>
+
+            Memo
+
+            <br>
+
+            <small>
+              Memo lapangan
+            </small>
+
+          </button>
+
+
+          <!-- TINDAK LANJUT -->
+
+          <button
+            class="action"
+            onclick="PAG.Router.go('tindaklanjut')"
+          >
+
+            ✅
+
+            <br>
+
+            Tindak Lanjut
+
+            <br>
+
+            <small>
+              Penyelesaian temuan
+            </small>
+
           </button>
 
         </div>
 
 
+        <!-- ============================================
+             STATUS SISTEM
+             ============================================ -->
+
         <div class="card">
 
-          <h3>Status Sistem</h3>
+          <h3>
+            Status Sistem
+          </h3>
 
           <p>
-            ${navigator.onLine
-              ? "🟢 Online"
-              : "🔴 Offline"}
+            ${
+              navigator.onLine
+                ? "🟢 Online"
+                : "🔴 Offline"
+            }
           </p>
 
           <p>
+
             Paket:
+
             <b>
               ${paket.length}
             </b>
+
           </p>
 
         </div>
