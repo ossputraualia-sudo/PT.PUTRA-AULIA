@@ -10,12 +10,18 @@ PAG.UI = {
       document.getElementById("view");
 
     if (!view) {
+
       console.error(
         "PAG.UI: #view tidak ditemukan."
       );
+
       return;
     }
 
+
+    /* ===================================================
+       ACTIVE NAV
+       =================================================== */
 
     this.setActiveNav(route);
 
@@ -34,70 +40,145 @@ PAG.UI = {
 
       switch (route) {
 
+        /* ===============================================
+           UTAMA
+           =============================================== */
+
         case "home":
-          module = PAG.Dashboard;
+
+          module =
+            PAG.Dashboard;
+
           break;
 
+
+        /* ===============================================
+           LAPORAN
+           =============================================== */
 
         case "report":
-          module = PAG.LaporanHarian;
+
+          module =
+            PAG.LaporanHarian;
+
           break;
 
+
+        /* ===============================================
+           FOTO / DOKUMENTASI
+           =============================================== */
 
         case "photo":
-          module = PAG.Dokumentasi;
+
+          module =
+            PAG.Dokumentasi;
+
           break;
 
 
-        case "profile":
-          module = PAG.Profile;
-          break;
-
+        /* ===============================================
+           NOTIFIKASI
+           =============================================== */
 
         case "notification":
-          module = PAG.Notification;
+
+          module =
+            PAG.Notification;
+
           break;
 
 
+        /* ===============================================
+           PROFIL
+           =============================================== */
+
+        case "profile":
+
+          module =
+            PAG.Profile;
+
+          break;
+
+
+        /* ===============================================
+           ACTIVITY
+           =============================================== */
+
+        case "activity":
+
+          module =
+            PAG.Activity;
+
+          break;
+
+
+        /* ===============================================
+           RFI
+           =============================================== */
+
         case "rfi":
-          module = PAG.RFI;
+
+          module =
+            PAG.RFI;
+
           break;
 
 
         case "inspection":
-          module = PAG.Inspection;
+
+          module =
+            PAG.Inspection;
+
           break;
 
 
         case "inspectionResult":
-          module = PAG.InspectionResult;
+
+          module =
+            PAG.InspectionResult;
+
           break;
 
 
+        /* ===============================================
+           INSTRUKSI
+           =============================================== */
+
         case "instruksi":
-          module = PAG.Instruksi;
+
+          module =
+            PAG.Instruksi;
+
           break;
 
 
         case "memo":
-          module = PAG.Memo;
+
+          module =
+            PAG.Memo;
+
           break;
 
 
         case "temuan":
-          module = PAG.Temuan;
+
+          module =
+            PAG.Temuan;
+
           break;
 
 
         case "tindaklanjut":
-          module = PAG.TindakLanjut;
+
+          module =
+            PAG.TindakLanjut;
+
           break;
 
 
-        case "activity":
-          module = PAG.Activity;
-          break;
-
+        /* ===============================================
+           DEFAULT
+           =============================================== */
 
         default:
 
@@ -106,15 +187,24 @@ PAG.UI = {
             route
           );
 
+          route =
+            "home";
+
           module =
             PAG.Dashboard;
 
-          route = "home";
+          this.setActiveNav(
+            "home"
+          );
 
           break;
 
       }
 
+
+      /* =================================================
+         MODULE CHECK
+         ================================================= */
 
       if (
         !module ||
@@ -122,6 +212,7 @@ PAG.UI = {
       ) {
 
         view.innerHTML = `
+
           <div class="card">
 
             <h3>
@@ -134,14 +225,27 @@ PAG.UI = {
             </p>
 
           </div>
+
         `;
 
         return;
-
       }
 
 
-      await module.render(view);
+      /* =================================================
+         RENDER MODULE
+         ================================================= */
+
+      await module.render(
+        view
+      );
+
+
+      /* =================================================
+         UPDATE CONNECTION
+         ================================================= */
+
+      this.updateConnectionStatus();
 
 
     } catch (error) {
@@ -167,9 +271,12 @@ PAG.UI = {
             )}
           </p>
 
+
           <button
             class="btn"
-            onclick="PAG.Router.go('home')"
+            onclick="
+              PAG.Router.go('home')
+            "
           >
             Kembali ke Beranda
           </button>
@@ -219,10 +326,15 @@ PAG.UI = {
      TOAST
      ===================================================== */
 
-  toast(message, duration = 2500) {
+  toast(
+    message,
+    duration = 2500
+  ) {
 
     const toast =
-      document.getElementById("toast");
+      document.getElementById(
+        "toast"
+      );
 
     if (!toast) return;
 
@@ -271,6 +383,12 @@ PAG.UI = {
       );
 
 
+    const icon =
+      el.querySelector(
+        ".status-icon"
+      );
+
+
     if (navigator.onLine) {
 
       el.classList.remove(
@@ -285,6 +403,14 @@ PAG.UI = {
 
       }
 
+
+      if (icon) {
+
+        icon.textContent =
+          "●";
+
+      }
+
     } else {
 
       el.classList.add(
@@ -296,6 +422,14 @@ PAG.UI = {
 
         text.textContent =
           "Offline";
+
+      }
+
+
+      if (icon) {
+
+        icon.textContent =
+          "●";
 
       }
 
@@ -345,7 +479,7 @@ PAG.UI = {
 
 
 /* =====================================================
-   ONLINE / OFFLINE EVENT
+   ONLINE
    ===================================================== */
 
 window.addEventListener(
@@ -358,6 +492,10 @@ window.addEventListener(
 );
 
 
+/* =====================================================
+   OFFLINE
+   ===================================================== */
+
 window.addEventListener(
   "offline",
   function () {
@@ -367,6 +505,10 @@ window.addEventListener(
   }
 );
 
+
+/* =====================================================
+   DOM READY
+   ===================================================== */
 
 document.addEventListener(
   "DOMContentLoaded",
