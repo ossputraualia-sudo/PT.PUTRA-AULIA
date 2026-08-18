@@ -1,10 +1,9 @@
-```javascript
 /* =====================================================
    PAG DOCS FIELD
    SERVICE WORKER
    ===================================================== */
 
-const CACHE_NAME = "pag-field-v19";
+const CACHE_NAME = "pag-field-v17";
 
 
 /* =====================================================
@@ -12,10 +11,12 @@ const CACHE_NAME = "pag-field-v19";
    ===================================================== */
 
 const APP_SHELL = [
+
   "./",
   "./index.html",
   "./manifest.json",
   "./css/app.css"
+
 ];
 
 
@@ -23,200 +24,466 @@ const APP_SHELL = [
    INSTALL
    ===================================================== */
 
-self.addEventListener("install", event => {
+self.addEventListener(
+  "install",
+  event => {
 
-  event.waitUntil(
+    console.log(
+      "PAG Docs Service Worker: INSTALL",
+      CACHE_NAME
+    );
 
-    caches.open(CACHE_NAME)
-      .then(cache => {
 
-        return cache.addAll(APP_SHELL);
+    event.waitUntil(
 
-      })
+      caches.open(CACHE_NAME)
+        .then(cache => {
 
-  );
+          return cache.addAll(
+            APP_SHELL
+          );
 
-  self.skipWaiting();
+        })
 
-});
+    );
+
+
+    /*
+     * Langsung aktifkan versi baru
+     */
+
+    self.skipWaiting();
+
+  }
+);
 
 
 /* =====================================================
    ACTIVATE
    ===================================================== */
 
-self.addEventListener("activate", event => {
+self.addEventListener(
+  "activate",
+  event => {
 
-  event.waitUntil(
+    console.log(
+      "PAG Docs Service Worker: ACTIVATE",
+      CACHE_NAME
+    );
 
-    caches.keys()
-      .then(keys => {
 
-        return Promise.all(
+    event.waitUntil(
 
-          keys
-            .filter(key =>
-              key !== CACHE_NAME
-            )
-            .map(key =>
-              caches.delete(key)
-            )
+      caches.keys()
+        .then(keys => {
 
-        );
+          return Promise.all(
 
-      })
+            keys
+              .filter(
+                key =>
+                  key !== CACHE_NAME
+              )
 
-  );
+              .map(
+                key =>
+                  caches.delete(key)
+              )
 
-  self.clients.claim();
+          );
 
-});
+        })
+
+        .then(() => {
+
+          /*
+           * Ambil kontrol semua halaman
+           */
+
+          return self.clients.claim();
+
+        })
+
+    );
+
+  }
+);
 
 
 /* =====================================================
    FETCH
    ===================================================== */
 
-self.addEventListener("fetch", event => {
+self.addEventListener(
+  "fetch",
+  event => {
 
-  const request =
-    event.request;
+    /*
+     * Hanya GET
+     */
 
+    if (
+      event.request.method !== "GET"
+    ) {
 
-  /* -----------------------------------------------
-     HANYA GET
-     ----------------------------------------------- */
+      return;
 
-  if (
-    request.method !== "GET"
-  ) {
-
-    return;
-
-  }
+    }
 
 
-  const url =
-    new URL(
-      request.url
-    );
+    const url =
+      new URL(
+        event.request.url
+      );
 
 
-  /* -----------------------------------------------
-     JAVASCRIPT / CSS / HTML
-     
-     SELALU NETWORK FIRST
-     
-     Supaya perubahan kode GitHub
-     langsung terbaca.
-     ----------------------------------------------- */
+    /* =================================================
+       JAVASCRIPT
+       =================================================
 
-  const isCodeFile =
-    url.pathname.endsWith(".js") ||
-    url.pathname.endsWith(".css") ||
-    url.pathname.endsWith(".html");
+       JS SELALU CEK SERVER TERLEBIH DAHULU.
+
+       Ini penting agar perubahan:
+       08_Router.js
+       09_UI.js
+       90_Dashboard.js
+       dll
+
+       tidak tertahan cache lama.
+       ================================================= */
+
+    if (
+      url.pathname.endsWith(".js")
+    ) {
+
+      event.respondWith(
+
+        fetch(
+          event.request,
+          {
+            cache: "no-store"
+          }
+        )
+
+          .then(
+            response => {
+
+              /*
+               * Simpan JS terbaru
+               */
+
+              if (
+                response &&
+                response.status === 200
+              ) {
+
+                const copy =
+                  response.clone();
 
 
-  if (isCodeFile) {
+                caches.open(
+                  CACHE_NAME
+                )
+                .then(
+                  cache => {
+
+                    cache.put(
+                      event.request,
+                      copy
+                    );
+
+                  }
+                );
+
+              }
+
+
+              return response;
+
+            }
+          )
+
+          .catch(
+            () => {
+
+              /*
+               * Jika offline,
+               * gunakan JS yang terakhir
+               * tersimpan di cache.
+               */
+
+              return caches.match(
+                event.request
+              );
+
+            }
+          )
+
+      );
+
+
+      return;
+
+    }
+
+
+    /* =================================================
+       CSS
+       =================================================
+
+       CSS juga dicek ke server terlebih dahulu
+       agar perubahan tampilan langsung terlihat.
+       ================================================= */
+
+    if (
+      url.pathname.endsWith(".css")
+    ) {
+
+      event.respondWith(
+
+        fetch(
+          event.request,
+          {
+            cache: "no-store"
+          }
+        )
+
+          .then(
+            response => {
+
+              if (
+                response &&
+                response.status === 200
+              ) {
+
+                const copy =
+                  response.clone();
+
+
+                caches.open(
+                  CACHE_NAME
+                )
+                .then(
+                  cache => {
+
+                    cache.put(
+                      event.request,
+                      copy
+                    );
+
+                  }
+                );
+
+              }
+
+
+              return response;
+
+            }
+          )
+
+          .catch(
+            () =>
+              caches.match(
+                event.request
+              )
+          )
+
+      );
+
+
+      return;
+
+    }
+
+
+    /* =================================================
+       INDEX HTML
+       =================================================
+
+       HTML juga network-first.
+       ================================================= */
+
+    if (
+      url.pathname.endsWith(
+        "/"
+      ) ||
+      url.pathname.endsWith(
+        "/index.html"
+      )
+    ) {
+
+      event.respondWith(
+
+        fetch(
+          event.request,
+          {
+            cache: "no-store"
+          }
+        )
+
+          .then(
+            response => {
+
+              if (
+                response &&
+                response.status === 200
+              ) {
+
+                const copy =
+                  response.clone();
+
+
+                caches.open(
+                  CACHE_NAME
+                )
+                .then(
+                  cache => {
+
+                    cache.put(
+                      event.request,
+                      copy
+                    );
+
+                  }
+                );
+
+              }
+
+
+              return response;
+
+            }
+          )
+
+          .catch(
+            () =>
+              caches.match(
+                "./index.html"
+              )
+          )
+
+      );
+
+
+      return;
+
+    }
+
+
+    /* =================================================
+       ASSET LAIN
+       =================================================
+
+       Untuk manifest, icon, gambar, dll:
+       CACHE FIRST.
+       ================================================= */
 
     event.respondWith(
 
-      fetch(request)
-        .then(response => {
+      caches.match(
+        event.request
+      )
 
-          if (
-            response &&
-            response.status === 200
-          ) {
+        .then(
+          cached => {
 
-            const copy =
-              response.clone();
+            if (cached) {
 
-            caches.open(CACHE_NAME)
-              .then(cache => {
-
-                cache.put(
-                  request,
-                  copy
-                );
-
-              });
-
-          }
-
-          return response;
-
-        })
-
-        .catch(() => {
-
-          return caches.match(request);
-
-        })
-
-    );
-
-    return;
-
-  }
-
-
-  /* -----------------------------------------------
-     FILE LAIN
-     
-     CACHE FIRST
-     ----------------------------------------------- */
-
-  event.respondWith(
-
-    caches.match(request)
-      .then(cached => {
-
-        if (cached) {
-
-          return cached;
-
-        }
-
-
-        return fetch(request)
-          .then(response => {
-
-            if (
-              response &&
-              response.status === 200 &&
-              response.type === "basic"
-            ) {
-
-              const copy =
-                response.clone();
-
-              caches.open(CACHE_NAME)
-                .then(cache => {
-
-                  cache.put(
-                    request,
-                    copy
-                  );
-
-                });
+              return cached;
 
             }
 
-            return response;
 
-          })
-          .catch(() => {
+            return fetch(
+              event.request
+            )
+
+              .then(
+                response => {
+
+                  if (
+                    response &&
+                    response.status === 200 &&
+                    response.type === "basic"
+                  ) {
+
+                    const copy =
+                      response.clone();
+
+
+                    caches.open(
+                      CACHE_NAME
+                    )
+                    .then(
+                      cache => {
+
+                        cache.put(
+                          event.request,
+                          copy
+                        );
+
+                      }
+                    );
+
+                  }
+
+
+                  return response;
+
+                }
+              );
+
+          }
+        )
+
+        .catch(
+          () => {
+
+            /*
+             * Fallback halaman utama
+             */
 
             return caches.match(
               "./index.html"
             );
 
-          });
+          }
+        )
 
-      })
+    );
 
-  );
+  }
+);
 
-});
-```
+
+/* =====================================================
+   MESSAGE
+   ===================================================== */
+
+self.addEventListener(
+  "message",
+  event => {
+
+    if (
+      event.data &&
+      event.data.type ===
+        "SKIP_WAITING"
+    ) {
+
+      self.skipWaiting();
+
+    }
+
+  }
+);
+
+
+/* =====================================================
+   DEBUG
+   ===================================================== */
+
+console.log(
+  "PAG Docs Field SW loaded:",
+  CACHE_NAME
+);
