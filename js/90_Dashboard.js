@@ -1,7 +1,7 @@
-```javascript
 /* =====================================================
    PAG DOCS FIELD
-   DASHBOARD
+   DASHBOARD / BERANDA
+   SIMPLE MOBILE
    ===================================================== */
 
 window.PAG = window.PAG || {};
@@ -12,19 +12,19 @@ PAG.Dashboard = {
 
     if (!v) {
       console.error(
-        "PAG.Dashboard: view tidak ditemukan."
+        "PAG.Dashboard: #view tidak ditemukan."
       );
       return;
     }
 
 
-    /* =================================================
+    /* ===================================================
        LOADING
-       ================================================= */
+       =================================================== */
 
     v.innerHTML = `
       <div class="card">
-        <p>Memuat Dashboard...</p>
+        <p>Memuat beranda...</p>
       </div>
     `;
 
@@ -35,7 +35,7 @@ PAG.Dashboard = {
          AUTH
          ================================================= */
 
-      let u = {};
+      let user = {};
 
       try {
 
@@ -44,24 +44,29 @@ PAG.Dashboard = {
           typeof PAG.Auth.ensure === "function"
         ) {
 
-          u =
+          user =
             await PAG.Auth.ensure() || {};
 
         }
 
-      } catch (error) {
+      } catch (e) {
 
         console.warn(
-          "Auth:",
-          error
+          "Dashboard Auth:",
+          e
         );
 
       }
 
 
+      /* =================================================
+         USER
+         ================================================= */
+
       const userName =
-        u.name ||
-        u.nama ||
+        user.name ||
+        user.nama ||
+        user.displayName ||
         "Personil Lapangan";
 
 
@@ -69,7 +74,7 @@ PAG.Dashboard = {
          MASTER
          ================================================= */
 
-      let m = {};
+      let master = {};
 
       try {
 
@@ -78,149 +83,146 @@ PAG.Dashboard = {
           typeof PAG.WebUtamaSync.getMaster === "function"
         ) {
 
-          m =
+          master =
             await PAG.WebUtamaSync.getMaster() || {};
 
         }
 
-      } catch (error) {
+      } catch (e) {
 
         console.warn(
-          "Master:",
-          error
+          "Dashboard Master:",
+          e
         );
 
       }
 
 
-      const paket =
-        Array.isArray(m.paket)
-          ? m.paket
+      /* =================================================
+         PAKET
+         ================================================= */
+
+      const paketList =
+        Array.isArray(master.paket)
+          ? master.paket
           : [];
 
 
-      const p =
-        paket[0] || {};
+      const paket =
+        paketList.length
+          ? paketList[0]
+          : {};
 
 
       const namaPaket =
-        p.nama ||
-        p.namaPaket ||
+        paket.nama ||
+        paket.namaPaket ||
+        master.namaPaket ||
         "Paket belum tersinkron";
 
+
+      /* =================================================
+         STATUS
+         ================================================= */
 
       const online =
         navigator.onLine;
 
 
       /* =================================================
-         DASHBOARD
+         RENDER
          ================================================= */
 
       v.innerHTML = `
 
+        <!-- =================================================
+             SAPAAN
+             ================================================= -->
 
-        <!-- =============================================
-             HERO
-             ============================================= -->
-
-        <div class="hero">
+        <section class="hero">
 
           <small>
-            PERSONIL LAPANGAN
+            PAG DOCS FIELD
           </small>
 
           <h2>
-            ${escapeHtml(userName)}
+            Selamat Datang
           </h2>
 
           <div>
-            ${escapeHtml(namaPaket)}
+            ${escapeDashboard(userName)}
+          </div>
+
+        </section>
+
+
+        <!-- =================================================
+             PAKET AKTIF
+             ================================================= -->
+
+        <div class="card dashboard-project">
+
+          <div class="dashboard-card-icon">
+            📁
+          </div>
+
+          <div class="dashboard-card-content">
+
+            <small>
+              PAKET AKTIF
+            </small>
+
+            <h3>
+              ${escapeDashboard(namaPaket)}
+            </h3>
+
           </div>
 
         </div>
 
 
-        <!-- =============================================
+        <!-- =================================================
              SOP
-             ============================================= -->
+             ================================================= -->
 
         <a
           href="https://drive.google.com/drive/folders/17D9uxcnayGFmWLk5mX0C-fckW2Cc5RJu?usp=sharing"
           target="_blank"
           rel="noopener noreferrer"
-          class="card sop-card"
-          style="
-            display:flex;
-            align-items:center;
-            gap:14px;
-            text-decoration:none;
-            color:inherit;
-            cursor:pointer;
-          "
+          class="card dashboard-link-card"
         >
 
-          <div
-            style="
-              width:46px;
-              height:46px;
-              min-width:46px;
-              display:flex;
-              align-items:center;
-              justify-content:center;
-              border-radius:14px;
-              background:#e0f2fe;
-              font-size:21px;
-            "
-          >
+          <div class="dashboard-card-icon sop-icon">
             📘
           </div>
 
+          <div class="dashboard-card-content">
 
-          <div style="flex:1">
-
-            <h3
-              style="
-                margin:0;
-                font-size:15px;
-              "
-            >
+            <h3>
               SOP Pekerjaan
             </h3>
 
-            <p
-              style="
-                margin:5px 0 0;
-                font-size:11px;
-                color:#64748b;
-              "
-            >
+            <p>
               Standar Operasional Prosedur
             </p>
 
           </div>
 
-
-          <span
-            style="
-              font-size:22px;
-              color:#94a3b8;
-            "
-          >
+          <span class="dashboard-arrow">
             ›
           </span>
 
         </a>
 
 
-        <!-- =============================================
-             PEKERJAAN UTAMA
-             ============================================= -->
+        <!-- =================================================
+             AKSI UTAMA
+             ================================================= -->
 
         <div class="dashboard-section">
 
           <h4 class="section-title">
-            Pekerjaan Utama
+            Kegiatan Lapangan
           </h4>
 
 
@@ -235,7 +237,7 @@ PAG.Dashboard = {
               onclick="
                 if (
                   PAG.Absensi &&
-                  PAG.Absensi.start
+                  typeof PAG.Absensi.start === 'function'
                 ) {
                   PAG.Absensi.start();
                 } else {
@@ -255,7 +257,7 @@ PAG.Dashboard = {
               </span>
 
               <small>
-                Selfie + GPS
+                Selfie & GPS
               </small>
 
             </button>
@@ -280,32 +282,7 @@ PAG.Dashboard = {
               </span>
 
               <small>
-                Catatan pekerjaan
-              </small>
-
-            </button>
-
-
-            <!-- INSPECTION -->
-
-            <button
-              class="action"
-              type="button"
-              onclick="
-                PAG.Router.go('inspection')
-              "
-            >
-
-              <span class="action-icon">
-                🔎
-              </span>
-
-              <span class="action-label">
-                Inspection
-              </span>
-
-              <small>
-                Pemeriksaan
+                Kegiatan pekerjaan
               </small>
 
             </button>
@@ -336,45 +313,70 @@ PAG.Dashboard = {
             </button>
 
 
+            <!-- INSPECTION -->
+
+            <button
+              class="action"
+              type="button"
+              onclick="
+                PAG.Router.go('inspection')
+              "
+            >
+
+              <span class="action-icon">
+                🔎
+              </span>
+
+              <span class="action-label">
+                Inspection
+              </span>
+
+              <small>
+                Pemeriksaan pekerjaan
+              </small>
+
+            </button>
+
+
           </div>
 
         </div>
 
 
-        <!-- =============================================
-             KOMUNIKASI
-             ============================================= -->
+        <!-- =================================================
+             INFORMASI PEKERJAAN
+             ================================================= -->
 
         <div class="dashboard-section">
 
           <h4 class="section-title">
-            Komunikasi
+            Dokumen & Informasi
           </h4>
 
 
           <div class="grid dashboard-grid">
 
 
-            <!-- NOTIFIKASI -->
+            <!-- RFI -->
 
             <button
               class="action"
               type="button"
               onclick="
-                PAG.Router.go('notification')
+                PAG.Router.go('rfi')
               "
             >
 
               <span class="action-icon">
-                🔔
+                ❓
               </span>
 
               <span class="action-label">
-                Notifikasi
+                RFI
               </span>
 
               <small>
-                Pemberitahuan
+                Request for Information
               </small>
 
             </button>
@@ -405,31 +407,6 @@ PAG.Dashboard = {
             </button>
 
 
-            <!-- MEMO -->
-
-            <button
-              class="action"
-              type="button"
-              onclick="
-                PAG.Router.go('memo')
-              "
-            >
-
-              <span class="action-icon">
-                📝
-              </span>
-
-              <span class="action-label">
-                Memo
-              </span>
-
-              <small>
-                Informasi pekerjaan
-              </small>
-
-            </button>
-
-
             <!-- TEMUAN -->
 
             <button
@@ -449,7 +426,32 @@ PAG.Dashboard = {
               </span>
 
               <small>
-                Masalah lapangan
+                Masalah & deviasi
+              </small>
+
+            </button>
+
+
+            <!-- TINDAK LANJUT -->
+
+            <button
+              class="action"
+              type="button"
+              onclick="
+                PAG.Router.go('tindaklanjut')
+              "
+            >
+
+              <span class="action-icon">
+                ↻
+              </span>
+
+              <span class="action-label">
+                Tindak Lanjut
+              </span>
+
+              <small>
+                Penyelesaian temuan
               </small>
 
             </button>
@@ -460,57 +462,76 @@ PAG.Dashboard = {
         </div>
 
 
-        <!-- =============================================
-             STATUS
-             ============================================= -->
+        <!-- =================================================
+             NOTIFIKASI RINGKAS
+             ================================================= -->
 
-        <div
-          class="card system-status"
-          style="
-            display:flex;
-            align-items:center;
-            gap:10px;
-          "
-        >
+        <div class="card dashboard-notification">
+
+          <div class="dashboard-card-icon">
+            🔔
+          </div>
+
+          <div class="dashboard-card-content">
+
+            <h3>
+              Notifikasi
+            </h3>
+
+            <p>
+              Periksa pemberitahuan terbaru
+            </p>
+
+          </div>
+
+          <button
+            type="button"
+            class="dashboard-mini-button"
+            onclick="
+              PAG.Router.go('notification')
+            "
+          >
+            Lihat
+          </button>
+
+        </div>
+
+
+        <!-- =================================================
+             STATUS SISTEM
+             ================================================= -->
+
+        <div class="dashboard-status">
 
           <span
-            style="
-              width:9px;
-              height:9px;
-              border-radius:50%;
-              background:
-                ${online
-                  ? "#22c55e"
-                  : "#ef4444"};
+            class="
+              dashboard-status-dot
+              ${online ? "" : "offline"}
             "
           ></span>
 
-
-          <span
-            style="
-              font-size:12px;
-              font-weight:600;
-            "
-          >
-            ${online
-              ? "Online"
-              : "Offline"}
-          </span>
-
-
-          <span
-            style="
-              font-size:11px;
-              color:#94a3b8;
-            "
-          >
-            • ${paket.length} paket
+          <span>
+            ${online ? "Online" : "Offline"}
           </span>
 
         </div>
 
 
       `;
+
+
+      /* ===================================================
+         UPDATE STATUS GLOBAL
+         =================================================== */
+
+      if (
+        PAG.UI &&
+        typeof PAG.UI.updateConnectionStatus === "function"
+      ) {
+
+        PAG.UI.updateConnectionStatus();
+
+      }
 
 
     } catch (error) {
@@ -526,11 +547,11 @@ PAG.Dashboard = {
         <div class="card">
 
           <h3>
-            Dashboard gagal dimuat
+            Beranda gagal dimuat
           </h3>
 
           <p>
-            ${escapeHtml(
+            ${escapeDashboard(
               error?.message ||
               String(error)
             )}
@@ -561,7 +582,7 @@ PAG.Dashboard = {
    ESCAPE HTML
    ===================================================== */
 
-function escapeHtml(value) {
+function escapeDashboard(value) {
 
   return String(value ?? "")
 
@@ -593,8 +614,11 @@ function escapeHtml(value) {
 }
 
 
+/* =====================================================
+   DEBUG
+   ===================================================== */
+
 console.log(
   "PAG Dashboard loaded:",
   !!PAG.Dashboard
 );
-```
