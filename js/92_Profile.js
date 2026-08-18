@@ -1,7 +1,26 @@
+```javascript
 /* =====================================================
    PAG DOCS FIELD
-   Profile.js
-   PROFILE
+   92_Profile.js
+   PROFILE / PERSONIL LAPANGAN
+
+   FUNGSI:
+   - Data Personil
+   - Paket Pekerjaan
+   - Catatan Pekerjaan
+   - Menampilkan Laporan Harian tersimpan
+   - Filter SAYA / SE / ADMIN
+   - Pencarian dokumen
+   - Sinkronisasi
+   - Pengaturan
+   - Logout
+
+   TERINTEGRASI DENGAN:
+   PAG.Auth
+   PAG.WebUtamaSync
+   PAG.Storage
+   PAG.OfflineSync
+   PAG.UI
    ===================================================== */
 
 window.PAG = window.PAG || {};
@@ -9,15 +28,21 @@ window.PAG = window.PAG || {};
 PAG.Profile = {
 
   /* =====================================================
-     RENDER PROFILE
+     RENDER
      ===================================================== */
 
   async render(v) {
 
     if (!v) {
-      console.error("PAG.Profile: view tidak ditemukan.");
+
+      console.error(
+        "PAG.Profile: view tidak ditemukan."
+      );
+
       return;
+
     }
+
 
     try {
 
@@ -26,8 +51,9 @@ PAG.Profile = {
          ================================================= */
 
       const u =
-        PAG.Auth && typeof PAG.Auth.get === "function"
-          ? (PAG.Auth.get() || {})
+        PAG.Auth &&
+        typeof PAG.Auth.get === "function"
+          ? PAG.Auth.get() || {}
           : {};
 
 
@@ -52,7 +78,7 @@ PAG.Profile = {
       } catch (error) {
 
         console.warn(
-          "Profile master tidak tersedia:",
+          "Profile: master tidak tersedia.",
           error
         );
 
@@ -60,13 +86,14 @@ PAG.Profile = {
 
 
       /* =================================================
-         PACKAGE
+         PAKET
          ================================================= */
 
       const paket =
         Array.isArray(master.paket)
           ? master.paket
           : [];
+
 
       const activePackage =
         paket.length
@@ -83,572 +110,514 @@ PAG.Profile = {
 
 
       /* =================================================
-         USER DATA
-         ================================================= */
-
-      const name =
-        u.name ||
-        u.nama ||
-        u.displayName ||
-        "Personil";
-
-
-      const userId =
-        u.userId ||
-        u.id ||
-        u.uid ||
-        "-";
-
-
-      const role =
-        u.jabatan ||
-        u.role ||
-        "Personil Lapangan";
-
-
-      const email =
-        u.email ||
-        "-";
-
-
-      /* =================================================
-         PACKAGE DATA
-         ================================================= */
-
-      let packageName = "-";
-
-      let packageId = "";
-
-      if (activePackage) {
-
-        packageName =
-          activePackage.nama ||
-          activePackage.namaPaket ||
-          activePackage.name ||
-          activePackage.paket ||
-          "-";
-
-        packageId =
-          activePackage.id ||
-          activePackage.packageId ||
-          activePackage.paketId ||
-          "";
-
-      }
-
-
-      /* =================================================
          RENDER
          ================================================= */
 
       v.innerHTML = `
 
-        <div class="profile-page">
+        <!-- =============================================
+             HEADER
+             ============================================= -->
+
+        <section class="profile-head">
+
+          <div class="profile-avatar">
+
+            ${PAG.Profile.initials(
+              u.name ||
+              u.nama ||
+              "P"
+            )}
+
+          </div>
 
 
-          <!-- ===========================================
-               PROFILE HEADER
-               =========================================== -->
+          <div class="profile-identity">
 
-          <section class="profile-header-card">
+            <div class="profile-name">
 
-            <div class="profile-avatar">
-              ${PAG.Profile.initials(name)}
-            </div>
-
-
-            <div class="profile-header-info">
-
-              <h2 class="profile-name">
-                ${PAG.Profile.escape(name)}
-              </h2>
-
-              <div class="profile-role">
-                ${PAG.Profile.escape(role)}
-              </div>
-
-              <div class="profile-online">
-
-                <span
-                  class="
-                    profile-status-dot
-                    ${online ? "online" : "offline"}
-                  "
-                ></span>
-
-                ${
-                  online
-                    ? "Online"
-                    : "Offline"
-                }
-
-              </div>
-
-            </div>
-
-          </section>
-
-
-          <!-- ===========================================
-               DATA PERSONIL
-               =========================================== -->
-
-          <section class="profile-section">
-
-            <div class="profile-section-title">
-
-              <span>👤</span>
-
-              <span>
-                Data Personil
-              </span>
+              ${PAG.Profile.escape(
+                u.name ||
+                u.nama ||
+                "Personil"
+              )}
 
             </div>
 
 
-            <div class="profile-card profile-data-card">
+            <div class="profile-role">
 
-              <div class="profile-data-row">
-
-                <span>
-                  Nama
-                </span>
-
-                <strong>
-                  ${PAG.Profile.escape(name)}
-                </strong>
-
-              </div>
-
-
-              <div class="profile-data-row">
-
-                <span>
-                  ID Personil
-                </span>
-
-                <strong>
-                  ${PAG.Profile.escape(userId)}
-                </strong>
-
-              </div>
-
-
-              <div class="profile-data-row">
-
-                <span>
-                  Jabatan
-                </span>
-
-                <strong>
-                  ${PAG.Profile.escape(role)}
-                </strong>
-
-              </div>
-
-
-              <div class="profile-data-row">
-
-                <span>
-                  Email
-                </span>
-
-                <strong>
-                  ${PAG.Profile.escape(email)}
-                </strong>
-
-              </div>
-
-            </div>
-
-          </section>
-
-
-          <!-- ===========================================
-               PAKET PEKERJAAN
-               =========================================== -->
-
-          <section class="profile-section">
-
-            <div class="profile-section-title">
-
-              <span>📦</span>
-
-              <span>
-                Paket Pekerjaan
-              </span>
+              ${PAG.Profile.escape(
+                u.jabatan ||
+                u.role ||
+                "Personil Lapangan"
+              )}
 
             </div>
 
 
-            <div class="profile-card">
+            <div class="profile-status">
 
-              ${
-                activePackage
+              <span class="
+                profile-status-dot
+                ${online ? "online" : "offline"}
+              "></span>
 
-                  ? `
+              ${online ? "Online" : "Offline"}
 
-                    <div class="profile-package">
+            </div>
 
-                      <div class="profile-package-icon">
-                        📦
-                      </div>
+          </div>
+
+        </section>
 
 
-                      <div class="profile-package-content">
+        <!-- =============================================
+             DATA PERSONIL
+             ============================================= -->
 
-                        <strong>
+        <section class="profile-section">
+
+          <div class="profile-section-title">
+
+            <span>👤</span>
+
+            Data Personil
+
+          </div>
+
+
+          <div class="profile-card">
+
+            <div class="profile-row">
+
+              <span>Nama</span>
+
+              <b>
+                ${PAG.Profile.escape(
+                  u.name ||
+                  u.nama ||
+                  "-"
+                )}
+              </b>
+
+            </div>
+
+
+            <div class="profile-row">
+
+              <span>ID Personil</span>
+
+              <b>
+                ${PAG.Profile.escape(
+                  u.userId ||
+                  u.id ||
+                  "-"
+                )}
+              </b>
+
+            </div>
+
+
+            <div class="profile-row">
+
+              <span>Jabatan</span>
+
+              <b>
+                ${PAG.Profile.escape(
+                  u.jabatan ||
+                  u.role ||
+                  "-"
+                )}
+              </b>
+
+            </div>
+
+
+            <div class="profile-row">
+
+              <span>Email</span>
+
+              <b>
+                ${PAG.Profile.escape(
+                  u.email ||
+                  "-"
+                )}
+              </b>
+
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- =============================================
+             PAKET PEKERJAAN
+             ============================================= -->
+
+        <section class="profile-section">
+
+          <div class="profile-section-title">
+
+            <span>📦</span>
+
+            Paket Pekerjaan
+
+          </div>
+
+
+          <div class="profile-card">
+
+            ${
+              activePackage
+
+                ? `
+
+                  <div class="package-title">
+
+                    ${PAG.Profile.escape(
+                      activePackage.nama ||
+                      activePackage.namaPaket ||
+                      activePackage.name ||
+                      "Paket Pekerjaan"
+                    )}
+
+                  </div>
+
+
+                  ${
+                    activePackage.id
+                      ? `
+
+                        <div class="package-info">
+
+                          ID:
                           ${PAG.Profile.escape(
-                            packageName
+                            activePackage.id
                           )}
-                        </strong>
+
+                        </div>
+
+                      `
+                      : ""
+                  }
 
 
-                        ${
-                          packageId
-                            ? `
-                              <small>
-                                ID:
-                                ${PAG.Profile.escape(
-                                  packageId
-                                )}
-                              </small>
-                            `
-                            : ""
-                        }
+                  <div class="package-badge">
 
+                    Paket Aktif
 
-                        <span class="profile-package-badge">
-                          Paket Aktif
-                        </span>
+                  </div>
 
-                      </div>
+                `
 
+                : `
+
+                  <div class="empty-state">
+
+                    <div class="empty-icon">
+                      📦
                     </div>
 
-                  `
+                    <b>
+                      Paket belum tersedia
+                    </b>
 
-                  : `
+                    <span>
+                      Data paket belum tersinkron.
+                    </span>
 
-                    <div class="profile-empty">
+                  </div>
 
-                      <div class="profile-empty-icon">
-                        📦
-                      </div>
+                `
+            }
 
-                      <strong>
-                        Paket belum tersedia
-                      </strong>
+          </div>
 
-                      <small>
-                        Data paket belum tersinkron.
-                      </small>
-
-                    </div>
-
-                  `
-              }
-
-            </div>
-
-          </section>
+        </section>
 
 
-          <!-- ===========================================
-               CATATAN PEKERJAAN
-               =========================================== -->
+        <!-- =============================================
+             CATATAN PEKERJAAN
+             ============================================= -->
 
-          <section class="profile-section">
+        <section class="profile-section">
 
-            <div class="profile-section-title">
+          <div class="profile-section-title">
 
-              <span>📁</span>
+            <span>📁</span>
 
-              <span>
-                Catatan Pekerjaan
-              </span>
+            Catatan Pekerjaan
+
+          </div>
+
+
+          <div class="profile-card documents-card">
+
+            <div class="document-description">
+
+              Seluruh laporan dan dokumen pekerjaan
+              yang berkaitan dengan personil dan paket.
 
             </div>
 
 
-            <div class="profile-card profile-documents-card">
+            <!-- TAB -->
+
+            <div class="document-tabs">
+
+              <button
+                type="button"
+                class="document-tab active"
+                data-source="all"
+              >
+                Semua
+              </button>
 
 
-              <div class="profile-documents-description">
-
-                Seluruh catatan dan dokumen pekerjaan
-                yang berkaitan dengan personil dan paket.
-
-              </div>
-
-
-              <!-- TABS -->
-
-              <div class="profile-document-tabs">
-
-                <button
-                  type="button"
-                  class="profile-document-tab active"
-                  data-source="all"
-                >
-                  Semua
-                </button>
+              <button
+                type="button"
+                class="document-tab"
+                data-source="self"
+              >
+                Saya
+              </button>
 
 
-                <button
-                  type="button"
-                  class="profile-document-tab"
-                  data-source="self"
-                >
-                  Saya
-                </button>
+              <button
+                type="button"
+                class="document-tab"
+                data-source="se"
+              >
+                SE
+              </button>
 
 
-                <button
-                  type="button"
-                  class="profile-document-tab"
-                  data-source="se"
-                >
-                  SE
-                </button>
-
-
-                <button
-                  type="button"
-                  class="profile-document-tab"
-                  data-source="admin"
-                >
-                  Admin
-                </button>
-
-              </div>
-
-
-              <!-- SEARCH -->
-
-              <div class="profile-document-search">
-
-                <input
-                  id="profileDocumentSearch"
-                  type="search"
-                  placeholder="Cari catatan atau dokumen..."
-                  autocomplete="off"
-                >
-
-              </div>
-
-
-              <!-- DOCUMENT LIST -->
-
-              <div id="profileDocuments">
-
-                <div class="profile-document-loading">
-                  Memuat catatan...
-                </div>
-
-              </div>
-
-
-            </div>
-
-          </section>
-
-
-          <!-- ===========================================
-               SINKRONISASI
-               =========================================== -->
-
-          <section class="profile-section">
-
-            <div class="profile-section-title">
-
-              <span>🔄</span>
-
-              <span>
-                Sinkronisasi
-              </span>
+              <button
+                type="button"
+                class="document-tab"
+                data-source="admin"
+              >
+                Admin
+              </button>
 
             </div>
 
 
-            <div class="profile-card">
+            <!-- SEARCH -->
 
-              <div class="profile-sync-row">
+            <div class="document-search">
 
-                <div>
+              <input
+                id="profileDocumentSearch"
+                type="search"
+                placeholder="Cari laporan atau dokumen..."
+                autocomplete="off"
+              >
 
-                  <strong>
-                    Status koneksi
-                  </strong>
-
-                  <small>
-
-                    ${
-                      online
-                        ? "Terhubung ke internet"
-                        : "Tidak ada koneksi internet"
-                    }
-
-                  </small>
-
-                </div>
+            </div>
 
 
-                <span
-                  class="
-                    profile-sync-badge
-                    ${online ? "online" : "offline"}
-                  "
-                >
+            <!-- DOCUMENT LIST -->
+
+            <div id="profileDocuments">
+
+              <div class="document-loading">
+
+                Memuat catatan...
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- =============================================
+             SINKRONISASI
+             ============================================= -->
+
+        <section class="profile-section">
+
+          <div class="profile-section-title">
+
+            <span>🔄</span>
+
+            Sinkronisasi
+
+          </div>
+
+
+          <div class="profile-card">
+
+            <div class="sync-status-row">
+
+              <div>
+
+                <b>
+                  Status koneksi
+                </b>
+
+                <small>
 
                   ${
                     online
-                      ? "Online"
-                      : "Offline"
+                      ? "Terhubung ke internet"
+                      : "Tidak ada koneksi internet"
                   }
 
-                </span>
+                </small>
 
               </div>
 
 
-              <button
-                type="button"
-                class="btn"
-                id="profileSync"
-              >
-                🔄 Sinkronkan Sekarang
-              </button>
+              <span class="
+                sync-indicator
+                ${online ? "online" : "offline"}
+              ">
 
-            </div>
+                ${online ? "Online" : "Offline"}
 
-          </section>
-
-
-          <!-- ===========================================
-               PENGATURAN
-               =========================================== -->
-
-          <section class="profile-section">
-
-            <div class="profile-section-title">
-
-              <span>⚙️</span>
-
-              <span>
-                Pengaturan
               </span>
 
             </div>
 
 
-            <div class="profile-card profile-settings-card">
+            <button
+              type="button"
+              class="btn"
+              id="profileSync"
+            >
+              🔄 Sinkronkan Sekarang
+            </button>
+
+          </div>
+
+        </section>
 
 
-              <button
-                type="button"
-                class="profile-setting-row"
-                id="profileNotificationSetting"
-              >
+        <!-- =============================================
+             PENGATURAN
+             ============================================= -->
 
-                <span>
+        <section class="profile-section">
 
-                  <span class="profile-setting-icon">
-                    🔔
-                  </span>
+          <div class="profile-section-title">
 
-                  <strong>
-                    Notifikasi
-                  </strong>
+            <span>⚙️</span>
 
-                </span>
+            Pengaturan
 
-                <span>
-                  ›
-                </span>
-
-              </button>
+          </div>
 
 
-              <button
-                type="button"
-                class="profile-setting-row"
-                id="profileStorageSetting"
-              >
-
-                <span>
-
-                  <span class="profile-setting-icon">
-                    💾
-                  </span>
-
-                  <strong>
-                    Data Lokal
-                  </strong>
-
-                </span>
-
-                <span>
-                  ›
-                </span>
-
-              </button>
-
-
-              <button
-                type="button"
-                class="profile-setting-row"
-                id="profileAbout"
-              >
-
-                <span>
-
-                  <span class="profile-setting-icon">
-                    ℹ️
-                  </span>
-
-                  <strong>
-                    Tentang PAG Docs
-                  </strong>
-
-                </span>
-
-                <span>
-                  ›
-                </span>
-
-              </button>
-
-
-            </div>
-
-          </section>
-
-
-          <!-- ===========================================
-               LOGOUT
-               =========================================== -->
-
-          <section class="profile-section">
+          <div class="profile-card">
 
             <button
               type="button"
-              class="profile-logout"
-              id="profileLogout"
+              class="profile-menu"
+              id="profileNotificationSetting"
             >
-              Keluar dari PAG Docs
+
+              <span>
+
+                🔔
+
+                <b>
+                  Notifikasi
+                </b>
+
+              </span>
+
+
+              <span>
+                ›
+              </span>
+
             </button>
 
-          </section>
+
+            <button
+              type="button"
+              class="profile-menu"
+              id="profileStorageSetting"
+            >
+
+              <span>
+
+                💾
+
+                <b>
+                  Data Lokal
+                </b>
+
+              </span>
 
 
-        </div>
+              <span>
+                ›
+              </span>
+
+            </button>
+
+
+            <button
+              type="button"
+              class="profile-menu"
+              id="profileAbout"
+            >
+
+              <span>
+
+                ℹ️
+
+                <b>
+                  Tentang PAG Docs
+                </b>
+
+              </span>
+
+
+              <span>
+                ›
+              </span>
+
+            </button>
+
+          </div>
+
+        </section>
+
+
+        <!-- =============================================
+             LOGOUT
+             ============================================= -->
+
+        <section class="
+          profile-section
+          profile-logout-section
+        ">
+
+          <button
+            type="button"
+            class="profile-logout"
+            id="profileLogout"
+          >
+
+            Keluar dari PAG Docs
+
+          </button>
+
+        </section>
 
       `;
 
 
       /* =================================================
-         LOAD DOCUMENTS
+         LOAD DOKUMEN
          ================================================= */
 
       const documentContainer =
@@ -664,59 +633,60 @@ PAG.Profile = {
 
 
       /* =================================================
-         TABS
+         TAB
          ================================================= */
 
       document
         .querySelectorAll(
-          ".profile-document-tab"
+          ".document-tab"
         )
-        .forEach(tab => {
+        .forEach(
+          tab => {
 
-          tab.addEventListener(
-            "click",
-            async function () {
+            tab.addEventListener(
+              "click",
+              async function () {
 
-              document
-                .querySelectorAll(
-                  ".profile-document-tab"
-                )
-                .forEach(x => {
-
-                  x.classList.remove(
-                    "active"
+                document
+                  .querySelectorAll(
+                    ".document-tab"
+                  )
+                  .forEach(
+                    x =>
+                      x.classList.remove(
+                        "active"
+                      )
                   );
 
-                });
 
-
-              this.classList.add(
-                "active"
-              );
-
-
-              await PAG.Profile.loadDocuments(
-                documentContainer,
-                this.dataset.source
-              );
-
-
-              const search =
-                document.getElementById(
-                  "profileDocumentSearch"
+                this.classList.add(
+                  "active"
                 );
 
 
-              if (search) {
+                await PAG.Profile.loadDocuments(
+                  documentContainer,
+                  this.dataset.source
+                );
 
-                search.value = "";
+
+                const search =
+                  document.getElementById(
+                    "profileDocumentSearch"
+                  );
+
+
+                if (search) {
+
+                  search.value = "";
+
+                }
 
               }
+            );
 
-            }
-          );
-
-        });
+          }
+        );
 
 
       /* =================================================
@@ -896,7 +866,7 @@ PAG.Profile = {
           function () {
 
             PAG.Profile.toast(
-              "Pengaturan data lokal akan tersedia."
+              "Data lokal dikelola otomatis oleh PAG Docs."
             );
 
           }
@@ -969,19 +939,13 @@ PAG.Profile = {
         .slice(0, 2);
 
 
-    if (!parts.length) {
-      return "P";
-    }
-
-
     return parts
       .map(
         x =>
-          x
-            .charAt(0)
-            .toUpperCase()
+          x.charAt(0)
       )
-      .join("");
+      .join("")
+      .toUpperCase();
 
   },
 
@@ -996,8 +960,8 @@ PAG.Profile = {
 
 
     /* =================================================
-       1. LOCAL STORAGE
-       ================================================= */
+       1. LOCAL REPORTS
+       ================================================ */
 
     try {
 
@@ -1006,41 +970,33 @@ PAG.Profile = {
         typeof PAG.Storage.getAll === "function"
       ) {
 
-        const stored =
+        const reports =
           await PAG.Storage.getAll(
             "reports"
           );
 
 
-        if (Array.isArray(stored)) {
+        if (
+          Array.isArray(reports)
+        ) {
 
-          stored.forEach(
-            item => {
+          reports.forEach(
+            record => {
 
-              if (!item) return;
+              if (!record) return;
 
 
               const data =
-                item.data ||
-                item.reportData ||
-                item;
+                record.data ||
+                record;
 
 
-              if (
-                data &&
-                (
-                  data.type === "laporan_harian" ||
-                  item.type === "laporan_harian"
+              result.push(
+                PAG.Profile.normalizeReport(
+                  data,
+                  record
                 )
-              ) {
-
-                result.push(
-                  PAG.Profile.normalizeDocument(
-                    data
-                  )
-                );
-
-              }
+              );
 
             }
           );
@@ -1052,7 +1008,7 @@ PAG.Profile = {
     } catch (error) {
 
       console.warn(
-        "Profile reports storage:",
+        "Profile local reports:",
         error
       );
 
@@ -1060,71 +1016,8 @@ PAG.Profile = {
 
 
     /* =================================================
-       2. ALTERNATIVE STORAGE METHOD
-       ================================================= */
-
-    try {
-
-      if (
-        PAG.Storage &&
-        typeof PAG.Storage.list === "function"
-      ) {
-
-        const stored =
-          await PAG.Storage.list(
-            "reports"
-          );
-
-
-        if (Array.isArray(stored)) {
-
-          stored.forEach(
-            item => {
-
-              if (!item) return;
-
-
-              const data =
-                item.data ||
-                item;
-
-
-              if (
-                data &&
-                (
-                  data.type === "laporan_harian" ||
-                  item.type === "laporan_harian"
-                )
-              ) {
-
-                result.push(
-                  PAG.Profile.normalizeDocument(
-                    data
-                  )
-                );
-
-              }
-
-            }
-          );
-
-        }
-
-      }
-
-    } catch (error) {
-
-      console.warn(
-        "Profile reports list:",
-        error
-      );
-
-    }
-
-
-    /* =================================================
-       3. MASTER
-       ================================================= */
+       2. MASTER WEB UTAMA
+       ================================================ */
 
     try {
 
@@ -1139,56 +1032,63 @@ PAG.Profile = {
 
         const collections = [
 
-          master.documents,
+          ...(Array.isArray(master.documents)
+            ? master.documents
+            : []),
 
-          master.dokumen,
+          ...(Array.isArray(master.dokumen)
+            ? master.dokumen
+            : []),
 
-          master.catatan,
+          ...(Array.isArray(master.catatan)
+            ? master.catatan
+            : []),
 
-          master.laporan,
+          ...(Array.isArray(master.laporan)
+            ? master.laporan
+            : []),
 
-          master.laporanHarian,
+          ...(Array.isArray(master.laporanHarian)
+            ? master.laporanHarian
+            : []),
 
-          master.instruksi,
+          ...(Array.isArray(master.instruksi)
+            ? master.instruksi
+            : []),
 
-          master.memo,
+          ...(Array.isArray(master.memo)
+            ? master.memo
+            : []),
 
-          master.temuan,
+          ...(Array.isArray(master.temuan)
+            ? master.temuan
+            : []),
 
-          master.tindaklanjut,
+          ...(Array.isArray(master.tindaklanjut)
+            ? master.tindaklanjut
+            : []),
 
-          master.rfi,
+          ...(Array.isArray(master.rfi)
+            ? master.rfi
+            : []),
 
-          master.inspection
+          ...(Array.isArray(master.inspection)
+            ? master.inspection
+            : [])
 
         ];
 
 
         collections.forEach(
-          collection => {
+          item => {
 
-            if (
-              !Array.isArray(collection)
-            ) {
-
-              return;
-
-            }
+            if (!item) return;
 
 
-            collection.forEach(
-              item => {
-
-                if (!item) return;
-
-
-                result.push(
-                  PAG.Profile.normalizeDocument(
-                    item
-                  )
-                );
-
-              }
+            result.push(
+              PAG.Profile.normalizeDocument(
+                item
+              )
             );
 
           }
@@ -1207,7 +1107,7 @@ PAG.Profile = {
 
 
     /* =================================================
-       4. DEDUPLICATE
+       3. DEDUPLICATE
        ================================================= */
 
     const unique =
@@ -1217,39 +1117,29 @@ PAG.Profile = {
     result.forEach(
       item => {
 
-        if (!item) return;
+        if (
+          !item ||
+          !item.id
+        ) {
 
-
-        const id =
-          item.id ||
-          (
-            item.type +
-            "_" +
-            item.date +
-            "_" +
-            item.title
-          );
-
-
-        if (!unique.has(id)) {
-
-          unique.set(
-            id,
-            item
-          );
+          return;
 
         }
+
+
+        unique.set(
+          String(item.id),
+          item
+        );
 
       }
     );
 
 
-    /* =================================================
-       5. SORT
-       ================================================= */
-
     return Array
-      .from(unique.values())
+      .from(
+        unique.values()
+      )
       .sort(
         (a, b) => {
 
@@ -1274,14 +1164,88 @@ PAG.Profile = {
 
 
   /* =====================================================
+     NORMALIZE REPORT
+     ===================================================== */
+
+  normalizeReport(data, record) {
+
+    const report =
+      data || {};
+
+
+    const id =
+      report.id ||
+      record?.id ||
+      `LH-${Date.now()}`;
+
+
+    const createdBy =
+      report.dibuat ||
+      report.createdByName ||
+      report.createdBy ||
+      "";
+
+
+    return {
+
+      id:
+
+        String(id),
+
+
+      type:
+
+        "laporan_harian",
+
+
+      title:
+
+        "Laporan Harian",
+
+
+      source:
+
+        "self",
+
+
+      createdBy:
+
+        createdBy,
+
+
+      date:
+
+        report.createdAt ||
+        record?.createdAt ||
+        "",
+
+
+      packageId:
+
+        report.packageId ||
+        report.paketId ||
+        "",
+
+
+      raw:
+
+        report,
+
+
+      isLocal:
+
+        true
+
+    };
+
+  },
+
+
+  /* =====================================================
      NORMALIZE DOCUMENT
      ===================================================== */
 
   normalizeDocument(item) {
-
-    item =
-      item || {};
-
 
     const type =
       String(
@@ -1293,19 +1257,13 @@ PAG.Profile = {
       );
 
 
-    /* =================================================
-       SOURCE
-       ================================================= */
-
     const sourceRaw =
       String(
         item.source ||
         item.sumber ||
         item.createdByRole ||
-        item.dibuatOlehRole ||
         ""
-      )
-      .toLowerCase();
+      ).toLowerCase();
 
 
     let source =
@@ -1332,79 +1290,21 @@ PAG.Profile = {
     }
 
 
-    /* =================================================
-       TITLE
-       ================================================= */
-
-    let title =
-      item.title ||
-      item.judul ||
-      item.nama ||
-      "";
-
-
-    if (!title) {
-
-      title =
-        PAG.Profile.documentTitle(
-          type
-        );
-
-    }
-
-
-    /* =================================================
-       CREATED BY
-       ================================================= */
-
     const createdBy =
       item.createdByName ||
       item.namaPembuat ||
       item.createdBy ||
       item.author ||
-      item.dibuat ||
       "";
 
-
-    /* =================================================
-       DATE
-       ================================================= */
-
-    const date =
-      item.createdAt ||
-      item.tanggal ||
-      item.date ||
-      item.updatedAt ||
-      "";
-
-
-    /* =================================================
-       PACKAGE
-       ================================================= */
-
-    const packageId =
-      item.packageId ||
-      item.paketId ||
-      "";
-
-
-    /* =================================================
-       REPORT DATA
-       ================================================= */
 
     return {
 
       id:
+
         item.id ||
         item.documentId ||
-        (
-          "DOC-" +
-          Date.now() +
-          "-" +
-          Math.random()
-            .toString(36)
-            .slice(2)
-        ),
+        `DOC-${Date.now()}-${Math.random()}`,
 
 
       type:
@@ -1416,7 +1316,12 @@ PAG.Profile = {
       title:
 
 
-        title,
+        item.title ||
+        item.judul ||
+        item.nama ||
+        PAG.Profile.documentTitle(
+          type
+        ),
 
 
       source:
@@ -1434,19 +1339,31 @@ PAG.Profile = {
       date:
 
 
-        date,
+        item.createdAt ||
+        item.tanggal ||
+        item.date ||
+        item.updatedAt ||
+        "",
 
 
       packageId:
 
 
-        packageId,
+        item.packageId ||
+        item.paketId ||
+        "",
 
 
       raw:
 
 
-        item
+        item,
+
+
+      isLocal:
+
+
+        false
 
     };
 
@@ -1542,13 +1459,15 @@ PAG.Profile = {
   ) {
 
     if (!container) {
+
       return;
+
     }
 
 
     container.innerHTML = `
 
-      <div class="profile-document-loading">
+      <div class="document-loading">
 
         Memuat catatan...
 
@@ -1573,8 +1492,8 @@ PAG.Profile = {
 
         filtered =
           documents.filter(
-            doc =>
-              doc.source === source
+            item =>
+              item.source === source
           );
 
       }
@@ -1593,29 +1512,29 @@ PAG.Profile = {
     } catch (error) {
 
       console.error(
-        "Profile load documents:",
+        "Load Profile Documents:",
         error
       );
 
 
       container.innerHTML = `
 
-        <div class="profile-empty">
+        <div class="empty-state">
 
-          <div class="profile-empty-icon">
-            📂
+          <div class="empty-icon">
+            ⚠️
           </div>
 
-          <strong>
+          <b>
             Gagal memuat catatan
-          </strong>
+          </b>
 
-          <small>
+          <span>
             ${PAG.Profile.escape(
               error.message ||
               String(error)
             )}
-          </small>
+          </span>
 
         </div>
 
@@ -1642,25 +1561,24 @@ PAG.Profile = {
 
       container.innerHTML = `
 
-        <div class="profile-empty">
+        <div class="empty-state">
 
-          <div class="profile-empty-icon">
+          <div class="empty-icon">
             📂
           </div>
 
-          <strong>
+          <b>
             Belum ada catatan
-          </strong>
+          </b>
 
-          <small>
+          <span>
             Laporan dan dokumen pekerjaan
-            yang tersimpan akan muncul di sini.
-          </small>
+            akan muncul di sini.
+          </span>
 
         </div>
 
       `;
-
 
       return;
 
@@ -1668,34 +1586,45 @@ PAG.Profile = {
 
 
     container.innerHTML =
+
       documents
         .map(
           (doc, index) => {
 
-            const searchText =
-              (
-                doc.title +
-                " " +
-                doc.type +
-                " " +
-                doc.createdBy
+            const raw =
+              doc.raw || {};
+
+
+            const itemCount =
+              Array.isArray(
+                raw.items
               )
-              .toLowerCase();
+                ? raw.items.length
+                : 0;
 
 
             return `
 
               <button
                 type="button"
-                class="profile-document-item"
-                data-index="${index}"
+                class="document-item"
+                data-document-id="${PAG.Profile.escape(
+                  doc.id
+                )}"
                 data-search="${PAG.Profile.escape(
-                  searchText
+                  (
+                    doc.title +
+                    " " +
+                    doc.type +
+                    " " +
+                    doc.createdBy +
+                    " " +
+                    (raw.paket || "")
+                  ).toLowerCase()
                 )}"
               >
 
-
-                <div class="profile-document-icon">
+                <div class="document-icon">
 
                   ${PAG.Profile.documentIcon(
                     doc.type
@@ -1704,33 +1633,29 @@ PAG.Profile = {
                 </div>
 
 
-                <div class="profile-document-content">
+                <div class="document-content">
 
-                  <strong>
+                  <b>
 
                     ${PAG.Profile.escape(
                       doc.title
                     )}
 
-                  </strong>
+                  </b>
 
 
                   <small>
 
                     ${PAG.Profile.escape(
-                      PAG.Profile.typeLabel(
-                        doc.type
-                      )
+                      doc.type
                     )}
 
                     ${
                       doc.createdBy
-                        ? `
-                          •
-                          ${PAG.Profile.escape(
+                        ? " • " +
+                          PAG.Profile.escape(
                             doc.createdBy
-                          )}
-                        `
+                          )
                         : ""
                     }
 
@@ -1738,15 +1663,35 @@ PAG.Profile = {
 
 
                   ${
+                    itemCount
+                      ? `
+
+                        <small>
+
+                          ${itemCount}
+                          kegiatan
+
+                        </small>
+
+                      `
+                      : ""
+                  }
+
+
+                  ${
                     doc.date
                       ? `
-                        <small
-                          class="profile-document-date"
-                        >
+
+                        <small class="
+                          document-date
+                        ">
+
                           ${PAG.Profile.formatDate(
                             doc.date
                           )}
+
                         </small>
+
                       `
                       : ""
                   }
@@ -1754,12 +1699,12 @@ PAG.Profile = {
                 </div>
 
 
-                <span
-                  class="
-                    profile-document-source
-                    ${doc.source}
-                  "
-                >
+                <span class="
+                  document-source
+                  ${PAG.Profile.escape(
+                    doc.source
+                  )}
+                ">
 
                   ${PAG.Profile.sourceLabel(
                     doc.source
@@ -1768,10 +1713,9 @@ PAG.Profile = {
                 </span>
 
 
-                <span class="profile-document-arrow">
+                <span class="document-arrow">
                   ›
                 </span>
-
 
               </button>
 
@@ -1783,12 +1727,12 @@ PAG.Profile = {
 
 
     /* =================================================
-       CLICK DOCUMENT
+       CLICK DETAIL
        ================================================= */
 
     container
       .querySelectorAll(
-        ".profile-document-item"
+        ".document-item"
       )
       .forEach(
         item => {
@@ -1797,25 +1741,26 @@ PAG.Profile = {
             "click",
             function () {
 
-              const index =
-                Number(
-                  this.dataset.index
-                );
+              const id =
+                this.dataset.documentId;
 
 
               const doc =
-                PAG.Profile._documents &&
-                PAG.Profile._documents[index];
+                (PAG.Profile._documents || [])
+                  .find(
+                    x =>
+                      String(x.id) ===
+                      String(id)
+                  );
 
 
-              if (!doc) {
-                return;
+              if (doc) {
+
+                PAG.Profile.openDocument(
+                  doc
+                );
+
               }
-
-
-              PAG.Profile.openDocument(
-                doc
-              );
 
             }
           );
@@ -1833,33 +1778,37 @@ PAG.Profile = {
   openDocument(doc) {
 
     if (!doc) {
+
       return;
+
     }
 
 
-    /* ================================================
+    const raw =
+      doc.raw || {};
+
+
+    /* =================================================
        LAPORAN HARIAN
-       ================================================ */
+       ================================================= */
 
     if (
-      String(doc.type)
-        .toLowerCase()
-        .includes("laporan")
+      doc.type ===
+      "laporan_harian"
     ) {
 
-      PAG.Profile.showReport(
-        doc.raw || doc
+      PAG.Profile.openReport(
+        raw
       );
-
 
       return;
 
     }
 
 
-    /* ================================================
-       OTHER DOCUMENT
-       ================================================ */
+    /* =================================================
+       DOKUMEN BIASA
+       ================================================= */
 
     PAG.Profile.toast(
       doc.title ||
@@ -1870,475 +1819,498 @@ PAG.Profile = {
 
 
   /* =====================================================
-     SHOW REPORT
+     OPEN REPORT DETAIL
      ===================================================== */
 
-  showReport(report) {
+  openReport(report) {
 
-    report =
-      report || {};
+    if (!report) {
+
+      return;
+
+    }
 
 
     const items =
-      Array.isArray(report.items)
+      Array.isArray(
+        report.items
+      )
         ? report.items
         : [];
 
 
-    let html = `
+    const html = `
 
-      <div class="profile-report-view">
-
+      <div class="profile-report-detail">
 
         <div class="profile-report-header">
 
-          <div>
+          <small>
+            PAG DOCS FIELD
+          </small>
 
-            <small>
-              PAG DOCS FIELD
-            </small>
-
-            <h3>
-              Laporan Harian
-            </h3>
-
-          </div>
+          <h3>
+            Laporan Harian
+          </h3>
 
 
-          <button
-            type="button"
-            class="profile-report-close"
-            id="profileReportClose"
-          >
-            ✕
-          </button>
+          ${
+            report.createdAt
+              ? `
+
+                <small>
+                  ${PAG.Profile.formatDate(
+                    report.createdAt
+                  )}
+                </small>
+
+              `
+              : ""
+          }
 
         </div>
 
 
         <div class="profile-report-info">
 
-          ${
-            report.paket
-              ? `
-                <div>
-                  <span>Paket</span>
-                  <strong>
-                    ${PAG.Profile.escape(
-                      report.paket
-                    )}
-                  </strong>
-                </div>
-              `
-              : ""
-          }
+          <div>
+            <span>Konsultan</span>
+            <b>
+              ${PAG.Profile.escape(
+                report.konsultan || "-"
+              )}
+            </b>
+          </div>
 
 
-          ${
-            report.konsultan
-              ? `
-                <div>
-                  <span>Konsultan</span>
-                  <strong>
-                    ${PAG.Profile.escape(
-                      report.konsultan
-                    )}
-                  </strong>
-                </div>
-              `
-              : ""
-          }
+          <div>
+            <span>Kontraktor</span>
+            <b>
+              ${PAG.Profile.escape(
+                report.kontraktor || "-"
+              )}
+            </b>
+          </div>
 
 
-          ${
-            report.kontraktor
-              ? `
-                <div>
-                  <span>Kontraktor</span>
-                  <strong>
-                    ${PAG.Profile.escape(
-                      report.kontraktor
-                    )}
-                  </strong>
-                </div>
-              `
-              : ""
-          }
+          <div>
+            <span>Paket</span>
+            <b>
+              ${PAG.Profile.escape(
+                report.paket || "-"
+              )}
+            </b>
+          </div>
 
 
-          ${
-            report.noKontrak
-              ? `
-                <div>
-                  <span>No. Kontrak</span>
-                  <strong>
-                    ${PAG.Profile.escape(
-                      report.noKontrak
-                    )}
-                  </strong>
-                </div>
-              `
-              : ""
-          }
+          <div>
+            <span>No. Kontrak</span>
+            <b>
+              ${PAG.Profile.escape(
+                report.noKontrak || "-"
+              )}
+            </b>
+          </div>
 
         </div>
 
 
         <div class="profile-report-items">
 
-    `;
+          <h4>
+            Kegiatan
+          </h4>
 
 
-    if (!items.length) {
+          ${
+            items.length
 
-      html += `
+              ? items
+                  .map(
+                    (item, index) => `
 
-        <div class="profile-empty">
+                      <div class="
+                        profile-report-item
+                      ">
 
-          <div class="profile-empty-icon">
-            📋
+                        <div class="
+                          profile-report-item-title
+                        ">
+
+                          <b>
+                            ${index + 1}.
+                            Kegiatan
+                          </b>
+
+                        </div>
+
+
+                        <div class="
+                          profile-report-grid
+                        ">
+
+                          <div>
+
+                            <span>
+                              Tanggal
+                            </span>
+
+                            <b>
+                              ${PAG.Profile.escape(
+                                item.tanggal ||
+                                "-"
+                              )}
+                            </b>
+
+                          </div>
+
+
+                          <div>
+
+                            <span>
+                              Divisi
+                            </span>
+
+                            <b>
+                              ${PAG.Profile.escape(
+                                item.devisi ||
+                                "-"
+                              )}
+                            </b>
+
+                          </div>
+
+
+                          <div>
+
+                            <span>
+                              STA
+                            </span>
+
+                            <b>
+                              ${PAG.Profile.escape(
+                                item.sta ||
+                                "-"
+                              )}
+                            </b>
+
+                          </div>
+
+
+                          <div>
+
+                            <span>
+                              Cuaca
+                            </span>
+
+                            <b>
+                              ${PAG.Profile.escape(
+                                item.cuaca ||
+                                "-"
+                              )}
+                            </b>
+
+                          </div>
+
+                        </div>
+
+
+                        <div class="
+                          profile-report-field
+                        ">
+
+                          <span>
+                            Uraian Pekerjaan
+                          </span>
+
+                          <p>
+                            ${PAG.Profile.escape(
+                              item.uraian ||
+                              "-"
+                            )}
+                          </p>
+
+                        </div>
+
+
+                        <div class="
+                          profile-report-field
+                        ">
+
+                          <span>
+                            Tenaga Kerja
+                          </span>
+
+                          <p>
+                            ${PAG.Profile.escape(
+                              item.tenaga ||
+                              "-"
+                            )}
+                          </p>
+
+                        </div>
+
+
+                        <div class="
+                          profile-report-field
+                        ">
+
+                          <span>
+                            Peralatan
+                          </span>
+
+                          <p>
+                            ${PAG.Profile.escape(
+                              item.peralatan ||
+                              "-"
+                            )}
+                          </p>
+
+                        </div>
+
+
+                        <div class="
+                          profile-report-field
+                        ">
+
+                          <span>
+                            Material
+                          </span>
+
+                          <p>
+                            ${PAG.Profile.escape(
+                              item.material ||
+                              "-"
+                            )}
+                          </p>
+
+                        </div>
+
+
+                        <div class="
+                          profile-report-field
+                        ">
+
+                          <span>
+                            Kendala
+                          </span>
+
+                          <p>
+                            ${PAG.Profile.escape(
+                              item.kendala ||
+                              "-"
+                            )}
+                          </p>
+
+                        </div>
+
+
+                        ${
+                          item.dokumentasi
+                            ? `
+
+                              <div class="
+                                profile-report-photo
+                              ">
+
+                                📷
+
+                                <span>
+                                  ${PAG.Profile.escape(
+                                    item.dokumentasi
+                                  )}
+                                </span>
+
+                              </div>
+
+                            `
+                            : ""
+                        }
+
+                      </div>
+
+                    `
+                  )
+                  .join("")
+
+              : `
+
+                  <div class="empty-state">
+
+                    Belum ada kegiatan.
+
+                  </div>
+
+                `
+          }
+
+        </div>
+
+
+        <div class="
+          profile-report-approval
+        ">
+
+          <div>
+
+            <span>
+              Dibuat oleh
+            </span>
+
+            <b>
+              ${PAG.Profile.escape(
+                report.dibuat ||
+                "-"
+              )}
+            </b>
+
           </div>
 
-          <strong>
-            Tidak ada kegiatan
-          </strong>
+
+          <div>
+
+            <span>
+              Diketahui oleh
+            </span>
+
+            <b>
+              ${PAG.Profile.escape(
+                report.diketahui ||
+                "-"
+              )}
+            </b>
+
+          </div>
 
         </div>
-
-      `;
-
-    } else {
-
-      items.forEach(
-        (item, index) => {
-
-          html += `
-
-            <div class="profile-report-item">
-
-              <div class="profile-report-item-header">
-
-                <strong>
-                  Kegiatan ${index + 1}
-                </strong>
-
-                ${
-                  item.tanggal
-                    ? `
-                      <span>
-                        ${PAG.Profile.escape(
-                          item.tanggal
-                        )}
-                      </span>
-                    `
-                    : ""
-                }
-
-              </div>
-
-
-              ${
-                item.devisi
-                  ? `
-                    <div class="profile-report-field">
-
-                      <span>Divisi</span>
-
-                      <strong>
-                        ${PAG.Profile.escape(
-                          item.devisi
-                        )}
-                      </strong>
-
-                    </div>
-                  `
-                  : ""
-              }
-
-
-              ${
-                item.sta
-                  ? `
-                    <div class="profile-report-field">
-
-                      <span>STA</span>
-
-                      <strong>
-                        ${PAG.Profile.escape(
-                          item.sta
-                        )}
-                      </strong>
-
-                    </div>
-                  `
-                  : ""
-              }
-
-
-              ${
-                item.cuaca
-                  ? `
-                    <div class="profile-report-field">
-
-                      <span>Cuaca</span>
-
-                      <strong>
-                        ${PAG.Profile.escape(
-                          item.cuaca
-                        )}
-                      </strong>
-
-                    </div>
-                  `
-                  : ""
-              }
-
-
-              ${
-                item.uraian
-                  ? `
-                    <div class="profile-report-text">
-
-                      <span>
-                        Uraian Pekerjaan
-                      </span>
-
-                      <p>
-                        ${PAG.Profile.escape(
-                          item.uraian
-                        )}
-                      </p>
-
-                    </div>
-                  `
-                  : ""
-              }
-
-
-              ${
-                item.tenaga
-                  ? `
-                    <div class="profile-report-text">
-
-                      <span>
-                        Tenaga Kerja
-                      </span>
-
-                      <p>
-                        ${PAG.Profile.escape(
-                          item.tenaga
-                        )}
-                      </p>
-
-                    </div>
-                  `
-                  : ""
-              }
-
-
-              ${
-                item.peralatan
-                  ? `
-                    <div class="profile-report-text">
-
-                      <span>
-                        Peralatan
-                      </span>
-
-                      <p>
-                        ${PAG.Profile.escape(
-                          item.peralatan
-                        )}
-                      </p>
-
-                    </div>
-                  `
-                  : ""
-              }
-
-
-              ${
-                item.material
-                  ? `
-                    <div class="profile-report-text">
-
-                      <span>
-                        Material
-                      </span>
-
-                      <p>
-                        ${PAG.Profile.escape(
-                          item.material
-                        )}
-                      </p>
-
-                    </div>
-                  `
-                  : ""
-              }
-
-
-              ${
-                item.kendala
-                  ? `
-                    <div class="profile-report-text">
-
-                      <span>
-                        Kendala
-                      </span>
-
-                      <p>
-                        ${PAG.Profile.escape(
-                          item.kendala
-                        )}
-                      </p>
-
-                    </div>
-                  `
-                  : ""
-              }
-
-
-              ${
-                item.dokumentasi
-                  ? `
-                    <div class="profile-report-field">
-
-                      <span>
-                        Dokumentasi
-                      </span>
-
-                      <strong>
-                        📷
-                        ${PAG.Profile.escape(
-                          item.dokumentasi
-                        )}
-                      </strong>
-
-                    </div>
-                  `
-                  : ""
-              }
-
-            </div>
-
-          `;
-
-        }
-      );
-
-    }
-
-
-    html += `
-
-        </div>
-
-
-        <div class="profile-report-signature">
-
-          ${
-            report.dibuat
-              ? `
-                <div>
-                  <span>Dibuat oleh</span>
-                  <strong>
-                    ${PAG.Profile.escape(
-                      report.dibuat
-                    )}
-                  </strong>
-                </div>
-              `
-              : ""
-          }
-
-
-          ${
-            report.diketahui
-              ? `
-                <div>
-                  <span>Diketahui oleh</span>
-                  <strong>
-                    ${PAG.Profile.escape(
-                      report.diketahui
-                    )}
-                  </strong>
-                </div>
-              `
-              : ""
-          }
-
-        </div>
-
 
       </div>
 
     `;
 
 
-    /* =================================================
-       MODAL
-       ================================================= */
+    PAG.Profile.showModal(
+      html
+    );
 
-    let modal =
+  },
+
+
+  /* =====================================================
+     MODAL
+     ===================================================== */
+
+  showModal(content) {
+
+    const old =
       document.getElementById(
-        "profileReportModal"
+        "profileDocumentModal"
       );
 
 
-    if (!modal) {
+    if (old) {
 
-      modal =
-        document.createElement(
-          "div"
-        );
-
-      modal.id =
-        "profileReportModal";
-
-      modal.className =
-        "profile-report-modal";
-
-      document.body.appendChild(
-        modal
-      );
+      old.remove();
 
     }
 
 
-    modal.innerHTML =
-      html;
+    const modal =
+      document.createElement(
+        "div"
+      );
 
 
-    modal.style.display =
-      "flex";
+    modal.id =
+      "profileDocumentModal";
+
+
+    modal.className =
+      "profile-document-modal";
+
+
+    modal.innerHTML = `
+
+      <div class="
+        profile-document-overlay
+      "></div>
+
+
+      <div class="
+        profile-document-dialog
+      ">
+
+        <button
+          type="button"
+          class="
+            profile-document-close
+          "
+          id="profileDocumentClose"
+        >
+          ×
+        </button>
+
+
+        <div class="
+          profile-document-body
+        ">
+
+          ${content}
+
+        </div>
+
+      </div>
+
+    `;
+
+
+    document.body.appendChild(
+      modal
+    );
+
+
+    const close =
+      () => {
+
+        modal.remove();
+
+      };
 
 
     modal
       .querySelector(
-        "#profileReportClose"
+        ".profile-document-overlay"
       )
       ?.addEventListener(
         "click",
-        function () {
-
-          modal.style.display =
-            "none";
-
-        }
+        close
       );
 
 
-    modal.addEventListener(
-      "click",
-      function (event) {
+    modal
+      .querySelector(
+        "#profileDocumentClose"
+      )
+      ?.addEventListener(
+        "click",
+        close
+      );
+
+
+    document.addEventListener(
+      "keydown",
+      function esc(e) {
 
         if (
-          event.target === modal
+          e.key === "Escape"
         ) {
 
-          modal.style.display =
-            "none";
+          close();
+
+          document.removeEventListener(
+            "keydown",
+            esc
+          );
 
         }
 
@@ -2349,22 +2321,20 @@ PAG.Profile = {
 
 
   /* =====================================================
-     FILTER DOCUMENTS
+     SEARCH
      ===================================================== */
 
   filterDocuments(keyword) {
 
     const value =
-      String(
-        keyword || ""
-      )
-      .trim()
-      .toLowerCase();
+      String(keyword || "")
+        .trim()
+        .toLowerCase();
 
 
     document
       .querySelectorAll(
-        "#profileDocuments .profile-document-item"
+        "#profileDocuments .document-item"
       )
       .forEach(
         item => {
@@ -2387,16 +2357,14 @@ PAG.Profile = {
 
 
   /* =====================================================
-     DOCUMENT ICON
+     ICON
      ===================================================== */
 
   documentIcon(type) {
 
     const t =
-      String(
-        type || ""
-      )
-      .toLowerCase();
+      String(type || "")
+        .toLowerCase();
 
 
     if (
@@ -2409,8 +2377,7 @@ PAG.Profile = {
 
 
     if (
-      t.includes("foto") ||
-      t.includes("photo")
+      t.includes("foto")
     ) {
 
       return "📷";
@@ -2441,15 +2408,6 @@ PAG.Profile = {
     ) {
 
       return "⚠️";
-
-    }
-
-
-    if (
-      t.includes("tindak")
-    ) {
-
-      return "🔧";
 
     }
 
@@ -2496,87 +2454,6 @@ PAG.Profile = {
 
 
   /* =====================================================
-     TYPE LABEL
-     ===================================================== */
-
-  typeLabel(type) {
-
-    const t =
-      String(
-        type || ""
-      )
-      .toLowerCase();
-
-
-    if (
-      t.includes("laporan")
-    ) {
-
-      return "Laporan Harian";
-
-    }
-
-
-    if (
-      t.includes("instruksi")
-    ) {
-
-      return "Instruksi Lapangan";
-
-    }
-
-
-    if (
-      t.includes("memo")
-    ) {
-
-      return "Memo";
-
-    }
-
-
-    if (
-      t.includes("temuan")
-    ) {
-
-      return "Temuan";
-
-    }
-
-
-    if (
-      t.includes("tindak")
-    ) {
-
-      return "Tindak Lanjut";
-
-    }
-
-
-    if (
-      t.includes("rfi")
-    ) {
-
-      return "RFI";
-
-    }
-
-
-    if (
-      t.includes("inspection")
-    ) {
-
-      return "Inspection";
-
-    }
-
-
-    return "Dokumen Pekerjaan";
-
-  },
-
-
-  /* =====================================================
      SOURCE LABEL
      ===================================================== */
 
@@ -2587,8 +2464,10 @@ PAG.Profile = {
       case "se":
         return "SE";
 
+
       case "admin":
         return "ADMIN";
+
 
       default:
         return "SAYA";
@@ -2605,7 +2484,9 @@ PAG.Profile = {
   formatDate(value) {
 
     if (!value) {
+
       return "";
+
     }
 
 
@@ -2629,13 +2510,24 @@ PAG.Profile = {
       return new Intl.DateTimeFormat(
         "id-ID",
         {
-          day: "2-digit",
-          month: "short",
-          year: "numeric",
-          hour: "2-digit",
-          minute: "2-digit"
+          day:
+            "2-digit",
+
+          month:
+            "short",
+
+          year:
+            "numeric",
+
+          hour:
+            "2-digit",
+
+          minute:
+            "2-digit"
         }
-      ).format(date);
+      ).format(
+        date
+      );
 
 
     } catch (error) {
@@ -2658,26 +2550,26 @@ PAG.Profile = {
         ? ""
         : value
     )
-    .replace(
-      /&/g,
-      "&amp;"
-    )
-    .replace(
-      /</g,
-      "&lt;"
-    )
-    .replace(
-      />/g,
-      "&gt;"
-    )
-    .replace(
-      /"/g,
-      "&quot;"
-    )
-    .replace(
-      /'/g,
-      "&#039;"
-    );
+      .replace(
+        /&/g,
+        "&amp;"
+      )
+      .replace(
+        /</g,
+        "&lt;"
+      )
+      .replace(
+        />/g,
+        "&gt;"
+      )
+      .replace(
+        /"/g,
+        "&quot;"
+      )
+      .replace(
+        /'/g,
+        "&#039;"
+      );
 
   },
 
@@ -2719,7 +2611,9 @@ PAG.Profile = {
 
 
     if (!toast) {
+
       return;
+
     }
 
 
@@ -2738,7 +2632,7 @@ PAG.Profile = {
 
     PAG.Profile._toastTimer =
       setTimeout(
-        function () {
+        () => {
 
           toast.style.display =
             "none";
@@ -2753,6 +2647,7 @@ PAG.Profile = {
 
 
 console.log(
-  "PAG Profile loaded:",
+  "PAG 92_Profile loaded:",
   !!PAG.Profile
 );
+```
