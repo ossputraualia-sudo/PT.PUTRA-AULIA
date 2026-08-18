@@ -232,9 +232,7 @@ PAG.Dashboard = {
           <button
             class="action"
             type="button"
-            onclick="PAG.Absensi && PAG.Absensi.start
-              ? PAG.Absensi.start()
-              : PAG.UI.toast('Modul Absensi belum tersedia')"
+            onclick="if(PAG.Absensi && PAG.Absensi.start){PAG.Absensi.start();}else{PAG.UI.toast('Modul Absensi belum tersedia');}"
           >
 
             📍
