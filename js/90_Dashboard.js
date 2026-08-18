@@ -1,7 +1,7 @@
 /* =====================================================
    PAG DOCS FIELD
    90_Dashboard.js
-   DASHBOARD STABLE
+   DASHBOARD
    ===================================================== */
 
 window.PAG = window.PAG || {};
@@ -11,13 +11,22 @@ PAG.Dashboard = {
   async render(v) {
 
     if (!v) {
-      console.error("PAG.Dashboard: view tidak ditemukan.");
+
+      console.error(
+        "PAG.Dashboard: view tidak ditemukan."
+      );
+
       return;
+
     }
 
-    var userName = "Personil Lapangan";
-    var namaPaket = "Paket belum tersinkron";
-    var online = navigator.onLine;
+
+    var userName =
+      "Personil Lapangan";
+
+    var namaPaket =
+      "Paket belum tersinkron";
+
 
     /* ===================================================
        USER
@@ -30,7 +39,8 @@ PAG.Dashboard = {
         typeof PAG.Auth.ensure === "function"
       ) {
 
-        var u = await PAG.Auth.ensure();
+        var u =
+          await PAG.Auth.ensure();
 
         if (u) {
 
@@ -76,9 +86,12 @@ PAG.Dashboard = {
               ? master.paket
               : [];
 
+
           if (paket.length) {
 
-            var p = paket[0];
+            var p =
+              paket[0] || {};
+
 
             namaPaket =
               p.nama ||
@@ -108,9 +121,15 @@ PAG.Dashboard = {
 
     v.innerHTML = `
 
+      <!-- =================================================
+           HERO
+           ================================================= -->
+
       <section class="hero dashboard-hero">
 
-        <small>PAG DOCS FIELD</small>
+        <small>
+          PAG DOCS FIELD
+        </small>
 
         <h2>
           ${dashboardEscape(userName)}
@@ -123,39 +142,9 @@ PAG.Dashboard = {
       </section>
 
 
-      <a
-        class="card dashboard-sop"
-        href="https://drive.google.com/drive/folders/17D9uxcnayGFmWLk5mX0C-fckW2Cc5RJu?usp=sharing"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-
-        <div class="dashboard-sop-icon">
-          📘
-        </div>
-
-        <div class="dashboard-sop-content">
-
-          <h3>
-            SOP Pekerjaan
-          </h3>
-
-          <p>
-            Standar Operasional Prosedur
-          </p>
-
-          <small>
-            Buka dokumen SOP
-          </small>
-
-        </div>
-
-        <div class="dashboard-arrow">
-          ›
-        </div>
-
-      </a>
-
+      <!-- =================================================
+           KEGIATAN LAPANGAN
+           ================================================= -->
 
       <section class="dashboard-section">
 
@@ -163,7 +152,11 @@ PAG.Dashboard = {
           Kegiatan Lapangan
         </h4>
 
+
         <div class="grid dashboard-grid">
+
+
+          <!-- ABSENSI -->
 
           <button
             type="button"
@@ -186,80 +179,95 @@ PAG.Dashboard = {
           </button>
 
 
+          <!-- PROGRESS -->
+
           <button
             type="button"
             class="action dashboard-action"
-            id="dashboardDokumentasi"
+            id="dashboardProgress"
           >
 
             <span class="action-icon">
-              📷
+              📊
             </span>
 
             <span class="action-label">
-              Dokumentasi
+              Progress
             </span>
 
             <small>
-              Foto Lapangan
+              Kemajuan pekerjaan
             </small>
 
           </button>
+
 
         </div>
 
       </section>
 
 
+      <!-- =================================================
+           INFORMASI PEKERJAAN
+           ================================================= -->
+
       <section class="dashboard-section">
 
         <h4 class="section-title">
-          Pelaporan
+          Informasi Pekerjaan
         </h4>
+
 
         <div class="grid dashboard-grid">
 
+
+          <!-- INSTRUKSI -->
+
           <button
             type="button"
             class="action dashboard-action"
-            id="dashboardReport"
+            id="dashboardInstruksi"
           >
 
             <span class="action-icon">
-              📋
+              📢
             </span>
 
             <span class="action-label">
-              Laporan Harian
+              Instruksi
             </span>
 
             <small>
-              Kegiatan & progress
+              Instruksi pekerjaan
             </small>
 
           </button>
 
 
+          <!-- MEMO -->
+
           <button
             type="button"
             class="action dashboard-action"
-            id="dashboardInspection"
+            id="dashboardMemo"
           >
 
             <span class="action-icon">
-              🔎
+              📝
             </span>
 
             <span class="action-label">
-              Inspection
+              Memo
             </span>
 
             <small>
-              Pemeriksaan pekerjaan
+              Catatan dan pemberitahuan
             </small>
 
           </button>
 
+
+          <!-- RFI -->
 
           <button
             type="button"
@@ -281,46 +289,8 @@ PAG.Dashboard = {
 
           </button>
 
-        </div>
-
-      </section>
-
-
-      <section class="card dashboard-status">
-
-        <div class="dashboard-status-left">
-
-          <span
-            class="dashboard-status-dot ${
-              online ? "online" : "offline"
-            }"
-          ></span>
-
-          <div>
-
-            <b>
-              ${online ? "Online" : "Offline"}
-            </b>
-
-            <small>
-              ${
-                online
-                  ? "Siap melakukan sinkronisasi"
-                  : "Data akan disimpan di perangkat"
-              }
-            </small>
-
-          </div>
 
         </div>
-
-        <button
-          type="button"
-          class="dashboard-sync-button"
-          id="dashboardSync"
-        >
-          ↻
-        </button>
 
       </section>
 
@@ -341,33 +311,16 @@ PAG.Dashboard = {
         ) {
 
           PAG.Absensi.start();
+
           return;
 
         }
 
-        dashboardToast(
-          "Modul Absensi belum tersedia"
-        );
-
-      }
-    );
-
-
-    /* ===================================================
-       DOKUMENTASI
-       =================================================== */
-
-    bindDashboardButton(
-      "dashboardDokumentasi",
-      function () {
 
         dashboardOpenModule(
-          "photo",
+          "absensi",
           [
-            "GPSPhoto",
-            "Dokumentasi",
-            "Photo",
-            "DokumentasiLapangan"
+            "Absensi"
           ]
         );
 
@@ -376,17 +329,18 @@ PAG.Dashboard = {
 
 
     /* ===================================================
-       LAPORAN
+       PROGRESS
        =================================================== */
 
     bindDashboardButton(
-      "dashboardReport",
+      "dashboardProgress",
       function () {
 
         dashboardOpenModule(
-          "report",
+          "progress",
           [
-            "LaporanHarian"
+            "Progress",
+            "LaporanProgress"
           ]
         );
 
@@ -395,17 +349,37 @@ PAG.Dashboard = {
 
 
     /* ===================================================
-       INSPECTION
+       INSTRUKSI
        =================================================== */
 
     bindDashboardButton(
-      "dashboardInspection",
+      "dashboardInstruksi",
       function () {
 
         dashboardOpenModule(
-          "inspection",
+          "instruksi",
           [
-            "Inspection"
+            "Instruksi",
+            "Instruction"
+          ]
+        );
+
+      }
+    );
+
+
+    /* ===================================================
+       MEMO
+       =================================================== */
+
+    bindDashboardButton(
+      "dashboardMemo",
+      function () {
+
+        dashboardOpenModule(
+          "memo",
+          [
+            "Memo"
           ]
         );
 
@@ -431,63 +405,6 @@ PAG.Dashboard = {
       }
     );
 
-
-    /* ===================================================
-       SYNC
-       =================================================== */
-
-    bindDashboardButton(
-      "dashboardSync",
-      async function (button) {
-
-        button.disabled = true;
-        button.textContent = "⏳";
-
-        try {
-
-          if (
-            PAG.WebUtamaSync &&
-            typeof PAG.WebUtamaSync.pull === "function"
-          ) {
-
-            await PAG.WebUtamaSync.pull();
-
-          }
-
-          if (
-            PAG.OfflineSync &&
-            typeof PAG.OfflineSync.run === "function"
-          ) {
-
-            await PAG.OfflineSync.run();
-
-          }
-
-          dashboardToast(
-            "Sinkronisasi selesai"
-          );
-
-        } catch (error) {
-
-          console.error(
-            "Dashboard Sync:",
-            error
-          );
-
-          dashboardToast(
-            "Sinkronisasi gagal"
-          );
-
-        } finally {
-
-          button.disabled = false;
-          button.textContent = "↻";
-
-        }
-
-      }
-    );
-
   }
 
 };
@@ -497,14 +414,19 @@ PAG.Dashboard = {
    BIND BUTTON
    ===================================================== */
 
-function bindDashboardButton(id, handler) {
+function bindDashboardButton(
+  id,
+  handler
+) {
 
   var button =
     document.getElementById(id);
 
+
   if (!button) {
     return;
   }
+
 
   button.addEventListener(
     "click",
@@ -522,6 +444,7 @@ function bindDashboardButton(id, handler) {
           error
         );
 
+
         dashboardToast(
           "Modul tidak dapat dibuka"
         );
@@ -538,7 +461,11 @@ function bindDashboardButton(id, handler) {
    OPEN MODULE
    ===================================================== */
 
-function dashboardOpenModule(route, names) {
+function dashboardOpenModule(
+  route,
+  names
+) {
+
 
   /* ---------------------------------------------------
      1. ROUTER UTAMA
@@ -554,25 +481,29 @@ function dashboardOpenModule(route, names) {
       var result =
         PAG.Router.go(route);
 
+
       /*
-       * Jangan langsung menganggap gagal.
-       * Router bisa bekerja async atau tanpa return.
+       * Router bisa bekerja async
        */
+
       if (
         result &&
         typeof result.then === "function"
       ) {
 
-        result.catch(function (error) {
+        result.catch(
+          function (error) {
 
-          console.warn(
-            "Router async:",
-            error
-          );
+            console.warn(
+              "Router async:",
+              error
+            );
 
-        });
+          }
+        );
 
       }
+
 
       return;
 
@@ -597,6 +528,7 @@ function dashboardOpenModule(route, names) {
       ? names
       : [];
 
+
   for (
     var i = 0;
     i < names.length;
@@ -606,17 +538,22 @@ function dashboardOpenModule(route, names) {
     var module =
       PAG[names[i]];
 
+
     if (
       module &&
       typeof module.render === "function"
     ) {
 
       var view =
-        document.getElementById("view");
+        document.getElementById(
+          "view"
+        );
+
 
       if (view) {
 
         module.render(view);
+
         return;
 
       }
@@ -655,7 +592,9 @@ function dashboardGo(route) {
    TOAST
    ===================================================== */
 
-function dashboardToast(message) {
+function dashboardToast(
+  message
+) {
 
   try {
 
@@ -664,7 +603,10 @@ function dashboardToast(message) {
       typeof PAG.UI.toast === "function"
     ) {
 
-      PAG.UI.toast(message);
+      PAG.UI.toast(
+        message
+      );
+
       return;
 
     }
@@ -675,22 +617,30 @@ function dashboardToast(message) {
 
   }
 
+
   var toast =
-    document.getElementById("toast");
+    document.getElementById(
+      "toast"
+    );
+
 
   if (!toast) {
     return;
   }
 
+
   toast.textContent =
     message;
+
 
   toast.style.display =
     "block";
 
+
   clearTimeout(
     dashboardToast.timer
   );
+
 
   dashboardToast.timer =
     setTimeout(
@@ -710,14 +660,40 @@ function dashboardToast(message) {
    ESCAPE
    ===================================================== */
 
-function dashboardEscape(value) {
+function dashboardEscape(
+  value
+) {
 
-  return String(value == null ? "" : value)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+  return String(
+    value == null
+      ? ""
+      : value
+  )
+
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+
+    .replace(
+      /</g,
+      "&lt;"
+    )
+
+    .replace(
+      />/g,
+      "&gt;"
+    )
+
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+
+    .replace(
+      /'/g,
+      "&#039;"
+    );
 
 }
 
