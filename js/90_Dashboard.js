@@ -1,4 +1,3 @@
-```javascript
 /* =====================================================
    PAG DOCS FIELD
    DASHBOARD
@@ -24,7 +23,6 @@ PAG.Dashboard = {
         <p>Memuat Dashboard...</p>
       </div>
     `;
-
 
     try {
 
@@ -60,7 +58,6 @@ PAG.Dashboard = {
          ================================================= */
 
       u = u || {};
-
 
       const userName =
         u.name ||
@@ -105,12 +102,10 @@ PAG.Dashboard = {
           ? m.paket
           : [];
 
-
       const p =
         paket.length
           ? paket[0]
           : null;
-
 
       const namaPaket =
         p?.nama ||
@@ -379,7 +374,6 @@ PAG.Dashboard = {
         error
       );
 
-
       v.innerHTML = `
 
         <div class="card">
@@ -438,4 +432,3 @@ console.log(
   "PAG Dashboard loaded:",
   !!PAG.Dashboard
 );
-```
