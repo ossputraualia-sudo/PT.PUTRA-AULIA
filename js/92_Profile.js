@@ -1,3 +1,4 @@
+```javascript
 /* =====================================================
    PAG DOCS FIELD
    PROFILE
@@ -7,13 +8,17 @@ window.PAG = window.PAG || {};
 
 PAG.Profile = {
 
-  /* =====================================================
+  _documents: [],
+
+
+  /* ===================================================
      RENDER
-     ===================================================== */
+     =================================================== */
 
   async render(v) {
 
     if (!v) return;
+
 
     try {
 
@@ -23,69 +28,68 @@ PAG.Profile = {
           ? PAG.Auth.get() || {}
           : {};
 
+
       var master = {};
+
 
       try {
 
         if (
           PAG.WebUtamaSync &&
-          typeof PAG.WebUtamaSync.getMaster === "function"
+          typeof PAG.WebUtamaSync.getMaster ===
+            "function"
         ) {
 
           master =
-            await PAG.WebUtamaSync.getMaster() || {};
+            await PAG.WebUtamaSync.getMaster() ||
+            {};
 
         }
 
-      } catch (e) {
+      } catch (error) {
 
         console.warn(
-          "Master Profil tidak tersedia:",
-          e
+          "Profile Master:",
+          error
         );
 
       }
 
-
-      /* =================================================
-         PAKET
-         ================================================= */
 
       var paket =
         Array.isArray(master.paket)
           ? master.paket
           : [];
 
+
       var activePackage =
-        paket[0] || null;
+        paket[0] ||
+        null;
 
-
-      /* =================================================
-         ONLINE
-         ================================================= */
 
       var online =
         navigator.onLine;
 
 
-      /* =================================================
-         USER
-         ================================================= */
-
       var nama =
         u.name ||
         u.nama ||
+        u.namaPersonil ||
+        u.displayName ||
         "Personil";
 
+
       var role =
-        u.jabatan ||
         u.role ||
+        u.jabatan ||
         "Personil Lapangan";
+
 
       var userId =
         u.userId ||
         u.id ||
         "-";
+
 
       var email =
         u.email ||
@@ -93,14 +97,10 @@ PAG.Profile = {
 
 
       /* =================================================
-         RENDER
+         HTML
          ================================================= */
 
       v.innerHTML = `
-
-        <!-- =============================================
-             PROFILE HEADER
-             ============================================= -->
 
         <div class="profile-head">
 
@@ -111,21 +111,16 @@ PAG.Profile = {
           <div class="profile-identity">
 
             <div class="profile-name">
-              ${PAG.Profile.escape(nama)}
+              ${PAG.UI.escape(nama)}
             </div>
 
             <div class="profile-role">
-              ${PAG.Profile.escape(role)}
+              ${PAG.UI.escape(role)}
             </div>
 
             <div class="profile-status">
 
-              <span
-                class="
-                  profile-status-dot
-                  ${online ? "online" : "offline"}
-                "
-              ></span>
+              <span class="profile-status-dot"></span>
 
               ${online ? "Online" : "Offline"}
 
@@ -136,16 +131,20 @@ PAG.Profile = {
         </div>
 
 
-        <!-- =============================================
+        <!-- =================================================
              DATA PERSONIL
-             ============================================= -->
+             ================================================= -->
 
         <div class="profile-section">
 
           <div class="profile-section-title">
+
             <span>👤</span>
+
             Data Personil
+
           </div>
+
 
           <div class="profile-card">
 
@@ -156,7 +155,7 @@ PAG.Profile = {
               </span>
 
               <b>
-                ${PAG.Profile.escape(nama)}
+                ${PAG.UI.escape(nama)}
               </b>
 
             </div>
@@ -169,7 +168,7 @@ PAG.Profile = {
               </span>
 
               <b>
-                ${PAG.Profile.escape(userId)}
+                ${PAG.UI.escape(userId)}
               </b>
 
             </div>
@@ -182,7 +181,7 @@ PAG.Profile = {
               </span>
 
               <b>
-                ${PAG.Profile.escape(role)}
+                ${PAG.UI.escape(role)}
               </b>
 
             </div>
@@ -195,7 +194,7 @@ PAG.Profile = {
               </span>
 
               <b>
-                ${PAG.Profile.escape(email)}
+                ${PAG.UI.escape(email)}
               </b>
 
             </div>
@@ -205,17 +204,15 @@ PAG.Profile = {
         </div>
 
 
-        <!-- =============================================
-             PAKET PEKERJAAN
-             ============================================= -->
+        <!-- =================================================
+             PAKET
+             ================================================= -->
 
         <div class="profile-section">
 
           <div class="profile-section-title">
 
-            <span>
-              📦
-            </span>
+            <span>📦</span>
 
             Paket Pekerjaan
 
@@ -227,61 +224,57 @@ PAG.Profile = {
             ${
               activePackage
 
-              ? `
+                ? `
 
-                <div class="package-title">
+                  <div class="package-title">
 
-                  ${PAG.Profile.escape(
-                    activePackage.nama ||
-                    activePackage.namaPaket ||
-                    activePackage.name ||
-                    activePackage.paket ||
-                    "Paket Pekerjaan"
-                  )}
+                    ${PAG.UI.escape(
+                      activePackage.nama ||
+                      activePackage.namaPaket ||
+                      activePackage.name ||
+                      "Paket Pekerjaan"
+                    )}
 
-                </div>
-
-
-                ${
-                  activePackage.id
-                    ? `
-                      <div class="package-info">
-                        ID:
-                        ${PAG.Profile.escape(
-                          activePackage.id
-                        )}
-                      </div>
-                    `
-                    : ""
-                }
-
-
-                <div class="package-badge">
-                  Paket Aktif
-                </div>
-
-              `
-
-              : `
-
-                <div class="empty-state">
-
-                  <div class="empty-icon">
-                    📦
                   </div>
 
-                  <b>
-                    Paket belum tersedia
-                  </b>
+                  ${
+                    activePackage.id
+                      ? `
+                        <div class="package-info">
+                          ID:
+                          ${PAG.UI.escape(
+                            activePackage.id
+                          )}
+                        </div>
+                      `
+                      : ""
+                  }
 
-                  <span>
-                    Data paket belum tersinkron.
-                  </span>
+                  <div class="package-badge">
+                    Paket Aktif
+                  </div>
 
-                </div>
+                `
 
-              `
+                : `
 
+                  <div class="empty-state">
+
+                    <div class="empty-icon">
+                      📦
+                    </div>
+
+                    <b>
+                      Paket belum tersedia
+                    </b>
+
+                    <span>
+                      Data paket belum tersinkron.
+                    </span>
+
+                  </div>
+
+                `
             }
 
           </div>
@@ -289,17 +282,15 @@ PAG.Profile = {
         </div>
 
 
-        <!-- =============================================
+        <!-- =================================================
              CATATAN PEKERJAAN
-             ============================================= -->
+             ================================================= -->
 
         <div class="profile-section">
 
           <div class="profile-section-title">
 
-            <span>
-              📁
-            </span>
+            <span>📁</span>
 
             Catatan Pekerjaan
 
@@ -308,59 +299,51 @@ PAG.Profile = {
 
           <div class="profile-card documents-card">
 
-
             <div class="document-description">
 
-              Laporan, catatan, dan dokumentasi
-              pekerjaan yang berkaitan dengan
+              Seluruh laporan dan dokumen pekerjaan
+              yang dibuat atau berkaitan dengan
               personil dan paket.
 
             </div>
 
 
-            <!-- TABS -->
-
             <div class="document-tabs">
 
               <button
-                type="button"
                 class="document-tab active"
                 data-source="all"
+                type="button"
               >
                 Semua
               </button>
 
-
               <button
-                type="button"
                 class="document-tab"
                 data-source="self"
+                type="button"
               >
                 Saya
               </button>
 
-
               <button
-                type="button"
                 class="document-tab"
                 data-source="se"
+                type="button"
               >
                 SE
               </button>
 
-
               <button
-                type="button"
                 class="document-tab"
                 data-source="admin"
+                type="button"
               >
                 Admin
               </button>
 
             </div>
 
-
-            <!-- SEARCH -->
 
             <div class="document-search">
 
@@ -373,8 +356,6 @@ PAG.Profile = {
             </div>
 
 
-            <!-- DOCUMENTS -->
-
             <div id="profileDocuments">
 
               <div class="document-loading">
@@ -383,23 +364,20 @@ PAG.Profile = {
 
             </div>
 
-
           </div>
 
         </div>
 
 
-        <!-- =============================================
+        <!-- =================================================
              SINKRONISASI
-             ============================================= -->
+             ================================================= -->
 
         <div class="profile-section">
 
           <div class="profile-section-title">
 
-            <span>
-              🔄
-            </span>
+            <span>🔄</span>
 
             Sinkronisasi
 
@@ -428,31 +406,28 @@ PAG.Profile = {
 
 
               <span
-                class="
-                  sync-indicator
-                  ${online ? "online" : "offline"}
-                "
+                class="sync-indicator ${
+                  online
+                    ? "online"
+                    : "offline"
+                }"
               >
-
                 ${
                   online
                     ? "Online"
                     : "Offline"
                 }
-
               </span>
 
             </div>
 
 
             <button
-              type="button"
               class="btn"
               id="profileSync"
+              type="button"
             >
-
               🔄 Sinkronkan Sekarang
-
             </button>
 
           </div>
@@ -460,17 +435,15 @@ PAG.Profile = {
         </div>
 
 
-        <!-- =============================================
+        <!-- =================================================
              PENGATURAN
-             ============================================= -->
+             ================================================= -->
 
         <div class="profile-section">
 
           <div class="profile-section-title">
 
-            <span>
-              ⚙️
-            </span>
+            <span>⚙️</span>
 
             Pengaturan
 
@@ -479,18 +452,15 @@ PAG.Profile = {
 
           <div class="profile-card">
 
-
             <button
-              type="button"
               class="profile-menu"
+              type="button"
               id="profileNotificationSetting"
             >
 
               <span>
                 🔔
-                <b>
-                  Notifikasi
-                </b>
+                <b>Notifikasi</b>
               </span>
 
               <span>
@@ -501,16 +471,14 @@ PAG.Profile = {
 
 
             <button
-              type="button"
               class="profile-menu"
+              type="button"
               id="profileStorageSetting"
             >
 
               <span>
                 💾
-                <b>
-                  Data Lokal
-                </b>
+                <b>Data Lokal</b>
               </span>
 
               <span>
@@ -521,16 +489,14 @@ PAG.Profile = {
 
 
             <button
-              type="button"
               class="profile-menu"
+              type="button"
               id="profileAbout"
             >
 
               <span>
                 ℹ️
-                <b>
-                  Tentang PAG Docs
-                </b>
+                <b>Tentang PAG Docs</b>
               </span>
 
               <span>
@@ -538,23 +504,22 @@ PAG.Profile = {
               </span>
 
             </button>
-
 
           </div>
 
         </div>
 
 
-        <!-- =============================================
+        <!-- =================================================
              LOGOUT
-             ============================================= -->
+             ================================================= -->
 
         <div class="profile-section profile-logout-section">
 
           <button
-            type="button"
             class="profile-logout"
             id="profileLogout"
+            type="button"
           >
             Keluar dari PAG Docs
           </button>
@@ -565,23 +530,19 @@ PAG.Profile = {
 
 
       /* =================================================
-         LOAD DOCUMENTS
+         LOAD
          ================================================= */
 
-      var documentContainer =
+      await PAG.Profile.loadDocuments(
         document.getElementById(
           "profileDocuments"
-        );
-
-
-      await PAG.Profile.loadDocuments(
-        documentContainer,
+        ),
         "all"
       );
 
 
       /* =================================================
-         TAB
+         TABS
          ================================================= */
 
       document
@@ -589,18 +550,18 @@ PAG.Profile = {
           ".document-tab"
         )
         .forEach(
-          function(tab) {
+          function (tab) {
 
             tab.addEventListener(
               "click",
-              async function() {
+              async function () {
 
                 document
                   .querySelectorAll(
                     ".document-tab"
                   )
                   .forEach(
-                    function(x) {
+                    function (x) {
 
                       x.classList.remove(
                         "active"
@@ -621,19 +582,6 @@ PAG.Profile = {
                   ),
                   this.dataset.source
                 );
-
-
-                var search =
-                  document.getElementById(
-                    "profileDocumentSearch"
-                  );
-
-
-                if (search) {
-
-                  search.value = "";
-
-                }
 
               }
             );
@@ -656,7 +604,7 @@ PAG.Profile = {
 
         search.addEventListener(
           "input",
-          function() {
+          function () {
 
             PAG.Profile.filterDocuments(
               this.value
@@ -681,11 +629,12 @@ PAG.Profile = {
       if (sync) {
 
         sync.onclick =
-          async function() {
+          async function () {
 
             try {
 
-              sync.disabled = true;
+              sync.disabled =
+                true;
 
               sync.textContent =
                 "⏳ Menyinkronkan...";
@@ -713,16 +662,16 @@ PAG.Profile = {
               }
 
 
-              PAG.UI.toast(
-                "Sinkronisasi selesai"
-              );
-
-
               await PAG.Profile.loadDocuments(
                 document.getElementById(
                   "profileDocuments"
                 ),
                 "all"
+              );
+
+
+              PAG.UI.toast(
+                "Sinkronisasi selesai"
               );
 
 
@@ -741,7 +690,8 @@ PAG.Profile = {
 
             } finally {
 
-              sync.disabled = false;
+              sync.disabled =
+                false;
 
               sync.textContent =
                 "🔄 Sinkronkan Sekarang";
@@ -757,16 +707,13 @@ PAG.Profile = {
          LOGOUT
          ================================================= */
 
-      var logout =
-        document.getElementById(
+      document
+        .getElementById(
           "profileLogout"
-        );
-
-
-      if (logout) {
-
-        logout.onclick =
-          function() {
+        )
+        ?.addEventListener(
+          "click",
+          function () {
 
             if (
               confirm(
@@ -774,21 +721,12 @@ PAG.Profile = {
               )
             ) {
 
-              if (
-                PAG.Auth &&
-                typeof PAG.Auth.logout ===
-                  "function"
-              ) {
-
-                PAG.Auth.logout();
-
-              }
+              PAG.Auth.logout();
 
             }
 
-          };
-
-      }
+          }
+        );
 
 
       /* =================================================
@@ -801,7 +739,7 @@ PAG.Profile = {
         )
         ?.addEventListener(
           "click",
-          function() {
+          function () {
 
             PAG.UI.toast(
               "Pengaturan notifikasi akan tersedia."
@@ -817,10 +755,10 @@ PAG.Profile = {
         )
         ?.addEventListener(
           "click",
-          function() {
+          function () {
 
             PAG.UI.toast(
-              "Pengaturan data lokal akan tersedia."
+              "Data lokal PAG Docs tersimpan di perangkat."
             );
 
           }
@@ -833,7 +771,7 @@ PAG.Profile = {
         )
         ?.addEventListener(
           "click",
-          function() {
+          function () {
 
             PAG.UI.toast(
               "PAG Docs Field"
@@ -860,7 +798,7 @@ PAG.Profile = {
           </h3>
 
           <p>
-            ${PAG.Profile.escape(
+            ${PAG.UI.escape(
               error.message ||
               String(error)
             )}
@@ -875,42 +813,47 @@ PAG.Profile = {
   },
 
 
-  /* =====================================================
+  /* ===================================================
      INITIALS
-     ===================================================== */
+     =================================================== */
 
   initials(name) {
 
     var text =
-      String(name || "P");
+      String(
+        name ||
+        "P"
+      );
 
 
     var parts =
       text
         .trim()
         .split(/\s+/)
-        .filter(Boolean)
-        .slice(0, 2);
+        .slice(
+          0,
+          2
+        );
 
 
     return parts
       .map(
-        function(x) {
+        function (x) {
 
           return x
-            .charAt(0)
-            .toUpperCase();
+            .charAt(0);
 
         }
       )
-      .join("");
+      .join("")
+      .toUpperCase();
 
   },
 
 
-  /* =====================================================
+  /* ===================================================
      GET DOCUMENTS
-     ===================================================== */
+     =================================================== */
 
   async getDocuments() {
 
@@ -918,96 +861,7 @@ PAG.Profile = {
 
 
     /* =================================================
-       1. MASTER WEB UTAMA
-       ================================================= */
-
-    try {
-
-      var master = {};
-
-
-      if (
-        PAG.WebUtamaSync &&
-        typeof PAG.WebUtamaSync.getMaster ===
-          "function"
-      ) {
-
-        master =
-          await PAG.WebUtamaSync.getMaster() || {};
-
-      }
-
-
-      var collections = [
-
-        master.documents,
-
-        master.dokumen,
-
-        master.catatan,
-
-        master.laporan,
-
-        master.laporanHarian,
-
-        master.instruksi,
-
-        master.memo,
-
-        master.temuan,
-
-        master.tindaklanjut,
-
-        master.rfi,
-
-        master.inspection
-
-      ];
-
-
-      collections.forEach(
-        function(collection) {
-
-          if (
-            !Array.isArray(collection)
-          ) {
-
-            return;
-
-          }
-
-
-          collection.forEach(
-            function(item) {
-
-              if (!item) return;
-
-
-              result.push(
-                PAG.Profile.normalizeDocument(
-                  item
-                )
-              );
-
-            }
-          );
-
-        }
-      );
-
-
-    } catch (error) {
-
-      console.warn(
-        "Profile master documents:",
-        error
-      );
-
-    }
-
-
-    /* =================================================
-       2. LAPORAN HARIAN LOKAL
+       1. LOCAL STORAGE LAPORAN
        ================================================= */
 
     try {
@@ -1016,23 +870,58 @@ PAG.Profile = {
         JSON.parse(
           localStorage.getItem(
             "PAG_FIELD_REPORTS"
-          ) || "[]"
+          ) ||
+          "[]"
         );
 
 
       if (
-        Array.isArray(localReports)
+        Array.isArray(
+          localReports
+        )
       ) {
 
         localReports.forEach(
-          function(report) {
+          function (report) {
 
             if (!report) return;
 
 
             result.push(
-              PAG.Profile.normalizeLocalReport(
-                report
+              PAG.Profile.normalizeDocument(
+                {
+                  id:
+                    report.id,
+
+                  type:
+                    report.type ||
+                    "laporan_harian",
+
+                  title:
+                    "Laporan Harian",
+
+                  source:
+                    "self",
+
+                  createdBy:
+                    report.dibuat ||
+                    report.personil ||
+                    "",
+
+                  date:
+                    report.createdAt,
+
+                  packageId:
+                    report.paket ||
+                    "",
+
+                  raw:
+                    report,
+
+                  data:
+                    report
+
+                }
               )
             );
 
@@ -1052,7 +941,188 @@ PAG.Profile = {
 
 
     /* =================================================
-       3. DEDUPLIKASI
+       2. PAG STORAGE
+       ================================================= */
+
+    try {
+
+      if (
+        PAG.Storage &&
+        typeof PAG.Storage.getAll ===
+          "function"
+      ) {
+
+        var stored =
+          await PAG.Storage.getAll(
+            "reports"
+          );
+
+
+        if (
+          Array.isArray(
+            stored
+          )
+        ) {
+
+          stored.forEach(
+            function (entry) {
+
+              if (!entry) return;
+
+
+              var data =
+                entry.data ||
+                entry;
+
+
+              result.push(
+                PAG.Profile.normalizeDocument(
+                  {
+                    id:
+                      entry.id ||
+                      data.id,
+
+                    type:
+                      entry.type ||
+                      data.type ||
+                      "laporan_harian",
+
+                    title:
+                      entry.title ||
+                      data.title ||
+                      "Laporan Harian",
+
+                    source:
+                      "self",
+
+                    createdBy:
+                      data.dibuat ||
+                      data.personil ||
+                      "",
+
+                    date:
+                      entry.createdAt ||
+                      data.createdAt,
+
+                    packageId:
+                      data.paket ||
+                      "",
+
+                    raw:
+                      data,
+
+                    data:
+                      data
+
+                  }
+                )
+              );
+
+            }
+          );
+
+        }
+
+      }
+
+    } catch (error) {
+
+      console.warn(
+        "Profile PAG Storage:",
+        error
+      );
+
+    }
+
+
+    /* =================================================
+       3. MASTER BACKEND
+       ================================================= */
+
+    try {
+
+      if (
+        PAG.WebUtamaSync &&
+        typeof PAG.WebUtamaSync.getMaster ===
+          "function"
+      ) {
+
+        var master =
+          await PAG.WebUtamaSync.getMaster() ||
+          {};
+
+
+        var collections = [
+
+          master.documents,
+
+          master.dokumen,
+
+          master.catatan,
+
+          master.laporan,
+
+          master.laporanHarian,
+
+          master.instruksi,
+
+          master.memo,
+
+          master.temuan,
+
+          master.tindaklanjut,
+
+          master.rfi,
+
+          master.inspection
+
+        ];
+
+
+        collections.forEach(
+          function (collection) {
+
+            if (
+              !Array.isArray(
+                collection
+              )
+            ) {
+              return;
+            }
+
+
+            collection.forEach(
+              function (item) {
+
+                if (!item) return;
+
+
+                result.push(
+                  PAG.Profile.normalizeDocument(
+                    item
+                  )
+                );
+
+              }
+            );
+
+          }
+        );
+
+      }
+
+    } catch (error) {
+
+      console.warn(
+        "Profile Master Documents:",
+        error
+      );
+
+    }
+
+
+    /* =================================================
+       DUPLICATE
        ================================================= */
 
     var unique =
@@ -1060,7 +1130,7 @@ PAG.Profile = {
 
 
     result.forEach(
-      function(item) {
+      function (item) {
 
         if (
           item &&
@@ -1078,23 +1148,20 @@ PAG.Profile = {
     );
 
 
-    /* =================================================
-       4. SORT
-       ================================================= */
-
     return Array
-      .from(unique.values())
+      .from(
+        unique.values()
+      )
       .sort(
-        function(a, b) {
+        function (a, b) {
 
           return (
             new Date(
               b.date || 0
-            ).getTime() -
-
+            ) -
             new Date(
               a.date || 0
-            ).getTime()
+            )
           );
 
         }
@@ -1103,123 +1170,16 @@ PAG.Profile = {
   },
 
 
-  /* =====================================================
-     NORMALIZE LOCAL REPORT
-     ===================================================== */
-
-  normalizeLocalReport(report) {
-
-    var data =
-      report.data ||
-      report;
-
-
-    var items =
-      Array.isArray(data.items)
-        ? data.items
-        : [];
-
-
-    var firstItem =
-      items[0] || {};
-
-
-    var title =
-      "Laporan Harian";
-
-
-    var source =
-      "self";
-
-
-    return {
-
-      id:
-        data.id ||
-        report.id ||
-        (
-          "LH-" +
-          Date.now() +
-          "-" +
-          Math.random()
-        ),
-
-
-      type:
-        "laporan_harian",
-
-
-      title:
-        title,
-
-
-      source:
-        source,
-
-
-      createdBy:
-        data.dibuat ||
-        "",
-
-
-      date:
-        data.createdAt ||
-        report.createdAt ||
-        firstItem.tanggal ||
-        "",
-
-
-      packageId:
-        data.packageId ||
-        "",
-
-
-      packageName:
-        data.paket ||
-        "",
-
-
-      konsultan:
-        data.konsultan ||
-        "",
-
-
-      kontraktor:
-        data.kontraktor ||
-        "",
-
-
-      noKontrak:
-        data.noKontrak ||
-        "",
-
-
-      diketahui:
-        data.diketahui ||
-        "",
-
-
-      items:
-        items,
-
-
-      raw:
-        data,
-
-
-      isLocalReport:
-        true
-
-    };
-
-  },
-
-
-  /* =====================================================
-     NORMALIZE DOCUMENT MASTER
-     ===================================================== */
+  /* ===================================================
+     NORMALIZE
+     =================================================== */
 
   normalizeDocument(item) {
+
+    item =
+      item ||
+      {};
+
 
     var type =
       String(
@@ -1236,9 +1196,9 @@ PAG.Profile = {
         item.source ||
         item.sumber ||
         item.createdByRole ||
-        item.role ||
         ""
-      ).toLowerCase();
+      )
+        .toLowerCase();
 
 
     var source =
@@ -1246,7 +1206,9 @@ PAG.Profile = {
 
 
     if (
-      sourceRaw.includes("admin")
+      sourceRaw.includes(
+        "admin"
+      )
     ) {
 
       source =
@@ -1255,24 +1217,13 @@ PAG.Profile = {
     } else if (
       sourceRaw.includes("se") ||
       sourceRaw.includes("supervisor") ||
-      sourceRaw.includes("engineer") ||
-      sourceRaw.includes("site engineer") ||
-      sourceRaw.includes("site_engineer")
+      sourceRaw.includes("engineer")
     ) {
 
       source =
         "se";
 
     }
-
-
-    var createdBy =
-      item.createdByName ||
-      item.namaPembuat ||
-      item.createdBy ||
-      item.author ||
-      item.dibuat ||
-      "";
 
 
     return {
@@ -1287,10 +1238,8 @@ PAG.Profile = {
           Math.random()
         ),
 
-
       type:
         type,
-
 
       title:
         item.title ||
@@ -1300,14 +1249,15 @@ PAG.Profile = {
           type
         ),
 
-
       source:
         source,
 
-
       createdBy:
-        createdBy,
-
+        item.createdByName ||
+        item.namaPembuat ||
+        item.createdBy ||
+        item.author ||
+        "",
 
       date:
         item.createdAt ||
@@ -1316,44 +1266,39 @@ PAG.Profile = {
         item.updatedAt ||
         "",
 
-
       packageId:
         item.packageId ||
         item.paketId ||
         "",
 
-
-      packageName:
-        item.paket ||
-        item.namaPaket ||
-        "",
-
-
       raw:
-        item,
-
-
-      isLocalReport:
-        false
+        item.raw ||
+        item.data ||
+        item
 
     };
 
   },
 
 
-  /* =====================================================
-     DOCUMENT TITLE
-     ===================================================== */
+  /* ===================================================
+     TITLE
+     =================================================== */
 
   documentTitle(type) {
 
     var t =
-      String(type || "")
+      String(
+        type ||
+        ""
+      )
         .toLowerCase();
 
 
     if (
-      t.includes("laporan")
+      t.includes(
+        "laporan"
+      )
     ) {
 
       return "Laporan Harian";
@@ -1362,7 +1307,9 @@ PAG.Profile = {
 
 
     if (
-      t.includes("instruksi")
+      t.includes(
+        "instruksi"
+      )
     ) {
 
       return "Instruksi Lapangan";
@@ -1371,7 +1318,9 @@ PAG.Profile = {
 
 
     if (
-      t.includes("memo")
+      t.includes(
+        "memo"
+      )
     ) {
 
       return "Memo";
@@ -1380,7 +1329,9 @@ PAG.Profile = {
 
 
     if (
-      t.includes("temuan")
+      t.includes(
+        "temuan"
+      )
     ) {
 
       return "Temuan";
@@ -1389,7 +1340,9 @@ PAG.Profile = {
 
 
     if (
-      t.includes("tindak")
+      t.includes(
+        "tindak"
+      )
     ) {
 
       return "Tindak Lanjut";
@@ -1398,7 +1351,9 @@ PAG.Profile = {
 
 
     if (
-      t.includes("rfi")
+      t.includes(
+        "rfi"
+      )
     ) {
 
       return "RFI";
@@ -1407,7 +1362,9 @@ PAG.Profile = {
 
 
     if (
-      t.includes("inspection")
+      t.includes(
+        "inspection"
+      )
     ) {
 
       return "Inspection";
@@ -1420,9 +1377,9 @@ PAG.Profile = {
   },
 
 
-  /* =====================================================
+  /* ===================================================
      LOAD
-     ===================================================== */
+     =================================================== */
 
   async loadDocuments(
     container,
@@ -1430,6 +1387,11 @@ PAG.Profile = {
   ) {
 
     if (!container) return;
+
+
+    source =
+      source ||
+      "all";
 
 
     container.innerHTML = `
@@ -1450,16 +1412,15 @@ PAG.Profile = {
 
 
     if (
-      source &&
       source !== "all"
     ) {
 
       filtered =
         documents.filter(
-          function(doc) {
+          function (x) {
 
             return (
-              doc.source ===
+              x.source ===
               source
             );
 
@@ -1481,9 +1442,9 @@ PAG.Profile = {
   },
 
 
-  /* =====================================================
-     RENDER DOCUMENTS
-     ===================================================== */
+  /* ===================================================
+     RENDER
+     =================================================== */
 
   renderDocuments(
     container,
@@ -1491,7 +1452,6 @@ PAG.Profile = {
   ) {
 
     if (
-      !documents ||
       !documents.length
     ) {
 
@@ -1524,86 +1484,27 @@ PAG.Profile = {
     container.innerHTML =
       documents
         .map(
-          function(doc) {
-
-            var itemCount =
-              Array.isArray(doc.items)
-                ? doc.items.length
-                : 0;
-
-
-            var packageText =
-              doc.packageName
-                ? `
-                  <small>
-                    📦
-                    ${PAG.Profile.escape(
-                      doc.packageName
-                    )}
-                  </small>
-                `
-                : "";
-
-
-            var countText =
-              itemCount
-                ? `
-                  <small>
-                    📋
-                    ${itemCount}
-                    kegiatan
-                  </small>
-                `
-                : "";
-
-
-            var photoCount =
-              PAG.Profile.countPhotos(
-                doc
-              );
-
-
-            var photoText =
-              photoCount
-                ? `
-                  <small>
-                    📷
-                    ${photoCount}
-                    foto
-                  </small>
-                `
-                : "";
-
+          function (doc) {
 
             return `
 
-              <div
-                class="
-                  document-item
-                  ${
-                    doc.isLocalReport
-                      ? "local-report"
-                      : ""
-                  }
-                "
-                data-search="
-                  ${PAG.Profile.escape(
-                    (
-                      doc.title +
-                      " " +
-                      doc.type +
-                      " " +
-                      doc.createdBy +
-                      " " +
-                      (
-                        doc.packageName ||
-                        ""
-                      )
-                    ).toLowerCase()
-                  )}
-                "
+              <button
+                type="button"
+                class="document-item"
+                data-document-id="${PAG.UI.escape(
+                  doc.id
+                )}"
+                data-search="${PAG.UI.escape(
+                  (
+                    doc.title +
+                    " " +
+                    doc.type +
+                    " " +
+                    doc.createdBy
+                  )
+                    .toLowerCase()
+                )}"
               >
-
 
                 <div class="document-icon">
 
@@ -1617,7 +1518,7 @@ PAG.Profile = {
                 <div class="document-content">
 
                   <b>
-                    ${PAG.Profile.escape(
+                    ${PAG.UI.escape(
                       doc.title
                     )}
                   </b>
@@ -1625,14 +1526,14 @@ PAG.Profile = {
 
                   <small>
 
-                    ${PAG.Profile.escape(
+                    ${PAG.UI.escape(
                       doc.type
                     )}
 
                     ${
                       doc.createdBy
                         ? " • " +
-                          PAG.Profile.escape(
+                          PAG.UI.escape(
                             doc.createdBy
                           )
                         : ""
@@ -1644,60 +1545,20 @@ PAG.Profile = {
                   ${
                     doc.date
                       ? `
+
                         <small
                           class="document-date"
                         >
+
                           ${PAG.Profile.formatDate(
                             doc.date
                           )}
+
                         </small>
+
                       `
                       : ""
                   }
-
-
-                  ${packageText}
-
-                  ${countText}
-
-                  ${photoText}
-
-
-                  ${
-                    doc.isLocalReport
-                      ? `
-                        <span
-                          class="
-                            document-local-badge
-                          "
-                        >
-                          Tersimpan Lokal
-                        </span>
-                      `
-                      : ""
-                  }
-
-
-                  ${
-                    doc.isLocalReport
-                      ? `
-                        <button
-                          type="button"
-                          class="
-                            document-view-button
-                          "
-                          data-report-id="
-                            ${PAG.Profile.escape(
-                              doc.id
-                            )}
-                          "
-                        >
-                          Lihat Detail
-                        </button>
-                      `
-                      : ""
-                  }
-
 
                 </div>
 
@@ -1716,7 +1577,11 @@ PAG.Profile = {
                 </span>
 
 
-              </div>
+                <span>
+                  ›
+                </span>
+
+              </button>
 
             `;
 
@@ -1726,26 +1591,22 @@ PAG.Profile = {
 
 
     /* =================================================
-       DETAIL BUTTON
+       CLICK DOCUMENT
        ================================================= */
 
     container
       .querySelectorAll(
-        ".document-view-button"
+        ".document-item"
       )
       .forEach(
-        function(button) {
+        function (button) {
 
           button.addEventListener(
             "click",
-            function() {
+            function () {
 
-              var id =
-                this.dataset.reportId;
-
-
-              PAG.Profile.showReport(
-                id
+              PAG.Profile.openDocument(
+                this.dataset.documentId
               );
 
             }
@@ -1757,33 +1618,28 @@ PAG.Profile = {
   },
 
 
-  /* =====================================================
-     SHOW REPORT
-     ===================================================== */
+  /* ===================================================
+     OPEN DOCUMENT
+     =================================================== */
 
-  showReport(id) {
+  openDocument(id) {
 
-    var reports =
-      PAG.Profile._documents || [];
+    var doc =
+      PAG.Profile._documents.find(
+        function (item) {
 
-
-    var report =
-      reports.find(
-        function(item) {
-
-          return (
-            String(item.id) ===
-            String(id)
-          );
+          return String(
+            item.id
+          ) === String(id);
 
         }
       );
 
 
-    if (!report) {
+    if (!doc) {
 
       PAG.UI.toast(
-        "Laporan tidak ditemukan."
+        "Dokumen tidak ditemukan."
       );
 
       return;
@@ -1791,430 +1647,255 @@ PAG.Profile = {
     }
 
 
+    var data =
+      doc.raw ||
+      {};
+
+
     var items =
-      Array.isArray(report.items)
-        ? report.items
+      Array.isArray(
+        data.items
+      )
+        ? data.items
         : [];
 
 
     var html = `
 
-      <div class="profile-report-detail">
+      <div class="card">
+
+        <div class="profile-section-title">
+          📋 Laporan Harian
+        </div>
 
 
-        <div class="profile-report-header">
+        <div class="profile-row">
+          <span>
+            Paket
+          </span>
 
           <b>
-            Laporan Harian
+            ${PAG.UI.escape(
+              data.paket ||
+              "-"
+            )}
           </b>
-
-          <button
-            type="button"
-            id="profileReportClose"
-          >
-            ✕
-          </button>
-
         </div>
 
 
-        ${
-          report.packageName
-            ? `
-              <div class="profile-report-package">
-                📦
-                ${PAG.Profile.escape(
-                  report.packageName
-                )}
-              </div>
-            `
-            : ""
-        }
+        <div class="profile-row">
+          <span>
+            Konsultan
+          </span>
+
+          <b>
+            ${PAG.UI.escape(
+              data.konsultan ||
+              "-"
+            )}
+          </b>
+        </div>
+
+
+        <div class="profile-row">
+          <span>
+            Kontraktor
+          </span>
+
+          <b>
+            ${PAG.UI.escape(
+              data.kontraktor ||
+              "-"
+            )}
+          </b>
+        </div>
+
+
+        <div class="profile-row">
+          <span>
+            Dibuat oleh
+          </span>
+
+          <b>
+            ${PAG.UI.escape(
+              data.dibuat ||
+              "-"
+            )}
+          </b>
+        </div>
+
+
+        <hr>
 
 
         ${
-          report.date
-            ? `
-              <div class="profile-report-date">
-                ${PAG.Profile.formatDate(
-                  report.date
-                )}
-              </div>
-            `
-            : ""
-        }
+          items
+            .map(
+              function (item, index) {
+
+                return `
+
+                  <div class="profile-card">
+
+                    <b>
+                      Kegiatan ${index + 1}
+                    </b>
 
 
-        <div class="profile-report-items">
+                    <div class="profile-row">
+                      <span>
+                        Tanggal
+                      </span>
 
-          ${
-            items.length
-              ? items
-                  .map(
-                    function(item, index) {
+                      <b>
+                        ${PAG.UI.escape(
+                          item.tanggal ||
+                          "-"
+                        )}
+                      </b>
+                    </div>
 
-                      return `
 
-                        <div
-                          class="
-                            profile-report-item
-                          "
-                        >
+                    <div class="profile-row">
+                      <span>
+                        Divisi
+                      </span>
 
-                          <div
-                            class="
-                              profile-report-item-title
+                      <b>
+                        ${PAG.UI.escape(
+                          item.divisi ||
+                          "-"
+                        )}
+                      </b>
+                    </div>
+
+
+                    <div class="profile-row">
+                      <span>
+                        STA
+                      </span>
+
+                      <b>
+                        ${PAG.UI.escape(
+                          item.sta ||
+                          "-"
+                        )}
+                      </b>
+                    </div>
+
+
+                    <div class="profile-row">
+                      <span>
+                        Cuaca
+                      </span>
+
+                      <b>
+                        ${PAG.UI.escape(
+                          item.cuaca ||
+                          "-"
+                        )}
+                      </b>
+                    </div>
+
+
+                    <div class="profile-row">
+                      <span>
+                        Uraian
+                      </span>
+
+                      <b>
+                        ${PAG.UI.escape(
+                          item.uraian ||
+                          "-"
+                        )}
+                      </b>
+                    </div>
+
+
+                    ${
+                      item.dokumentasiDataUrl
+                        ? `
+
+                          <img
+                            src="${item.dokumentasiDataUrl}"
+                            style="
+                              width:100%;
+                              margin-top:12px;
+                              border-radius:12px;
                             "
+                            alt="Dokumentasi"
                           >
 
-                            <b>
-                              Kegiatan
-                              ${index + 1}
-                            </b>
-
-                          </div>
-
-
-                          ${
-                            item.tanggal
-                              ? `
-                                <div>
-                                  <small>
-                                    Tanggal
-                                  </small>
-                                  <b>
-                                    ${PAG.Profile.escape(
-                                      item.tanggal
-                                    )}
-                                  </b>
-                                </div>
-                              `
-                              : ""
-                          }
-
-
-                          ${
-                            item.divisi
-                              ? `
-                                <div>
-                                  <small>
-                                    Divisi
-                                  </small>
-                                  <b>
-                                    ${PAG.Profile.escape(
-                                      item.divisi
-                                    )}
-                                  </b>
-                                </div>
-                              `
-                              : ""
-                          }
-
-
-                          ${
-                            item.sta
-                              ? `
-                                <div>
-                                  <small>
-                                    STA
-                                  </small>
-                                  <b>
-                                    ${PAG.Profile.escape(
-                                      item.sta
-                                    )}
-                                  </b>
-                                </div>
-                              `
-                              : ""
-                          }
-
-
-                          ${
-                            item.cuaca
-                              ? `
-                                <div>
-                                  <small>
-                                    Cuaca
-                                  </small>
-                                  <b>
-                                    ${PAG.Profile.escape(
-                                      item.cuaca
-                                    )}
-                                  </b>
-                                </div>
-                              `
-                              : ""
-                          }
-
-
-                          ${
-                            item.uraian
-                              ? `
-                                <div>
-                                  <small>
-                                    Uraian
-                                  </small>
-                                  <p>
-                                    ${PAG.Profile.escape(
-                                      item.uraian
-                                    )}
-                                  </p>
-                                </div>
-                              `
-                              : ""
-                          }
-
-
-                          ${
-                            item.tenaga
-                              ? `
-                                <div>
-                                  <small>
-                                    Tenaga Kerja
-                                  </small>
-                                  <p>
-                                    ${PAG.Profile.escape(
-                                      item.tenaga
-                                    )}
-                                  </p>
-                                </div>
-                              `
-                              : ""
-                          }
-
-
-                          ${
-                            item.peralatan
-                              ? `
-                                <div>
-                                  <small>
-                                    Peralatan
-                                  </small>
-                                  <p>
-                                    ${PAG.Profile.escape(
-                                      item.peralatan
-                                    )}
-                                  </p>
-                                </div>
-                              `
-                              : ""
-                          }
-
-
-                          ${
-                            item.material
-                              ? `
-                                <div>
-                                  <small>
-                                    Material
-                                  </small>
-                                  <p>
-                                    ${PAG.Profile.escape(
-                                      item.material
-                                    )}
-                                  </p>
-                                </div>
-                              `
-                              : ""
-                          }
-
-
-                          ${
-                            item.kendala
-                              ? `
-                                <div>
-                                  <small>
-                                    Kendala
-                                  </small>
-                                  <p>
-                                    ${PAG.Profile.escape(
-                                      item.kendala
-                                    )}
-                                  </p>
-                                </div>
-                              `
-                              : ""
-                          }
-
-
-                          ${
-                            item.dokumentasiDataUrl
-                              ? `
-                                <div
-                                  class="
-                                    profile-report-photo
-                                  "
-                                >
-
-                                  <small>
-                                    Dokumentasi
-                                  </small>
-
-                                  <img
-                                    src="${item.dokumentasiDataUrl}"
-                                    alt="Dokumentasi"
-                                  >
-
-                                </div>
-                              `
-                              : ""
-                          }
-
-                        </div>
-
-                      `;
-
+                        `
+                        : ""
                     }
-                  )
-                  .join("")
-              : `
-                <div class="empty-state">
-                  Tidak ada kegiatan.
-                </div>
-              `
-          }
 
-        </div>
+                  </div>
 
+                `;
 
-        <div class="profile-report-sign">
-
-          ${
-            report.createdBy
-              ? `
-                <div>
-                  <small>
-                    Dibuat oleh
-                  </small>
-                  <b>
-                    ${PAG.Profile.escape(
-                      report.createdBy
-                    )}
-                  </b>
-                </div>
-              `
-              : ""
-          }
+              }
+            )
+            .join("")
+        }
 
 
-          ${
-            report.diketahui
-              ? `
-                <div>
-                  <small>
-                    Diketahui oleh
-                  </small>
-                  <b>
-                    ${PAG.Profile.escape(
-                      report.diketahui
-                    )}
-                  </b>
-                </div>
-              `
-              : ""
-          }
-
-        </div>
-
+        <button
+          type="button"
+          class="btn"
+          id="profileBackDocuments"
+        >
+          ← Kembali
+        </button>
 
       </div>
 
     `;
 
 
-    var modal =
-      document.createElement(
-        "div"
+    var view =
+      document.getElementById(
+        "view"
       );
 
 
-    modal.className =
-      "profile-report-modal";
+    if (!view) return;
 
 
-    modal.innerHTML =
+    view.innerHTML =
       html;
 
 
-    document.body.appendChild(
-      modal
-    );
-
-
-    modal
-      .querySelector(
-        "#profileReportClose"
+    document
+      .getElementById(
+        "profileBackDocuments"
       )
       ?.addEventListener(
         "click",
-        function() {
+        function () {
 
-          modal.remove();
+          PAG.Router.go(
+            "profile"
+          );
 
         }
       );
 
-
-    modal.addEventListener(
-      "click",
-      function(event) {
-
-        if (
-          event.target === modal
-        ) {
-
-          modal.remove();
-
-        }
-
-      }
-    );
-
   },
 
 
-  /* =====================================================
-     COUNT PHOTOS
-     ===================================================== */
-
-  countPhotos(doc) {
-
-    if (
-      !doc ||
-      !Array.isArray(doc.items)
-    ) {
-
-      return 0;
-
-    }
-
-
-    return doc.items.filter(
-      function(item) {
-
-        return (
-          item &&
-          (
-            item.dokumentasiDataUrl ||
-            item.dokumentasi
-          )
-        );
-
-      }
-    ).length;
-
-  },
-
-
-  /* =====================================================
+  /* ===================================================
      FILTER
-     ===================================================== */
+     =================================================== */
 
-  filterDocuments(keyword) {
+  filterDocuments(
+    keyword
+  ) {
 
     var value =
       String(
-        keyword || ""
+        keyword ||
+        ""
       )
         .trim()
         .toLowerCase();
@@ -2225,7 +1906,7 @@ PAG.Profile = {
         "#profileDocuments .document-item"
       )
       .forEach(
-        function(item) {
+        function (item) {
 
           var text =
             item.dataset.search ||
@@ -2244,21 +1925,24 @@ PAG.Profile = {
   },
 
 
-  /* =====================================================
+  /* ===================================================
      ICON
-     ===================================================== */
+     =================================================== */
 
   documentIcon(type) {
 
     var t =
       String(
-        type || ""
+        type ||
+        ""
       )
         .toLowerCase();
 
 
     if (
-      t.includes("laporan")
+      t.includes(
+        "laporan"
+      )
     ) {
 
       return "📋";
@@ -2267,7 +1951,9 @@ PAG.Profile = {
 
 
     if (
-      t.includes("foto")
+      t.includes(
+        "foto"
+      )
     ) {
 
       return "📷";
@@ -2276,7 +1962,9 @@ PAG.Profile = {
 
 
     if (
-      t.includes("instruksi")
+      t.includes(
+        "instruksi"
+      )
     ) {
 
       return "📢";
@@ -2285,7 +1973,9 @@ PAG.Profile = {
 
 
     if (
-      t.includes("memo")
+      t.includes(
+        "memo"
+      )
     ) {
 
       return "📝";
@@ -2294,7 +1984,9 @@ PAG.Profile = {
 
 
     if (
-      t.includes("temuan")
+      t.includes(
+        "temuan"
+      )
     ) {
 
       return "⚠️";
@@ -2303,7 +1995,9 @@ PAG.Profile = {
 
 
     if (
-      t.includes("rfi")
+      t.includes(
+        "rfi"
+      )
     ) {
 
       return "❓";
@@ -2312,28 +2006,12 @@ PAG.Profile = {
 
 
     if (
-      t.includes("inspection")
+      t.includes(
+        "inspection"
+      )
     ) {
 
       return "🔎";
-
-    }
-
-
-    if (
-      t.includes("approval")
-    ) {
-
-      return "✓";
-
-    }
-
-
-    if (
-      t.includes("signature")
-    ) {
-
-      return "✍️";
 
     }
 
@@ -2343,13 +2021,15 @@ PAG.Profile = {
   },
 
 
-  /* =====================================================
-     SOURCE LABEL
-     ===================================================== */
+  /* ===================================================
+     SOURCE
+     =================================================== */
 
   sourceLabel(source) {
 
-    switch (source) {
+    switch (
+      source
+    ) {
 
       case "se":
         return "SE";
@@ -2365,99 +2045,52 @@ PAG.Profile = {
   },
 
 
-  /* =====================================================
+  /* ===================================================
      DATE
-     ===================================================== */
+     =================================================== */
 
   formatDate(value) {
 
-    if (!value) {
-
-      return "";
-
-    }
-
-
     try {
-
-      var d =
-        new Date(value);
-
-
-      if (
-        isNaN(
-          d.getTime()
-        )
-      ) {
-
-        return String(value);
-
-      }
-
 
       return new Intl.DateTimeFormat(
         "id-ID",
         {
-          day: "2-digit",
-          month: "short",
-          year: "numeric",
-          hour: "2-digit",
-          minute: "2-digit"
+          day:
+            "2-digit",
+
+          month:
+            "short",
+
+          year:
+            "numeric",
+
+          hour:
+            "2-digit",
+
+          minute:
+            "2-digit"
         }
-      ).format(d);
+      ).format(
+        new Date(value)
+      );
 
+    } catch (error) {
 
-    } catch (e) {
-
-      return String(value);
+      return String(
+        value ||
+        ""
+      );
 
     }
-
-  },
-
-
-  /* =====================================================
-     ESCAPE
-     ===================================================== */
-
-  escape(value) {
-
-    return String(
-      value == null
-        ? ""
-        : value
-    )
-      .replace(
-        /&/g,
-        "&amp;"
-      )
-      .replace(
-        /</g,
-        "&lt;"
-      )
-      .replace(
-        />/g,
-        "&gt;"
-      )
-      .replace(
-        /"/g,
-        "&quot;"
-      )
-      .replace(
-        /'/g,
-        "&#039;"
-      );
 
   }
 
 };
 
 
-/* =====================================================
-   DEBUG
-   ===================================================== */
-
 console.log(
   "PAG Profile loaded:",
   !!PAG.Profile
 );
+```
