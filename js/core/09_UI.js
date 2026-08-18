@@ -602,3 +602,49 @@ function escapeUIHtml(value) {
     .replace(/'/g, "&#039;");
 
 }
+updateConnectionStatus() {
+
+  const el =
+    document.getElementById(
+      "connectionStatus"
+    );
+
+  if (!el) return;
+
+  const online =
+    navigator.onLine;
+
+  const text =
+    el.querySelector(".status-text");
+
+  if (online) {
+
+    el.classList.remove("offline");
+
+    text.textContent =
+      "Online";
+
+  } else {
+
+    el.classList.add("offline");
+
+    text.textContent =
+      "Offline";
+
+  }
+
+}
+window.addEventListener(
+  "online",
+  () => PAG.UI.updateConnectionStatus()
+);
+
+window.addEventListener(
+  "offline",
+  () => PAG.UI.updateConnectionStatus()
+);
+
+document.addEventListener(
+  "DOMContentLoaded",
+  () => PAG.UI.updateConnectionStatus()
+);
