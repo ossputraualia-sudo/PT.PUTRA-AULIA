@@ -123,6 +123,44 @@ PAG.Dashboard = {
           </div>
 
         </div>
+```javascript
+<a
+  class="card sop-home-card"
+  href="https://drive.google.com/drive/folders/17D9uxcnayGFmWLk5mX0C-fckW2Cc5RJu?usp=sharing"
+  target="_blank"
+  rel="noopener noreferrer"
+  style="
+    text-decoration:none;
+    color:inherit;
+    display:flex;
+    align-items:center;
+    gap:13px;
+    cursor:pointer;
+  "
+>
+
+  <div class="sop-home-icon">
+    📘
+  </div>
+
+  <div class="sop-home-content">
+
+    <b>
+      SOP Pekerjaan
+    </b>
+
+    <span>
+      Standar Operasional Prosedur
+    </span>
+
+  </div>
+
+  <div class="sop-home-arrow">
+    ›
+  </div>
+
+</a>
+```
 
 
         <!-- =========================================
