@@ -1,8 +1,7 @@
-```javascript
 /* =====================================================
    PAG DOCS FIELD
    DASHBOARD
-   VERSI SEDERHANA / MOBILE FIRST
+   Versi sederhana - Mobile First
    ===================================================== */
 
 window.PAG = window.PAG || {};
@@ -12,713 +11,556 @@ PAG.Dashboard = {
   async render(v) {
 
     if (!v) {
-      console.error(
-        "PAG.Dashboard: view tidak ditemukan."
-      );
+      console.error("PAG.Dashboard: view tidak ditemukan.");
       return;
     }
 
+    /* ===================================================
+       DEFAULT
+       =================================================== */
+
+    var userName = "Personil Lapangan";
+    var namaPaket = "Paket belum tersinkron";
+    var online = navigator.onLine;
 
     /* ===================================================
-       LOADING
+       AMBIL USER
+       GAGAL BACKEND TIDAK BOLEH MEMBUAT DASHBOARD MATI
+       =================================================== */
+
+    try {
+
+      if (
+        PAG.Auth &&
+        typeof PAG.Auth.ensure === "function"
+      ) {
+
+        var u = await PAG.Auth.ensure();
+
+        if (u) {
+
+          userName =
+            u.name ||
+            u.nama ||
+            u.namaPersonil ||
+            userName;
+
+        }
+
+      }
+
+    } catch (error) {
+
+      console.warn(
+        "Dashboard: Auth tidak tersedia.",
+        error
+      );
+
+    }
+
+    /* ===================================================
+       AMBIL MASTER
+       =================================================== */
+
+    try {
+
+      if (
+        PAG.WebUtamaSync &&
+        typeof PAG.WebUtamaSync.getMaster === "function"
+      ) {
+
+        var master =
+          await PAG.WebUtamaSync.getMaster();
+
+        if (master) {
+
+          var paket =
+            Array.isArray(master.paket)
+              ? master.paket
+              : [];
+
+          if (paket.length > 0) {
+
+            var p = paket[0];
+
+            namaPaket =
+              p.nama ||
+              p.namaPaket ||
+              p.paket ||
+              namaPaket;
+
+          }
+
+        }
+
+      }
+
+    } catch (error) {
+
+      console.warn(
+        "Dashboard: Master tidak tersedia.",
+        error
+      );
+
+    }
+
+    /* ===================================================
+       RENDER
        =================================================== */
 
     v.innerHTML = `
 
-      <div class="card">
+      <!-- ===============================================
+           HERO
+           =============================================== -->
 
-        <p>
-          Memuat Beranda...
-        </p>
+      <section class="hero dashboard-hero">
 
-      </div>
+        <small>
+          PAG DOCS FIELD
+        </small>
+
+        <h2>
+          ${dashboardEscape(userName)}
+        </h2>
+
+        <div>
+          ${dashboardEscape(namaPaket)}
+        </div>
+
+      </section>
+
+
+      <!-- ===============================================
+           SOP
+           =============================================== -->
+
+      <a
+        class="card dashboard-sop"
+        href="https://drive.google.com/drive/folders/17D9uxcnayGFmWLk5mX0C-fckW2Cc5RJu?usp=sharing"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+
+        <div class="dashboard-sop-icon">
+          📘
+        </div>
+
+        <div class="dashboard-sop-content">
+
+          <h3>
+            SOP Pekerjaan
+          </h3>
+
+          <p>
+            Standar Operasional Prosedur
+          </p>
+
+          <small>
+            Buka dokumen SOP
+          </small>
+
+        </div>
+
+        <div class="dashboard-arrow">
+          ›
+        </div>
+
+      </a>
+
+
+      <!-- ===============================================
+           KEGIATAN LAPANGAN
+           =============================================== -->
+
+      <section class="dashboard-section">
+
+        <h4 class="section-title">
+          Kegiatan Lapangan
+        </h4>
+
+        <div class="grid dashboard-grid">
+
+          <!-- ABSENSI -->
+
+          <button
+            type="button"
+            class="action dashboard-action"
+            id="dashboardAbsensi"
+          >
+
+            <span class="action-icon">
+              📍
+            </span>
+
+            <span class="action-label">
+              Absensi
+            </span>
+
+            <small>
+              Selfie + GPS
+            </small>
+
+          </button>
+
+
+          <!-- DOKUMENTASI -->
+
+          <button
+            type="button"
+            class="action dashboard-action"
+            id="dashboardDokumentasi"
+          >
+
+            <span class="action-icon">
+              📷
+            </span>
+
+            <span class="action-label">
+              Dokumentasi
+            </span>
+
+            <small>
+              Foto Lapangan
+            </small>
+
+          </button>
+
+        </div>
+
+      </section>
+
+
+      <!-- ===============================================
+           PELAPORAN
+           =============================================== -->
+
+      <section class="dashboard-section">
+
+        <h4 class="section-title">
+          Pelaporan
+        </h4>
+
+        <div class="grid dashboard-grid">
+
+          <!-- LAPORAN HARIAN -->
+
+          <button
+            type="button"
+            class="action dashboard-action"
+            id="dashboardReport"
+          >
+
+            <span class="action-icon">
+              📋
+            </span>
+
+            <span class="action-label">
+              Laporan Harian
+            </span>
+
+            <small>
+              Kegiatan & progress
+            </small>
+
+          </button>
+
+
+          <!-- INSPECTION -->
+
+          <button
+            type="button"
+            class="action dashboard-action"
+            id="dashboardInspection"
+          >
+
+            <span class="action-icon">
+              🔎
+            </span>
+
+            <span class="action-label">
+              Inspection
+            </span>
+
+            <small>
+              Pemeriksaan pekerjaan
+            </small>
+
+          </button>
+
+
+          <!-- RFI -->
+
+          <button
+            type="button"
+            class="action dashboard-action"
+            id="dashboardRfi"
+          >
+
+            <span class="action-icon">
+              ❓
+            </span>
+
+            <span class="action-label">
+              RFI
+            </span>
+
+            <small>
+              Request for Information
+            </small>
+
+          </button>
+
+        </div>
+
+      </section>
+
+
+      <!-- ===============================================
+           STATUS
+           =============================================== -->
+
+      <section class="card dashboard-status">
+
+        <div class="dashboard-status-left">
+
+          <span
+            class="dashboard-status-dot ${online ? "online" : "offline"}"
+          ></span>
+
+          <div>
+
+            <b>
+              ${online ? "Online" : "Offline"}
+            </b>
+
+            <small>
+              ${online
+                ? "Siap melakukan sinkronisasi"
+                : "Data akan disimpan di perangkat"
+              }
+            </small>
+
+          </div>
+
+        </div>
+
+        <button
+          type="button"
+          class="dashboard-sync-button"
+          id="dashboardSync"
+        >
+          ↻
+        </button>
+
+      </section>
 
     `;
 
 
-    try {
+    /* ===================================================
+       EVENT ABSENSI
+       =================================================== */
 
-      /* =================================================
-         AUTH
-         ================================================= */
+    var absensiBtn =
+      document.getElementById("dashboardAbsensi");
 
-      let u = {};
+    if (absensiBtn) {
 
-      try {
+      absensiBtn.addEventListener(
+        "click",
+        function () {
 
-        if (
-          PAG.Auth &&
-          typeof PAG.Auth.ensure === "function"
-        ) {
+          try {
 
-          u =
-            await PAG.Auth.ensure() || {};
+            if (
+              PAG.Absensi &&
+              typeof PAG.Absensi.start === "function"
+            ) {
 
-        }
+              PAG.Absensi.start();
 
-      } catch (error) {
+            } else {
 
-        console.warn(
-          "Auth tidak tersedia:",
-          error
-        );
-
-      }
-
-
-      /* =================================================
-         USER
-         ================================================= */
-
-      const userName =
-        u.name ||
-        u.nama ||
-        u.namaPersonil ||
-        "Personil Lapangan";
-
-
-      const userRole =
-        u.role ||
-        u.jabatan ||
-        "Personil Lapangan";
-
-
-      /* =================================================
-         MASTER
-         ================================================= */
-
-      let master = {};
-
-      try {
-
-        if (
-          PAG.WebUtamaSync &&
-          typeof PAG.WebUtamaSync.getMaster === "function"
-        ) {
-
-          master =
-            await PAG.WebUtamaSync.getMaster() || {};
-
-        }
-
-      } catch (error) {
-
-        console.warn(
-          "Master tidak tersedia:",
-          error
-        );
-
-      }
-
-
-      /* =================================================
-         PAKET
-         ================================================= */
-
-      const paketList =
-        Array.isArray(master.paket)
-          ? master.paket
-          : [];
-
-
-      const paket =
-        paketList.length
-          ? paketList[0]
-          : null;
-
-
-      const namaPaket =
-        paket?.nama ||
-        paket?.namaPaket ||
-        "Paket belum tersinkron";
-
-
-      /* =================================================
-         CONNECTION
-         ================================================= */
-
-      const online =
-        navigator.onLine;
-
-
-      /* =================================================
-         RENDER
-         ================================================= */
-
-      v.innerHTML = `
-
-
-        <!-- =============================================
-             HERO
-             ============================================= -->
-
-        <div class="hero">
-
-          <small>
-            PAG DOCS FIELD
-          </small>
-
-          <h2>
-            ${escapeHtml(userName)}
-          </h2>
-
-          <div>
-            ${escapeHtml(namaPaket)}
-          </div>
-
-        </div>
-
-
-        <!-- =============================================
-             SOP
-             ============================================= -->
-
-        <a
-          href="https://drive.google.com/drive/folders/17D9uxcnayGFmWLk5mX0C-fckW2Cc5RJu?usp=sharing"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="sop-card"
-        >
-
-          <div class="sop-card-icon">
-            📘
-          </div>
-
-          <div class="sop-card-content">
-
-            <span class="sop-card-title">
-              SOP Pekerjaan
-            </span>
-
-            <span class="sop-card-description">
-              Standar Operasional Prosedur
-            </span>
-
-          </div>
-
-          <div class="sop-card-arrow">
-            ›
-          </div>
-
-        </a>
-
-
-        <!-- =============================================
-             KEHADIRAN & DOKUMENTASI
-             ============================================= -->
-
-        <div class="dashboard-section">
-
-          <h4 class="section-title">
-            📍 Kehadiran & Dokumentasi
-          </h4>
-
-
-          <div class="grid dashboard-grid">
-
-
-            <!-- ABSENSI -->
-
-            <button
-              class="action"
-              type="button"
-              onclick="
-                if (
-                  PAG.Absensi &&
-                  typeof PAG.Absensi.start === 'function'
-                ) {
-
-                  PAG.Absensi.start();
-
-                } else {
-
-                  PAG.UI.toast(
-                    'Modul Absensi belum tersedia'
-                  );
-
-                }
-              "
-            >
-
-              <span class="action-icon">
-                📍
-              </span>
-
-              <span class="action-label">
-                Absensi
-              </span>
-
-              <small>
-                Selfie + GPS
-              </small>
-
-            </button>
-
-
-            <!-- DOKUMENTASI -->
-
-            <button
-              class="action"
-              type="button"
-              onclick="
-                PAG.Router.go('photo')
-              "
-            >
-
-              <span class="action-icon">
-                📷
-              </span>
-
-              <span class="action-label">
-                Dokumentasi
-              </span>
-
-              <small>
-                Foto Lapangan
-              </small>
-
-            </button>
-
-
-          </div>
-
-        </div>
-
-
-        <!-- =============================================
-             PELAPORAN
-             ============================================= -->
-
-        <div class="dashboard-section">
-
-          <h4 class="section-title">
-            📋 Pelaporan
-          </h4>
-
-
-          <div class="grid dashboard-grid">
-
-
-            <!-- LAPORAN HARIAN -->
-
-            <button
-              class="action"
-              type="button"
-              onclick="
-                PAG.Router.go('report')
-              "
-            >
-
-              <span class="action-icon">
-                📋
-              </span>
-
-              <span class="action-label">
-                Laporan Harian
-              </span>
-
-              <small>
-                Progress & Kondisi
-              </small>
-
-            </button>
-
-
-            <!-- RFI -->
-
-            <button
-              class="action"
-              type="button"
-              onclick="
-                PAG.Router.go('rfi')
-              "
-            >
-
-              <span class="action-icon">
-                ❓
-              </span>
-
-              <span class="action-label">
-                RFI
-              </span>
-
-              <small>
-                Request for Information
-              </small>
-
-            </button>
-
-
-            <!-- INSPECTION -->
-
-            <button
-              class="action"
-              type="button"
-              onclick="
-                PAG.Router.go('inspection')
-              "
-            >
-
-              <span class="action-icon">
-                🔎
-              </span>
-
-              <span class="action-label">
-                Inspection
-              </span>
-
-              <small>
-                Pemeriksaan
-              </small>
-
-            </button>
-
-
-            <!-- HASIL INSPECTION -->
-
-            <button
-              class="action"
-              type="button"
-              onclick="
-                PAG.Router.go('inspectionResult')
-              "
-            >
-
-              <span class="action-icon">
-                📊
-              </span>
-
-              <span class="action-label">
-                Hasil Inspection
-              </span>
-
-              <small>
-                Hasil & Temuan
-              </small>
-
-            </button>
-
-
-          </div>
-
-        </div>
-
-
-        <!-- =============================================
-             MANAJEMEN PEKERJAAN
-             ============================================= -->
-
-        <div class="dashboard-section">
-
-          <h4 class="section-title">
-            ⚙️ Manajemen Pekerjaan
-          </h4>
-
-
-          <div class="grid dashboard-grid">
-
-
-            <!-- INSTRUKSI -->
-
-            <button
-              class="action"
-              type="button"
-              onclick="
-                PAG.Router.go('instruksi')
-              "
-            >
-
-              <span class="action-icon">
-                📢
-              </span>
-
-              <span class="action-label">
-                Instruksi
-              </span>
-
-              <small>
-                Perintah Kerja
-              </small>
-
-            </button>
-
-
-            <!-- MEMO -->
-
-            <button
-              class="action"
-              type="button"
-              onclick="
-                PAG.Router.go('memo')
-              "
-            >
-
-              <span class="action-icon">
-                📝
-              </span>
-
-              <span class="action-label">
-                Memo
-              </span>
-
-              <small>
-                Nota Dinas
-              </small>
-
-            </button>
-
-
-            <!-- TEMUAN -->
-
-            <button
-              class="action"
-              type="button"
-              onclick="
-                PAG.Router.go('temuan')
-              "
-            >
-
-              <span class="action-icon">
-                ⚠️
-              </span>
-
-              <span class="action-label">
-                Temuan
-              </span>
-
-              <small>
-                Masalah & Deviasi
-              </small>
-
-            </button>
-
-
-            <!-- TINDAK LANJUT -->
-
-            <button
-              class="action"
-              type="button"
-              onclick="
-                PAG.Router.go('tindaklanjut')
-              "
-            >
-
-              <span class="action-icon">
-                🔄
-              </span>
-
-              <span class="action-label">
-                Tindak Lanjut
-              </span>
-
-              <small>
-                Perbaikan & Closure
-              </small>
-
-            </button>
-
-
-          </div>
-
-        </div>
-
-
-        <!-- =============================================
-             STATUS SINKRONISASI
-             ============================================= -->
-
-        <div class="card">
-
-          <div class="sync-status-row">
-
-            <div>
-
-              <b>
-                Sinkronisasi Data
-              </b>
-
-              <small>
-                ${paketList.length}
-                paket tersimpan
-              </small>
-
-            </div>
-
-
-            <span
-              class="
-                sync-indicator
-                ${online ? "online" : "offline"}
-              "
-            >
-
-              ${online ? "ONLINE" : "OFFLINE"}
-
-            </span>
-
-          </div>
-
-
-          <button
-            class="btn"
-            type="button"
-            id="dashboardSyncBtn"
-          >
-
-            🔄 Sinkron Sekarang
-
-          </button>
-
-        </div>
-
-
-      `;
-
-
-      /* =================================================
-         SYNC BUTTON
-         ================================================= */
-
-      const syncBtn =
-        document.getElementById(
-          "dashboardSyncBtn"
-        );
-
-
-      if (syncBtn) {
-
-        syncBtn.addEventListener(
-          "click",
-          async function () {
-
-            try {
-
-              syncBtn.disabled = true;
-
-              syncBtn.textContent =
-                "⏳ Menyinkronkan...";
-
-
-              if (
-                PAG.WebUtamaSync &&
-                typeof PAG.WebUtamaSync.pull === "function"
-              ) {
-
-                await PAG.WebUtamaSync.pull();
-
-              }
-
-
-              if (
-                PAG.OfflineSync &&
-                typeof PAG.OfflineSync.run === "function"
-              ) {
-
-                await PAG.OfflineSync.run();
-
-              }
-
-
-              if (
-                PAG.UI &&
-                typeof PAG.UI.toast === "function"
-              ) {
-
-                PAG.UI.toast(
-                  "Sinkronisasi selesai"
-                );
-
-              }
-
-
-              syncBtn.textContent =
-                "✅ Sinkron Selesai";
-
-
-              setTimeout(
-                function () {
-
-                  syncBtn.disabled = false;
-
-                  syncBtn.textContent =
-                    "🔄 Sinkron Sekarang";
-
-                },
-                1800
+              dashboardToast(
+                "Modul Absensi belum tersedia"
               );
-
-
-            } catch (error) {
-
-              console.error(
-                "Dashboard sync error:",
-                error
-              );
-
-
-              if (
-                PAG.UI &&
-                typeof PAG.UI.toast === "function"
-              ) {
-
-                PAG.UI.toast(
-                  "Sinkronisasi gagal"
-                );
-
-              }
-
-
-              syncBtn.disabled = false;
-
-              syncBtn.textContent =
-                "🔄 Coba Sinkron Lagi";
 
             }
 
+          } catch (error) {
+
+            console.error(
+              "Absensi:",
+              error
+            );
+
+            dashboardToast(
+              "Absensi tidak dapat dibuka"
+            );
+
           }
-        );
 
-      }
-
-
-    } catch (error) {
-
-      console.error(
-        "PAG Dashboard Error:",
-        error
+        }
       );
 
+    }
 
-      v.innerHTML = `
 
-        <div class="card">
+    /* ===================================================
+       DOKUMENTASI
+       =================================================== */
 
-          <h3>
-            Beranda gagal dimuat
-          </h3>
+    var dokumentasiBtn =
+      document.getElementById(
+        "dashboardDokumentasi"
+      );
 
-          <p>
-            ${escapeHtml(
-              error?.message ||
-              String(error)
-            )}
-          </p>
+    if (dokumentasiBtn) {
 
-          <button
-            class="btn"
-            type="button"
-            onclick="
-              PAG.Router.go('home')
-            "
-          >
+      dokumentasiBtn.addEventListener(
+        "click",
+        function () {
 
-            Coba Lagi
+          dashboardGo("photo");
 
-          </button>
+        }
+      );
 
-        </div>
+    }
 
-      `;
+
+    /* ===================================================
+       LAPORAN
+       =================================================== */
+
+    var reportBtn =
+      document.getElementById(
+        "dashboardReport"
+      );
+
+    if (reportBtn) {
+
+      reportBtn.addEventListener(
+        "click",
+        function () {
+
+          dashboardGo("report");
+
+        }
+      );
+
+    }
+
+
+    /* ===================================================
+       INSPECTION
+       =================================================== */
+
+    var inspectionBtn =
+      document.getElementById(
+        "dashboardInspection"
+      );
+
+    if (inspectionBtn) {
+
+      inspectionBtn.addEventListener(
+        "click",
+        function () {
+
+          dashboardGo("inspection");
+
+        }
+      );
+
+    }
+
+
+    /* ===================================================
+       RFI
+       =================================================== */
+
+    var rfiBtn =
+      document.getElementById(
+        "dashboardRfi"
+      );
+
+    if (rfiBtn) {
+
+      rfiBtn.addEventListener(
+        "click",
+        function () {
+
+          dashboardGo("rfi");
+
+        }
+      );
+
+    }
+
+
+    /* ===================================================
+       SYNC
+       =================================================== */
+
+    var syncBtn =
+      document.getElementById(
+        "dashboardSync"
+      );
+
+    if (syncBtn) {
+
+      syncBtn.addEventListener(
+        "click",
+        async function () {
+
+          syncBtn.disabled = true;
+          syncBtn.textContent = "⏳";
+
+          try {
+
+            if (
+              PAG.WebUtamaSync &&
+              typeof PAG.WebUtamaSync.pull === "function"
+            ) {
+
+              await PAG.WebUtamaSync.pull();
+
+            }
+
+            if (
+              PAG.OfflineSync &&
+              typeof PAG.OfflineSync.run === "function"
+            ) {
+
+              await PAG.OfflineSync.run();
+
+            }
+
+            dashboardToast(
+              "Sinkronisasi selesai"
+            );
+
+          } catch (error) {
+
+            console.error(
+              "Dashboard Sync:",
+              error
+            );
+
+            dashboardToast(
+              "Sinkronisasi gagal"
+            );
+
+          } finally {
+
+            syncBtn.disabled = false;
+            syncBtn.textContent = "↻";
+
+          }
+
+        }
+      );
 
     }
 
@@ -728,37 +570,102 @@ PAG.Dashboard = {
 
 
 /* =====================================================
-   ESCAPE HTML
+   ROUTER HELPER
    ===================================================== */
 
-function escapeHtml(value) {
+function dashboardGo(route) {
 
-  return String(value ?? "")
+  try {
 
-    .replace(
-      /&/g,
-      "&amp;"
-    )
+    if (
+      PAG.Router &&
+      typeof PAG.Router.go === "function"
+    ) {
 
-    .replace(
-      /</g,
-      "&lt;"
-    )
+      PAG.Router.go(route);
 
-    .replace(
-      />/g,
-      "&gt;"
-    )
+    } else {
 
-    .replace(
-      /"/g,
-      "&quot;"
-    )
+      dashboardToast(
+        "Modul belum tersedia: " + route
+      );
 
-    .replace(
-      /'/g,
-      "&#039;"
+    }
+
+  } catch (error) {
+
+    console.error(
+      "Dashboard Router:",
+      error
     );
+
+    dashboardToast(
+      "Tidak dapat membuka modul"
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   TOAST
+   ===================================================== */
+
+function dashboardToast(message) {
+
+  try {
+
+    if (
+      PAG.UI &&
+      typeof PAG.UI.toast === "function"
+    ) {
+
+      PAG.UI.toast(message);
+      return;
+
+    }
+
+  } catch (error) {
+
+    console.warn(error);
+
+  }
+
+  var toast =
+    document.getElementById("toast");
+
+  if (!toast) {
+    return;
+  }
+
+  toast.textContent = message;
+  toast.style.display = "block";
+
+  setTimeout(
+    function () {
+
+      toast.style.display = "none";
+
+    },
+    2500
+  );
+
+}
+
+
+/* =====================================================
+   ESCAPE
+   ===================================================== */
+
+function dashboardEscape(value) {
+
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 
 }
 
@@ -771,4 +678,3 @@ console.log(
   "PAG Dashboard loaded:",
   !!PAG.Dashboard
 );
-```
