@@ -1,8 +1,8 @@
 PAG.UI = {
 
-  // =====================================================
-  // RENDER ROUTE
-  // =====================================================
+  /* =====================================================
+     RENDER
+     ===================================================== */
 
   async render(route) {
 
@@ -10,408 +10,144 @@ PAG.UI = {
       document.getElementById("view");
 
     if (!view) {
-
       console.error(
-        "PAG.UI: #view tidak ditemukan"
+        "PAG.UI: #view tidak ditemukan."
       );
-
       return;
-
     }
 
 
-    // Loading
+    this.setActiveNav(route);
 
-    view.innerHTML = `
-
-      <div class="card">
-
-        <p>
-          Memuat halaman...
-        </p>
-
-      </div>
-
-    `;
-
-
-    // ===================================================
-    // ROUTE → MODULE
-    // ===================================================
 
     try {
 
+      view.innerHTML = `
+        <div class="card">
+          <p>Memuat...</p>
+        </div>
+      `;
+
+
+      let module = null;
+
+
       switch (route) {
 
-
-        // ===============================================
-        // HOME
-        // ===============================================
-
         case "home":
-
-          if (
-            PAG.Dashboard &&
-            PAG.Dashboard.render
-          ) {
-
-            await PAG.Dashboard.render(view);
-
-          } else {
-
-            this.notReady(
-              view,
-              "Dashboard"
-            );
-
-          }
-
+          module = PAG.Dashboard;
           break;
 
-
-        // ===============================================
-        // LAPORAN
-        // ===============================================
 
         case "report":
-
-          if (
-            PAG.LaporanHarian &&
-            PAG.LaporanHarian.render
-          ) {
-
-            await PAG.LaporanHarian.render(view);
-
-          } else {
-
-            this.notReady(
-              view,
-              "Laporan Harian"
-            );
-
-          }
-
+          module = PAG.LaporanHarian;
           break;
 
-
-        // ===============================================
-        // FOTO / DOKUMENTASI
-        // ===============================================
 
         case "photo":
-
-          if (
-            PAG.Dokumentasi &&
-            PAG.Dokumentasi.render
-          ) {
-
-            await PAG.Dokumentasi.render(view);
-
-          } else {
-
-            this.notReady(
-              view,
-              "Dokumentasi"
-            );
-
-          }
-
+          module = PAG.Dokumentasi;
           break;
 
-
-        // ===============================================
-        // PROFILE
-        // ===============================================
 
         case "profile":
-
-          if (
-            PAG.Profile &&
-            PAG.Profile.render
-          ) {
-
-            await PAG.Profile.render(view);
-
-          } else {
-
-            this.notReady(
-              view,
-              "Profil"
-            );
-
-          }
-
-          break;
-
-case "notification":
-
-  await this.module(
-    view,
-    PAG.Notification,
-    "Notifikasi"
-  );
-
-  break;
-        // ===============================================
-        // ACTIVITY
-        // ===============================================
-
-        case "activity":
-
-          if (
-            PAG.Activity &&
-            PAG.Activity.render
-          ) {
-
-            await PAG.Activity.render(view);
-
-          } else {
-
-            this.notReady(
-              view,
-              "Aktivitas"
-            );
-
-          }
-
+          module = PAG.Profile;
           break;
 
 
-        // ===============================================
-        // RFI
-        // ===============================================
+        case "notification":
+          module = PAG.Notification;
+          break;
+
 
         case "rfi":
-
-          await this.module(
-            view,
-            PAG.RFI,
-            "RFI"
-          );
-
+          module = PAG.RFI;
           break;
 
-
-        // ===============================================
-        // INSPECTION
-        // ===============================================
 
         case "inspection":
-
-          await this.module(
-            view,
-            PAG.Inspection,
-            "Inspection"
-          );
-
+          module = PAG.Inspection;
           break;
 
-
-        // ===============================================
-        // INSPECTION RESULT
-        // ===============================================
 
         case "inspectionResult":
-
-          await this.module(
-            view,
-            PAG.InspectionResult,
-            "Hasil Inspection"
-          );
-
+          module = PAG.InspectionResult;
           break;
 
-
-        // ===============================================
-        // INSTRUKSI
-        // ===============================================
 
         case "instruksi":
-
-          await this.module(
-            view,
-            PAG.Instruksi,
-            "Instruksi"
-          );
-
+          module = PAG.Instruksi;
           break;
 
-
-        // ===============================================
-        // MEMO
-        // ===============================================
 
         case "memo":
-
-          await this.module(
-            view,
-            PAG.Memo,
-            "Memo"
-          );
-
+          module = PAG.Memo;
           break;
 
-
-        // ===============================================
-        // TEMUAN
-        // ===============================================
 
         case "temuan":
-
-          await this.module(
-            view,
-            PAG.Temuan,
-            "Temuan"
-          );
-
+          module = PAG.Temuan;
           break;
 
-
-        // ===============================================
-        // TINDAK LANJUT
-        // ===============================================
 
         case "tindaklanjut":
-
-          await this.module(
-            view,
-            PAG.TindakLanjut,
-            "Tindak Lanjut"
-          );
-
+          module = PAG.TindakLanjut;
           break;
 
 
-        // ===============================================
-        // REVISION
-        // ===============================================
-
-        case "revision":
-
-          await this.module(
-            view,
-            PAG.Revision,
-            "Revision"
-          );
-
+        case "activity":
+          module = PAG.Activity;
           break;
 
-
-        // ===============================================
-        // APPROVAL
-        // ===============================================
-
-        case "approval":
-
-          await this.module(
-            view,
-            PAG.Approval,
-            "Approval"
-          );
-
-          break;
-
-
-        // ===============================================
-        // SIGNATURE
-        // ===============================================
-
-        case "signature":
-
-          await this.module(
-            view,
-            PAG.Signature,
-            "Signature"
-          );
-
-          break;
-
-
-        // ===============================================
-        // QR VERIFY
-        // ===============================================
-
-        case "qrverify":
-
-          await this.module(
-            view,
-            PAG.QRVerify,
-            "QR Verify"
-          );
-
-          break;
-
-
-        // ===============================================
-        // AUDIT LOG
-        // ===============================================
-
-        case "auditlog":
-
-          await this.module(
-            view,
-            PAG.AuditLog,
-            "Audit Log"
-          );
-
-          break;
-
-
-        // ===============================================
-        // DRIVE
-        // ===============================================
-
-        case "drive":
-
-          await this.module(
-            view,
-            PAG.Drive,
-            "Google Drive"
-          );
-
-          break;
-
-
-        // ===============================================
-        // PDF
-        // ===============================================
-
-        case "pdf":
-
-          await this.module(
-            view,
-            PAG.PDFGenerator,
-            "PDF Generator"
-          );
-
-          break;
-
-
-        // ===============================================
-        // DEFAULT
-        // ===============================================
 
         default:
 
-          await PAG.Router.go(
-            "home"
+          console.warn(
+            "Route tidak ditemukan:",
+            route
           );
+
+          module =
+            PAG.Dashboard;
+
+          route = "home";
+
+          break;
 
       }
 
 
-      // =================================================
-      // UPDATE NAVIGATION
-      // =================================================
+      if (
+        !module ||
+        typeof module.render !== "function"
+      ) {
 
-      this.updateNavigation(route);
+        view.innerHTML = `
+          <div class="card">
+
+            <h3>
+              Modul belum tersedia
+            </h3>
+
+            <p>
+              Modul:
+              ${this.escape(route)}
+            </p>
+
+          </div>
+        `;
+
+        return;
+
+      }
+
+
+      await module.render(view);
 
 
     } catch (error) {
 
       console.error(
-        "UI RENDER ERROR:",
-        route,
+        "PAG.UI render error:",
         error
       );
 
@@ -420,12 +156,12 @@ case "notification":
 
         <div class="card">
 
-          <h2>
+          <h3>
             Gagal memuat halaman
-          </h2>
+          </h3>
 
           <p>
-            ${escapeUIHtml(
+            ${this.escape(
               error.message ||
               String(error)
             )}
@@ -447,94 +183,11 @@ case "notification":
   },
 
 
-  // =====================================================
-  // GENERIC MODULE RENDER
-  // =====================================================
+  /* =====================================================
+     NAV ACTIVE
+     ===================================================== */
 
-  async module(
-    view,
-    module,
-    title
-  ) {
-
-    if (
-      module &&
-      typeof module.render === "function"
-    ) {
-
-      await module.render(view);
-
-      return;
-
-    }
-
-
-    // Modul masih placeholder
-
-    view.innerHTML = `
-
-      <div class="card">
-
-        <h2>
-          ${escapeUIHtml(title)}
-        </h2>
-
-        <p>
-          Modul ${escapeUIHtml(title)}
-          siap dikembangkan.
-        </p>
-
-        <button
-          class="btn"
-          onclick="PAG.Router.go('home')"
-        >
-          Kembali ke Beranda
-        </button>
-
-      </div>
-
-    `;
-
-  },
-
-
-  // =====================================================
-  // MODULE NOT READY
-  // =====================================================
-
-  notReady(view, title) {
-
-    view.innerHTML = `
-
-      <div class="card">
-
-        <h2>
-          ${escapeUIHtml(title)}
-        </h2>
-
-        <p>
-          Modul belum tersedia.
-        </p>
-
-        <button
-          class="btn"
-          onclick="PAG.Router.go('home')"
-        >
-          Kembali ke Beranda
-        </button>
-
-      </div>
-
-    `;
-
-  },
-
-
-  // =====================================================
-  // UPDATE BOTTOM NAV
-  // =====================================================
-
-  updateNavigation(route) {
+  setActiveNav(route) {
 
     document
       .querySelectorAll(
@@ -542,49 +195,148 @@ case "notification":
       )
       .forEach(button => {
 
-        const r =
-          button.dataset.r;
-
-        button.classList.toggle(
-          "active",
-          r === route
+        button.classList.remove(
+          "active"
         );
+
+
+        if (
+          button.dataset.r === route
+        ) {
+
+          button.classList.add(
+            "active"
+          );
+
+        }
 
       });
 
   },
 
 
-  // =====================================================
-  // TOAST
-  // =====================================================
+  /* =====================================================
+     TOAST
+     ===================================================== */
 
-  toast(message) {
+  toast(message, duration = 2500) {
 
     const toast =
       document.getElementById("toast");
 
     if (!toast) return;
 
+
     toast.textContent =
       message;
+
 
     toast.style.display =
       "block";
 
+
     clearTimeout(
-      this.toastTimer
+      this._toastTimer
     );
 
-    this.toastTimer =
-      setTimeout(
-        () => {
 
-          toast.style.display =
-            "none";
+    this._toastTimer =
+      setTimeout(() => {
 
-        },
-        2500
+        toast.style.display =
+          "none";
+
+      }, duration);
+
+  },
+
+
+  /* =====================================================
+     CONNECTION STATUS
+     ===================================================== */
+
+  updateConnectionStatus() {
+
+    const el =
+      document.getElementById(
+        "connectionStatus"
+      );
+
+    if (!el) return;
+
+
+    const text =
+      el.querySelector(
+        ".status-text"
+      );
+
+
+    if (navigator.onLine) {
+
+      el.classList.remove(
+        "offline"
+      );
+
+
+      if (text) {
+
+        text.textContent =
+          "Online";
+
+      }
+
+    } else {
+
+      el.classList.add(
+        "offline"
+      );
+
+
+      if (text) {
+
+        text.textContent =
+          "Offline";
+
+      }
+
+    }
+
+  },
+
+
+  /* =====================================================
+     ESCAPE HTML
+     ===================================================== */
+
+  escape(value) {
+
+    return String(
+      value ?? ""
+    )
+
+      .replace(
+        /&/g,
+        "&amp;"
+      )
+
+      .replace(
+        /</g,
+        "&lt;"
+      )
+
+      .replace(
+        />/g,
+        "&gt;"
+      )
+
+      .replace(
+        /"/g,
+        "&quot;"
+      )
+
+      .replace(
+        /'/g,
+        "&#039;"
       );
 
   }
@@ -592,59 +344,35 @@ case "notification":
 };
 
 
-function escapeUIHtml(value) {
+/* =====================================================
+   ONLINE / OFFLINE EVENT
+   ===================================================== */
 
-  return String(value ?? "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-
-}
-updateConnectionStatus() {
-
-  const el =
-    document.getElementById(
-      "connectionStatus"
-    );
-
-  if (!el) return;
-
-  const online =
-    navigator.onLine;
-
-  const text =
-    el.querySelector(".status-text");
-
-  if (online) {
-
-    el.classList.remove("offline");
-
-    text.textContent =
-      "Online";
-
-  } else {
-
-    el.classList.add("offline");
-
-    text.textContent =
-      "Offline";
-
-  }
-
-}
 window.addEventListener(
   "online",
-  () => PAG.UI.updateConnectionStatus()
+  function () {
+
+    PAG.UI.updateConnectionStatus();
+
+  }
 );
+
 
 window.addEventListener(
   "offline",
-  () => PAG.UI.updateConnectionStatus()
+  function () {
+
+    PAG.UI.updateConnectionStatus();
+
+  }
 );
+
 
 document.addEventListener(
   "DOMContentLoaded",
-  () => PAG.UI.updateConnectionStatus()
+  function () {
+
+    PAG.UI.updateConnectionStatus();
+
+  }
 );
