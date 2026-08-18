@@ -1,21 +1,33 @@
 PAG.Dashboard = {
 
+  /* =====================================================
+     DASHBOARD
+     ===================================================== */
+
   async render(v) {
 
     try {
 
+      /* =================================================
+         LOADING
+         ================================================= */
+
       v.innerHTML = `
-        <div class="hero">
-          <small>PERSONIL LAPANGAN</small>
-          <h2>Memuat...</h2>
-          <div>Menyiapkan data proyek</div>
+
+        <div class="card">
+
+          <p>
+            Memuat Dashboard...
+          </p>
+
         </div>
+
       `;
 
 
-      // ==================================================
-      // AUTH
-      // ==================================================
+      /* =================================================
+         AUTH
+         ================================================= */
 
       const u =
         await PAG.Auth.ensure();
@@ -24,10 +36,19 @@ PAG.Dashboard = {
       if (!u) {
 
         v.innerHTML = `
+
           <div class="card">
-            <h2>Login diperlukan</h2>
-            <p>Nama personil belum diberikan.</p>
+
+            <h2>
+              Login diperlukan
+            </h2>
+
+            <p>
+              Data personil belum tersedia.
+            </p>
+
           </div>
+
         `;
 
         return;
@@ -35,11 +56,12 @@ PAG.Dashboard = {
       }
 
 
-      // ==================================================
-      // MASTER WEB UTAMA
-      // ==================================================
+      /* =================================================
+         MASTER WEB UTAMA
+         ================================================= */
 
       let m = {};
+
 
       try {
 
@@ -57,7 +79,9 @@ PAG.Dashboard = {
 
 
       const paket =
-        Array.isArray(m?.paket)
+        Array.isArray(
+          m?.paket
+        )
           ? m.paket
           : [];
 
@@ -66,15 +90,15 @@ PAG.Dashboard = {
         paket[0];
 
 
-      // ==================================================
-      // DASHBOARD
-      // ==================================================
+      /* =================================================
+         DASHBOARD
+         ================================================= */
 
       v.innerHTML = `
 
-        <!-- ============================================
-             HEADER PERSONIL / PAKET
-             ============================================ -->
+        <!-- =========================================
+             HERO
+             ========================================= -->
 
         <div class="hero">
 
@@ -83,22 +107,27 @@ PAG.Dashboard = {
           </small>
 
           <h2>
-            ${escapeHtml(u.name)}
+            ${escapeHtml(
+              u.name ||
+              "Personil"
+            )}
           </h2>
 
           <div>
+
             ${escapeHtml(
               p?.nama ||
               "Paket belum tersinkron"
             )}
+
           </div>
 
         </div>
 
 
-        <!-- ============================================
-             MENU UTAMA LAPANGAN
-             ============================================ -->
+        <!-- =========================================
+             MENU UTAMA
+             ========================================= -->
 
         <div class="grid">
 
@@ -107,6 +136,7 @@ PAG.Dashboard = {
 
           <button
             class="action"
+            type="button"
             onclick="PAG.Absensi.start()"
           >
 
@@ -115,8 +145,6 @@ PAG.Dashboard = {
             <br>
 
             Absensi
-
-            <br>
 
             <small>
               Selfie + GPS
@@ -129,6 +157,7 @@ PAG.Dashboard = {
 
           <button
             class="action"
+            type="button"
             onclick="PAG.Router.go('report')"
           >
 
@@ -138,10 +167,8 @@ PAG.Dashboard = {
 
             Laporan Harian
 
-            <br>
-
             <small>
-              Progress & kondisi
+              Laporan pekerjaan
             </small>
 
           </button>
@@ -151,16 +178,15 @@ PAG.Dashboard = {
 
           <button
             class="action"
+            type="button"
             onclick="PAG.Router.go('rfi')"
           >
 
-            📝
+            📄
 
             <br>
 
             RFI
-
-            <br>
 
             <small>
               Request for Information
@@ -173,41 +199,18 @@ PAG.Dashboard = {
 
           <button
             class="action"
+            type="button"
             onclick="PAG.Router.go('inspection')"
           >
 
-            🔍
+            🔎
 
             <br>
 
             Inspection
 
-            <br>
-
             <small>
               Pemeriksaan lapangan
-            </small>
-
-          </button>
-
-
-          <!-- TEMUAN -->
-
-          <button
-            class="action"
-            onclick="PAG.Router.go('temuan')"
-          >
-
-            ⚠️
-
-            <br>
-
-            Temuan
-
-            <br>
-
-            <small>
-              Temuan lapangan
             </small>
 
           </button>
@@ -217,6 +220,7 @@ PAG.Dashboard = {
 
           <button
             class="action"
+            type="button"
             onclick="PAG.Router.go('instruksi')"
           >
 
@@ -225,8 +229,6 @@ PAG.Dashboard = {
             <br>
 
             Instruksi
-
-            <br>
 
             <small>
               Instruksi pekerjaan
@@ -239,19 +241,39 @@ PAG.Dashboard = {
 
           <button
             class="action"
+            type="button"
             onclick="PAG.Router.go('memo')"
           >
 
-            📄
+            📝
 
             <br>
 
             Memo
 
+            <small>
+              Catatan pekerjaan
+            </small>
+
+          </button>
+
+
+          <!-- TEMUAN -->
+
+          <button
+            class="action"
+            type="button"
+            onclick="PAG.Router.go('temuan')"
+          >
+
+            ⚠️
+
             <br>
 
+            Temuan
+
             <small>
-              Memo lapangan
+              Temuan lapangan
             </small>
 
           </button>
@@ -261,16 +283,15 @@ PAG.Dashboard = {
 
           <button
             class="action"
+            type="button"
             onclick="PAG.Router.go('tindaklanjut')"
           >
 
-            ✅
+            ✓
 
             <br>
 
             Tindak Lanjut
-
-            <br>
 
             <small>
               Penyelesaian temuan
@@ -278,10 +299,33 @@ PAG.Dashboard = {
 
           </button>
 
+
         </div>
 
 
-        `;
+        <!-- =========================================
+             INFORMASI PAKET
+             ========================================= -->
+
+        <div class="card">
+
+          <h3>
+            Paket Pekerjaan
+          </h3>
+
+          <p>
+
+            ${escapeHtml(
+              p?.nama ||
+              "Belum ada paket"
+            )}
+
+          </p>
+
+        </div>
+
+
+      `;
 
 
     } catch (error) {
@@ -307,11 +351,15 @@ PAG.Dashboard = {
             )}
           </p>
 
+
           <button
             class="btn"
+            type="button"
             onclick="PAG.Router.go('home')"
           >
+
             Coba Lagi
+
           </button>
 
         </div>
@@ -325,17 +373,39 @@ PAG.Dashboard = {
 };
 
 
-// ======================================================
-// ESCAPE HTML
-// ======================================================
+/* =====================================================
+   ESCAPE HTML
+   ===================================================== */
 
 function escapeHtml(value) {
 
-  return String(value ?? "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+  return String(
+    value ?? ""
+  )
+
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+
+    .replace(
+      /</g,
+      "&lt;"
+    )
+
+    .replace(
+      />/g,
+      "&gt;"
+    )
+
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+
+    .replace(
+      /'/g,
+      "&#039;"
+    );
 
 }
