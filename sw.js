@@ -1,4 +1,15 @@
-const CACHE_NAME = "pag-field-v16";
+```javascript
+/* =====================================================
+   PAG DOCS FIELD
+   SERVICE WORKER
+   ===================================================== */
+
+const CACHE_NAME = "pag-field-v17";
+
+
+/* =====================================================
+   APP SHELL
+   ===================================================== */
 
 const APP_SHELL = [
   "./",
@@ -7,14 +18,21 @@ const APP_SHELL = [
   "./css/app.css"
 ];
 
+
+/* =====================================================
+   INSTALL
+   ===================================================== */
+
 self.addEventListener("install", event => {
 
   event.waitUntil(
 
     caches.open(CACHE_NAME)
-      .then(cache =>
-        cache.addAll(APP_SHELL)
-      )
+      .then(cache => {
+
+        return cache.addAll(APP_SHELL);
+
+      })
 
   );
 
@@ -23,21 +41,30 @@ self.addEventListener("install", event => {
 });
 
 
+/* =====================================================
+   ACTIVATE
+   ===================================================== */
+
 self.addEventListener("activate", event => {
 
   event.waitUntil(
 
-    caches.keys().then(keys =>
-      Promise.all(
-        keys
-          .filter(key =>
-            key !== CACHE_NAME
-          )
-          .map(key =>
-            caches.delete(key)
-          )
-      )
-    )
+    caches.keys()
+      .then(keys => {
+
+        return Promise.all(
+
+          keys
+            .filter(key =>
+              key !== CACHE_NAME
+            )
+            .map(key =>
+              caches.delete(key)
+            )
+
+        );
+
+      })
 
   );
 
@@ -46,19 +73,103 @@ self.addEventListener("activate", event => {
 });
 
 
+/* =====================================================
+   FETCH
+   ===================================================== */
+
 self.addEventListener("fetch", event => {
 
+  const request =
+    event.request;
+
+
+  /* -----------------------------------------------
+     HANYA GET
+     ----------------------------------------------- */
+
   if (
-    event.request.method !== "GET"
+    request.method !== "GET"
   ) {
 
     return;
 
   }
 
+
+  const url =
+    new URL(
+      request.url
+    );
+
+
+  /* -----------------------------------------------
+     JAVASCRIPT / CSS / HTML
+     
+     SELALU NETWORK FIRST
+     
+     Supaya perubahan kode GitHub
+     langsung terbaca.
+     ----------------------------------------------- */
+
+  const isCodeFile =
+    url.pathname.endsWith(".js") ||
+    url.pathname.endsWith(".css") ||
+    url.pathname.endsWith(".html");
+
+
+  if (isCodeFile) {
+
+    event.respondWith(
+
+      fetch(request)
+        .then(response => {
+
+          if (
+            response &&
+            response.status === 200
+          ) {
+
+            const copy =
+              response.clone();
+
+            caches.open(CACHE_NAME)
+              .then(cache => {
+
+                cache.put(
+                  request,
+                  copy
+                );
+
+              });
+
+          }
+
+          return response;
+
+        })
+
+        .catch(() => {
+
+          return caches.match(request);
+
+        })
+
+    );
+
+    return;
+
+  }
+
+
+  /* -----------------------------------------------
+     FILE LAIN
+     
+     CACHE FIRST
+     ----------------------------------------------- */
+
   event.respondWith(
 
-    caches.match(event.request)
+    caches.match(request)
       .then(cached => {
 
         if (cached) {
@@ -67,7 +178,8 @@ self.addEventListener("fetch", event => {
 
         }
 
-        return fetch(event.request)
+
+        return fetch(request)
           .then(response => {
 
             if (
@@ -80,24 +192,31 @@ self.addEventListener("fetch", event => {
                 response.clone();
 
               caches.open(CACHE_NAME)
-                .then(cache =>
+                .then(cache => {
+
                   cache.put(
-                    event.request,
+                    request,
                     copy
-                  )
-                );
+                  );
+
+                });
 
             }
 
             return response;
 
           })
-          .catch(() =>
-            caches.match("./index.html")
-          );
+          .catch(() => {
+
+            return caches.match(
+              "./index.html"
+            );
+
+          });
 
       })
 
   );
 
 });
+```
