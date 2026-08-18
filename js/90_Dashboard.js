@@ -1,7 +1,7 @@
 /* =====================================================
    PAG DOCS FIELD
-   DASHBOARD
-   Versi sederhana - Mobile First
+   90_Dashboard.js
+   DASHBOARD STABLE
    ===================================================== */
 
 window.PAG = window.PAG || {};
@@ -15,17 +15,12 @@ PAG.Dashboard = {
       return;
     }
 
-    /* ===================================================
-       DEFAULT
-       =================================================== */
-
     var userName = "Personil Lapangan";
     var namaPaket = "Paket belum tersinkron";
     var online = navigator.onLine;
 
     /* ===================================================
-       AMBIL USER
-       GAGAL BACKEND TIDAK BOLEH MEMBUAT DASHBOARD MATI
+       USER
        =================================================== */
 
     try {
@@ -43,6 +38,7 @@ PAG.Dashboard = {
             u.name ||
             u.nama ||
             u.namaPersonil ||
+            u.displayName ||
             userName;
 
         }
@@ -52,14 +48,15 @@ PAG.Dashboard = {
     } catch (error) {
 
       console.warn(
-        "Dashboard: Auth tidak tersedia.",
+        "Dashboard Auth:",
         error
       );
 
     }
 
+
     /* ===================================================
-       AMBIL MASTER
+       MASTER
        =================================================== */
 
     try {
@@ -79,7 +76,7 @@ PAG.Dashboard = {
               ? master.paket
               : [];
 
-          if (paket.length > 0) {
+          if (paket.length) {
 
             var p = paket[0];
 
@@ -98,27 +95,22 @@ PAG.Dashboard = {
     } catch (error) {
 
       console.warn(
-        "Dashboard: Master tidak tersedia.",
+        "Dashboard Master:",
         error
       );
 
     }
 
+
     /* ===================================================
-       RENDER
+       HTML
        =================================================== */
 
     v.innerHTML = `
 
-      <!-- ===============================================
-           HERO
-           =============================================== -->
-
       <section class="hero dashboard-hero">
 
-        <small>
-          PAG DOCS FIELD
-        </small>
+        <small>PAG DOCS FIELD</small>
 
         <h2>
           ${dashboardEscape(userName)}
@@ -130,10 +122,6 @@ PAG.Dashboard = {
 
       </section>
 
-
-      <!-- ===============================================
-           SOP
-           =============================================== -->
 
       <a
         class="card dashboard-sop"
@@ -169,10 +157,6 @@ PAG.Dashboard = {
       </a>
 
 
-      <!-- ===============================================
-           KEGIATAN LAPANGAN
-           =============================================== -->
-
       <section class="dashboard-section">
 
         <h4 class="section-title">
@@ -180,8 +164,6 @@ PAG.Dashboard = {
         </h4>
 
         <div class="grid dashboard-grid">
-
-          <!-- ABSENSI -->
 
           <button
             type="button"
@@ -203,8 +185,6 @@ PAG.Dashboard = {
 
           </button>
 
-
-          <!-- DOKUMENTASI -->
 
           <button
             type="button"
@@ -231,10 +211,6 @@ PAG.Dashboard = {
       </section>
 
 
-      <!-- ===============================================
-           PELAPORAN
-           =============================================== -->
-
       <section class="dashboard-section">
 
         <h4 class="section-title">
@@ -242,8 +218,6 @@ PAG.Dashboard = {
         </h4>
 
         <div class="grid dashboard-grid">
-
-          <!-- LAPORAN HARIAN -->
 
           <button
             type="button"
@@ -266,8 +240,6 @@ PAG.Dashboard = {
           </button>
 
 
-          <!-- INSPECTION -->
-
           <button
             type="button"
             class="action dashboard-action"
@@ -288,8 +260,6 @@ PAG.Dashboard = {
 
           </button>
 
-
-          <!-- RFI -->
 
           <button
             type="button"
@@ -316,16 +286,14 @@ PAG.Dashboard = {
       </section>
 
 
-      <!-- ===============================================
-           STATUS
-           =============================================== -->
-
       <section class="card dashboard-status">
 
         <div class="dashboard-status-left">
 
           <span
-            class="dashboard-status-dot ${online ? "online" : "offline"}"
+            class="dashboard-status-dot ${
+              online ? "online" : "offline"
+            }"
           ></span>
 
           <div>
@@ -335,9 +303,10 @@ PAG.Dashboard = {
             </b>
 
             <small>
-              ${online
-                ? "Siap melakukan sinkronisasi"
-                : "Data akan disimpan di perangkat"
+              ${
+                online
+                  ? "Siap melakukan sinkronisasi"
+                  : "Data akan disimpan di perangkat"
               }
             </small>
 
@@ -359,210 +328,165 @@ PAG.Dashboard = {
 
 
     /* ===================================================
-       EVENT ABSENSI
+       ABSENSI
        =================================================== */
 
-    var absensiBtn =
-      document.getElementById("dashboardAbsensi");
+    bindDashboardButton(
+      "dashboardAbsensi",
+      function () {
 
-    if (absensiBtn) {
+        if (
+          PAG.Absensi &&
+          typeof PAG.Absensi.start === "function"
+        ) {
 
-      absensiBtn.addEventListener(
-        "click",
-        function () {
-
-          try {
-
-            if (
-              PAG.Absensi &&
-              typeof PAG.Absensi.start === "function"
-            ) {
-
-              PAG.Absensi.start();
-
-            } else {
-
-              dashboardToast(
-                "Modul Absensi belum tersedia"
-              );
-
-            }
-
-          } catch (error) {
-
-            console.error(
-              "Absensi:",
-              error
-            );
-
-            dashboardToast(
-              "Absensi tidak dapat dibuka"
-            );
-
-          }
+          PAG.Absensi.start();
+          return;
 
         }
-      );
 
-    }
+        dashboardToast(
+          "Modul Absensi belum tersedia"
+        );
+
+      }
+    );
 
 
     /* ===================================================
        DOKUMENTASI
        =================================================== */
 
-    var dokumentasiBtn =
-      document.getElementById(
-        "dashboardDokumentasi"
-      );
+    bindDashboardButton(
+      "dashboardDokumentasi",
+      function () {
 
-    if (dokumentasiBtn) {
+        dashboardOpenModule(
+          "photo",
+          [
+            "GPSPhoto",
+            "Dokumentasi",
+            "Photo",
+            "DokumentasiLapangan"
+          ]
+        );
 
-      dokumentasiBtn.addEventListener(
-        "click",
-        function () {
-
-          dashboardGo("photo");
-
-        }
-      );
-
-    }
+      }
+    );
 
 
     /* ===================================================
        LAPORAN
        =================================================== */
 
-    var reportBtn =
-      document.getElementById(
-        "dashboardReport"
-      );
+    bindDashboardButton(
+      "dashboardReport",
+      function () {
 
-    if (reportBtn) {
+        dashboardOpenModule(
+          "report",
+          [
+            "LaporanHarian"
+          ]
+        );
 
-      reportBtn.addEventListener(
-        "click",
-        function () {
-
-          dashboardGo("report");
-
-        }
-      );
-
-    }
+      }
+    );
 
 
     /* ===================================================
        INSPECTION
        =================================================== */
 
-    var inspectionBtn =
-      document.getElementById(
-        "dashboardInspection"
-      );
+    bindDashboardButton(
+      "dashboardInspection",
+      function () {
 
-    if (inspectionBtn) {
+        dashboardOpenModule(
+          "inspection",
+          [
+            "Inspection"
+          ]
+        );
 
-      inspectionBtn.addEventListener(
-        "click",
-        function () {
-
-          dashboardGo("inspection");
-
-        }
-      );
-
-    }
+      }
+    );
 
 
     /* ===================================================
        RFI
        =================================================== */
 
-    var rfiBtn =
-      document.getElementById(
-        "dashboardRfi"
-      );
+    bindDashboardButton(
+      "dashboardRfi",
+      function () {
 
-    if (rfiBtn) {
+        dashboardOpenModule(
+          "rfi",
+          [
+            "RFI"
+          ]
+        );
 
-      rfiBtn.addEventListener(
-        "click",
-        function () {
-
-          dashboardGo("rfi");
-
-        }
-      );
-
-    }
+      }
+    );
 
 
     /* ===================================================
        SYNC
        =================================================== */
 
-    var syncBtn =
-      document.getElementById(
-        "dashboardSync"
-      );
+    bindDashboardButton(
+      "dashboardSync",
+      async function (button) {
 
-    if (syncBtn) {
+        button.disabled = true;
+        button.textContent = "⏳";
 
-      syncBtn.addEventListener(
-        "click",
-        async function () {
+        try {
 
-          syncBtn.disabled = true;
-          syncBtn.textContent = "⏳";
+          if (
+            PAG.WebUtamaSync &&
+            typeof PAG.WebUtamaSync.pull === "function"
+          ) {
 
-          try {
-
-            if (
-              PAG.WebUtamaSync &&
-              typeof PAG.WebUtamaSync.pull === "function"
-            ) {
-
-              await PAG.WebUtamaSync.pull();
-
-            }
-
-            if (
-              PAG.OfflineSync &&
-              typeof PAG.OfflineSync.run === "function"
-            ) {
-
-              await PAG.OfflineSync.run();
-
-            }
-
-            dashboardToast(
-              "Sinkronisasi selesai"
-            );
-
-          } catch (error) {
-
-            console.error(
-              "Dashboard Sync:",
-              error
-            );
-
-            dashboardToast(
-              "Sinkronisasi gagal"
-            );
-
-          } finally {
-
-            syncBtn.disabled = false;
-            syncBtn.textContent = "↻";
+            await PAG.WebUtamaSync.pull();
 
           }
 
-        }
-      );
+          if (
+            PAG.OfflineSync &&
+            typeof PAG.OfflineSync.run === "function"
+          ) {
 
-    }
+            await PAG.OfflineSync.run();
+
+          }
+
+          dashboardToast(
+            "Sinkronisasi selesai"
+          );
+
+        } catch (error) {
+
+          console.error(
+            "Dashboard Sync:",
+            error
+          );
+
+          dashboardToast(
+            "Sinkronisasi gagal"
+          );
+
+        } finally {
+
+          button.disabled = false;
+          button.textContent = "↻";
+
+        }
+
+      }
+    );
 
   }
 
@@ -570,10 +494,55 @@ PAG.Dashboard = {
 
 
 /* =====================================================
-   ROUTER HELPER
+   BIND BUTTON
    ===================================================== */
 
-function dashboardGo(route) {
+function bindDashboardButton(id, handler) {
+
+  var button =
+    document.getElementById(id);
+
+  if (!button) {
+    return;
+  }
+
+  button.addEventListener(
+    "click",
+    async function () {
+
+      try {
+
+        await handler(button);
+
+      } catch (error) {
+
+        console.error(
+          "Dashboard button:",
+          id,
+          error
+        );
+
+        dashboardToast(
+          "Modul tidak dapat dibuka"
+        );
+
+      }
+
+    }
+  );
+
+}
+
+
+/* =====================================================
+   OPEN MODULE
+   ===================================================== */
+
+function dashboardOpenModule(route, names) {
+
+  /* ---------------------------------------------------
+     1. ROUTER UTAMA
+     --------------------------------------------------- */
 
   try {
 
@@ -582,28 +551,102 @@ function dashboardGo(route) {
       typeof PAG.Router.go === "function"
     ) {
 
-      PAG.Router.go(route);
+      var result =
+        PAG.Router.go(route);
 
-    } else {
+      /*
+       * Jangan langsung menganggap gagal.
+       * Router bisa bekerja async atau tanpa return.
+       */
+      if (
+        result &&
+        typeof result.then === "function"
+      ) {
 
-      dashboardToast(
-        "Modul belum tersedia: " + route
-      );
+        result.catch(function (error) {
+
+          console.warn(
+            "Router async:",
+            error
+          );
+
+        });
+
+      }
+
+      return;
 
     }
 
   } catch (error) {
 
-    console.error(
-      "Dashboard Router:",
+    console.warn(
+      "Router:",
       error
     );
 
-    dashboardToast(
-      "Tidak dapat membuka modul"
-    );
+  }
+
+
+  /* ---------------------------------------------------
+     2. CARI RENDERER LANGSUNG
+     --------------------------------------------------- */
+
+  names =
+    Array.isArray(names)
+      ? names
+      : [];
+
+  for (
+    var i = 0;
+    i < names.length;
+    i++
+  ) {
+
+    var module =
+      PAG[names[i]];
+
+    if (
+      module &&
+      typeof module.render === "function"
+    ) {
+
+      var view =
+        document.getElementById("view");
+
+      if (view) {
+
+        module.render(view);
+        return;
+
+      }
+
+    }
 
   }
+
+
+  /* ---------------------------------------------------
+     3. FALLBACK
+     --------------------------------------------------- */
+
+  dashboardToast(
+    "Modul belum tersedia"
+  );
+
+}
+
+
+/* =====================================================
+   LEGACY ROUTER HELPER
+   ===================================================== */
+
+function dashboardGo(route) {
+
+  dashboardOpenModule(
+    route,
+    []
+  );
 
 }
 
@@ -639,17 +682,26 @@ function dashboardToast(message) {
     return;
   }
 
-  toast.textContent = message;
-  toast.style.display = "block";
+  toast.textContent =
+    message;
 
-  setTimeout(
-    function () {
+  toast.style.display =
+    "block";
 
-      toast.style.display = "none";
-
-    },
-    2500
+  clearTimeout(
+    dashboardToast.timer
   );
+
+  dashboardToast.timer =
+    setTimeout(
+      function () {
+
+        toast.style.display =
+          "none";
+
+      },
+      2500
+    );
 
 }
 
@@ -660,7 +712,7 @@ function dashboardToast(message) {
 
 function dashboardEscape(value) {
 
-  return String(value || "")
+  return String(value == null ? "" : value)
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
@@ -675,6 +727,6 @@ function dashboardEscape(value) {
    ===================================================== */
 
 console.log(
-  "PAG Dashboard loaded:",
+  "PAG 90_Dashboard loaded:",
   !!PAG.Dashboard
 );
