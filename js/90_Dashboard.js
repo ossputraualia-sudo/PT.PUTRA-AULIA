@@ -1,58 +1,90 @@
 ```javascript
+/* =====================================================
+   PAG DOCS FIELD
+   DASHBOARD
+   ===================================================== */
+
+window.PAG = window.PAG || {};
+
 PAG.Dashboard = {
 
   async render(v) {
 
+    if (!v) {
+      console.error("PAG.Dashboard: view tidak ditemukan.");
+      return;
+    }
+
+    /* ===================================================
+       LOADING
+       =================================================== */
+
+    v.innerHTML = `
+      <div class="card">
+        <p>Memuat Dashboard...</p>
+      </div>
+    `;
+
+
     try {
 
-      /* =====================================================
-         LOADING
-         ===================================================== */
-
-      v.innerHTML = `
-        <div class="card">
-          <p>Memuat Dashboard...</p>
-        </div>
-      `;
-
-
-      /* =====================================================
+      /* =================================================
          AUTH
-         ===================================================== */
+         ================================================= */
 
-      const u =
-        await PAG.Auth.ensure();
+      let u = null;
 
+      try {
 
-      if (!u) {
+        if (
+          PAG.Auth &&
+          typeof PAG.Auth.ensure === "function"
+        ) {
 
-        v.innerHTML = `
-          <div class="card">
+          u = await PAG.Auth.ensure();
 
-            <h2>Login diperlukan</h2>
+        }
 
-            <p>
-              Nama personil belum diberikan.
-            </p>
+      } catch (error) {
 
-          </div>
-        `;
-
-        return;
+        console.warn(
+          "Auth tidak tersedia:",
+          error
+        );
 
       }
 
 
-      /* =====================================================
-         MASTER WEB UTAMA
-         ===================================================== */
+      /* =================================================
+         USER FALLBACK
+         ================================================= */
+
+      u = u || {};
+
+
+      const userName =
+        u.name ||
+        u.nama ||
+        "Personil Lapangan";
+
+
+      /* =================================================
+         MASTER
+         ================================================= */
 
       let m = {};
 
       try {
 
-        m =
-          await PAG.WebUtamaSync.getMaster();
+        if (
+          PAG.WebUtamaSync &&
+          typeof PAG.WebUtamaSync.getMaster === "function"
+        ) {
+
+          m =
+            await PAG.WebUtamaSync.getMaster() || {};
+
+        }
 
       } catch (error) {
 
@@ -64,25 +96,45 @@ PAG.Dashboard = {
       }
 
 
+      /* =================================================
+         PAKET
+         ================================================= */
+
       const paket =
-        Array.isArray(m?.paket)
+        Array.isArray(m.paket)
           ? m.paket
           : [];
 
 
       const p =
-        paket[0];
+        paket.length
+          ? paket[0]
+          : null;
 
 
-      /* =====================================================
+      const namaPaket =
+        p?.nama ||
+        p?.namaPaket ||
+        "Paket belum tersinkron";
+
+
+      /* =================================================
+         CONNECTION
+         ================================================= */
+
+      const online =
+        navigator.onLine;
+
+
+      /* =================================================
          DASHBOARD
-         ===================================================== */
+         ================================================= */
 
       v.innerHTML = `
 
-        <!-- =================================================
+        <!-- =============================================
              HERO
-             ================================================= -->
+             ============================================= -->
 
         <div class="hero">
 
@@ -91,64 +143,91 @@ PAG.Dashboard = {
           </small>
 
           <h2>
-            ${escapeHtml(u.name)}
+            ${escapeHtml(userName)}
           </h2>
 
           <div>
-            ${escapeHtml(
-              p?.nama ||
-              "Paket belum tersinkron"
-            )}
+            ${escapeHtml(namaPaket)}
           </div>
 
         </div>
 
 
-        <!-- =================================================
+        <!-- =============================================
              SOP
-             ================================================= -->
+             ============================================= -->
 
         <a
-          class="card sop-home-card"
           href="https://drive.google.com/drive/folders/17D9uxcnayGFmWLk5mX0C-fckW2Cc5RJu?usp=sharing"
           target="_blank"
           rel="noopener noreferrer"
+          class="card sop-card"
           style="
-            text-decoration:none;
-            color:inherit;
             display:flex;
             align-items:center;
-            gap:13px;
+            gap:14px;
+            text-decoration:none;
+            color:inherit;
             cursor:pointer;
           "
         >
 
-          <div class="sop-home-icon">
+          <div
+            style="
+              width:46px;
+              height:46px;
+              min-width:46px;
+              display:flex;
+              align-items:center;
+              justify-content:center;
+              border-radius:14px;
+              background:#e0f2fe;
+              font-size:22px;
+            "
+          >
             📘
           </div>
 
-          <div class="sop-home-content">
 
-            <b>
+          <div style="flex:1">
+
+            <h3
+              style="
+                margin:0;
+                font-size:15px;
+              "
+            >
               SOP Pekerjaan
-            </b>
+            </h3>
 
-            <span>
+            <p
+              style="
+                margin:5px 0 0;
+                font-size:11px;
+                color:#64748b;
+              "
+            >
               Standar Operasional Prosedur
-            </span>
+            </p>
 
           </div>
 
-          <div class="sop-home-arrow">
+
+          <div
+            style="
+              font-size:24px;
+              color:#94a3b8;
+            "
+          >
             ›
           </div>
 
         </a>
 
 
-        <!-- =================================================
-             ACTION MENU
-             ================================================= -->
+        <!-- =============================================
+             ACTION GRID
+             ============================================= -->
 
         <div class="grid">
 
@@ -156,21 +235,18 @@ PAG.Dashboard = {
           <!-- ABSENSI -->
 
           <button
-            type="button"
             class="action"
-            onclick="PAG.Absensi.start()"
+            type="button"
+            onclick="PAG.Absensi && PAG.Absensi.start
+              ? PAG.Absensi.start()
+              : PAG.UI.toast('Modul Absensi belum tersedia')"
           >
 
-            <div style="
-              font-size:28px;
-              margin-bottom:8px;
-            ">
-              📍
-            </div>
+            📍
 
-            <div>
-              Absensi
-            </div>
+            <br>
+
+            Absensi
 
             <small>
               Selfie + GPS
@@ -182,50 +258,40 @@ PAG.Dashboard = {
           <!-- LAPORAN -->
 
           <button
-            type="button"
             class="action"
+            type="button"
             onclick="PAG.Router.go('report')"
           >
 
-            <div style="
-              font-size:28px;
-              margin-bottom:8px;
-            ">
-              📋
-            </div>
+            📋
 
-            <div>
-              Laporan Harian
-            </div>
+            <br>
+
+            Laporan Harian
 
             <small>
-              Catatan pekerjaan
+              Dokumentasi pekerjaan
             </small>
 
           </button>
 
 
-          <!-- PEMERIKSAAN -->
+          <!-- NOTIFIKASI -->
 
           <button
-            type="button"
             class="action"
-            onclick="PAG.Router.go('inspection')"
+            type="button"
+            onclick="PAG.Router.go('notification')"
           >
 
-            <div style="
-              font-size:28px;
-              margin-bottom:8px;
-            ">
-              🔎
-            </div>
+            🔔
 
-            <div>
-              Pemeriksaan
-            </div>
+            <br>
+
+            Notifikasi
 
             <small>
-              Inspection & checklist
+              Informasi pekerjaan
             </small>
 
           </button>
@@ -234,24 +300,19 @@ PAG.Dashboard = {
           <!-- AKTIVITAS -->
 
           <button
-            type="button"
             class="action"
+            type="button"
             onclick="PAG.Router.go('activity')"
           >
 
-            <div style="
-              font-size:28px;
-              margin-bottom:8px;
-            ">
-              📝
-            </div>
+            ◷
 
-            <div>
-              Aktivitas
-            </div>
+            <br>
+
+            Aktivitas
 
             <small>
-              Riwayat pekerjaan
+              Riwayat kegiatan
             </small>
 
           </button>
@@ -260,66 +321,48 @@ PAG.Dashboard = {
         </div>
 
 
-        <!-- =================================================
+        <!-- =============================================
              STATUS SISTEM
-             ================================================= -->
+             ============================================= -->
 
         <div
           class="card"
           style="
-            padding:13px 15px;
+            display:flex;
+            align-items:center;
+            gap:12px;
           "
         >
 
-          <div style="
-            display:flex;
-            align-items:center;
-            justify-content:space-between;
-            gap:10px;
-          ">
+          <span
+            style="
+              width:10px;
+              height:10px;
+              border-radius:50%;
+              background:${online ? "#22c55e" : "#ef4444"};
+              display:block;
+            "
+          ></span>
 
-            <div>
 
-              <div style="
-                font-size:12px;
-                font-weight:700;
-                color:#334155;
-              ">
-                Status Sistem
-              </div>
+          <div>
 
-              <div style="
-                margin-top:4px;
+            <b
+              style="
+                font-size:13px;
+              "
+            >
+              ${online ? "Online" : "Offline"}
+            </b>
+
+            <div
+              style="
                 font-size:11px;
                 color:#64748b;
-              ">
-
-                ${
-                  navigator.onLine
-                    ? "🟢 Online"
-                    : "🔴 Offline"
-                }
-
-              </div>
-
-            </div>
-
-
-            <div style="
-              font-size:11px;
-              color:#64748b;
-              text-align:right;
-            ">
-
-              Paket
-
-              <b style="
-                color:#0f172a;
-                font-size:14px;
-              ">
-                ${paket.length}
-              </b>
-
+                margin-top:2px;
+              "
+            >
+              ${paket.length} paket tersinkron
             </div>
 
           </div>
@@ -331,12 +374,8 @@ PAG.Dashboard = {
 
     } catch (error) {
 
-      /* =====================================================
-         ERROR
-         ===================================================== */
-
       console.error(
-        "DASHBOARD ERROR:",
+        "PAG Dashboard Error:",
         error
       );
 
@@ -351,14 +390,14 @@ PAG.Dashboard = {
 
           <p>
             ${escapeHtml(
-              error.message ||
+              error?.message ||
               String(error)
             )}
           </p>
 
           <button
-            type="button"
             class="btn"
+            type="button"
             onclick="PAG.Router.go('home')"
           >
             Coba Lagi
@@ -375,38 +414,28 @@ PAG.Dashboard = {
 };
 
 
-/* =========================================================
+/* =====================================================
    ESCAPE HTML
-   ========================================================= */
+   ===================================================== */
 
 function escapeHtml(value) {
 
   return String(value ?? "")
-
-    .replace(
-      /&/g,
-      "&amp;"
-    )
-
-    .replace(
-      /</g,
-      "&lt;"
-    )
-
-    .replace(
-      />/g,
-      "&gt;"
-    )
-
-    .replace(
-      /"/g,
-      "&quot;"
-    )
-
-    .replace(
-      /'/g,
-      "&#039;"
-    );
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 
 }
+
+
+/* =====================================================
+   DEBUG
+   ===================================================== */
+
+console.log(
+  "PAG Dashboard loaded:",
+  !!PAG.Dashboard
+);
 ```
