@@ -1,4 +1,4 @@
-const CACHE_NAME = "pag-field-v23";
+const CACHE_NAME = "pag-field-v24";
 
 const APP_SHELL = [
   "./",
