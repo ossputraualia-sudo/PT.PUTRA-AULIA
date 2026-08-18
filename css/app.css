@@ -896,141 +896,110 @@ main {
 
 
 /* =====================================================
-   NAVBAR
+   BOTTOM NAVIGATION
    ===================================================== */
 
 nav {
+  position: fixed;
 
-  position:
-    fixed;
+  z-index: 2000;
 
-  z-index:
-    200;
+  bottom: 0;
 
-  bottom:
-    0;
+  left: 50%;
 
-  left:
-    50%;
+  transform: translateX(-50%);
 
-  transform:
-    translateX(-50%);
+  width: min(480px, 100%);
 
-  width:
-    min(480px,100%);
+  height: 76px;
 
-  height:
-    78px;
-
-  display:
-    flex;
+  display: flex;
 
   padding:
-    7px 8px;
-
-  padding-bottom:
-    calc(
-      7px +
-      env(safe-area-inset-bottom)
-    );
+    7px 8px
+    env(safe-area-inset-bottom);
 
   background:
-    rgba(255,255,255,.97);
+    rgba(255, 255, 255, .97);
 
   border-top:
-    1px solid
-    #dce9ee;
+    1px solid #dbe7e5;
 
   box-shadow:
-    0 -7px 25px
-    rgba(15,55,75,.10);
+    0 -6px 20px
+    rgba(15, 118, 110, .10);
 
   backdrop-filter:
-    blur(16px);
-
+    blur(14px);
 }
 
 
 nav button {
+  flex: 1;
 
-  position:
-    relative;
+  display: flex;
 
-  flex:
-    1;
+  flex-direction: column;
 
-  display:
-    flex;
+  align-items: center;
 
-  flex-direction:
-    column;
+  justify-content: center;
 
-  align-items:
-    center;
+  gap: 3px;
 
-  justify-content:
-    center;
+  border: 0;
 
-  gap:
-    3px;
+  background: transparent;
 
-  border:
-    0;
+  color: #64748b;
 
-  background:
-    transparent;
+  font-size: 20px;
 
-  color:
-    #718596;
+  border-radius: 12px;
 
-  font-size:
-    21px;
+  cursor: pointer;
 
-  border-radius:
-    13px;
-
-  cursor:
-    pointer;
-
+  transition: .15s ease;
 }
 
 
 nav button:active {
-
-  transform:
-    scale(.92);
-
+  transform: scale(.92);
 }
 
 
 nav button small {
+  display: block;
 
-  font-size:
-    10px;
+  font-size: 10px;
 
-  font-weight:
-    650;
-
+  font-weight: 600;
 }
 
 
-.nav-icon {
+/* NAVBAR AKTIF */
 
-  display:
-    flex;
+nav button.active {
+  background: #ecfdf5;
 
-  align-items:
-    center;
+  color: #0f766e;
+}
 
-  justify-content:
-    center;
 
-  width:
-    24px;
+nav button.active span {
+  color: #0f766e;
+}
 
-  height:
-    24px;
 
+/* =====================================================
+   MAIN
+   ===================================================== */
+
+main {
+  padding: 16px;
+
+  padding-bottom: 96px;
 }
 
 
