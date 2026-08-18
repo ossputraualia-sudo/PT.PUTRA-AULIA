@@ -1,6 +1,6 @@
 /* =====================================================
    PAG DOCS FIELD
-   DASHBOARD
+   DASHBOARD - SEMUA MENU
    ===================================================== */
 
 window.PAG = window.PAG || {};
@@ -221,95 +221,295 @@ PAG.Dashboard = {
 
 
         <!-- =============================================
-             ACTION GRID
+             KATEGORI 1: KEHADIRAN & DOKUMENTASI
              ============================================= -->
 
-        <div class="grid">
+        <div class="dashboard-section">
+
+          <h4 class="section-title">
+            📍 Kehadiran & Dokumentasi
+          </h4>
+
+          <div class="grid dashboard-grid">
+
+            <!-- ABSENSI -->
+            <button
+              class="action"
+              type="button"
+              onclick="if(PAG.Absensi && PAG.Absensi.start){PAG.Absensi.start();}else{PAG.UI.toast('Modul Absensi belum tersedia');}"
+            >
+              <span class="action-icon">📍</span>
+              <span class="action-label">Absensi</span>
+              <small>Selfie + GPS</small>
+            </button>
+
+            <!-- DOKUMENTASI -->
+            <button
+              class="action"
+              type="button"
+              onclick="PAG.Router.go('photo')"
+            >
+              <span class="action-icon">📷</span>
+              <span class="action-label">Dokumentasi</span>
+              <small>Foto Lapangan</small>
+            </button>
+
+          </div>
+
+        </div>
 
 
-          <!-- ABSENSI -->
+        <!-- =============================================
+             KATEGORI 2: PELAPORAN
+             ============================================= -->
 
-          <button
-            class="action"
-            type="button"
-            onclick="if(PAG.Absensi && PAG.Absensi.start){PAG.Absensi.start();}else{PAG.UI.toast('Modul Absensi belum tersedia');}"
-          >
+        <div class="dashboard-section">
 
-            📍
+          <h4 class="section-title">
+            📋 Pelaporan
+          </h4>
 
-            <br>
+          <div class="grid dashboard-grid">
 
-            Absensi
+            <!-- LAPORAN HARIAN -->
+            <button
+              class="action"
+              type="button"
+              onclick="PAG.Router.go('report')"
+            >
+              <span class="action-icon">📋</span>
+              <span class="action-label">Laporan Harian</span>
+              <small>Progress &amp; Kondisi</small>
+            </button>
 
-            <small>
-              Selfie + GPS
-            </small>
+            <!-- RFI -->
+            <button
+              class="action"
+              type="button"
+              onclick="PAG.Router.go('rfi')"
+            >
+              <span class="action-icon">❓</span>
+              <span class="action-label">RFI</span>
+              <small>Request for Info</small>
+            </button>
 
-          </button>
+            <!-- INSPECTION -->
+            <button
+              class="action"
+              type="button"
+              onclick="PAG.Router.go('inspection')"
+            >
+              <span class="action-icon">🔎</span>
+              <span class="action-label">Inspection</span>
+              <small>Pemeriksaan</small>
+            </button>
 
+            <!-- HASIL INSPECTION -->
+            <button
+              class="action"
+              type="button"
+              onclick="PAG.Router.go('inspectionResult')"
+            >
+              <span class="action-icon">📊</span>
+              <span class="action-label">Hasil Inspection</span>
+              <small>Nilai &amp; Temuan</small>
+            </button>
 
-          <!-- LAPORAN -->
+          </div>
 
-          <button
-            class="action"
-            type="button"
-            onclick="PAG.Router.go('report')"
-          >
-
-            📋
-
-            <br>
-
-            Laporan Harian
-
-            <small>
-              Dokumentasi pekerjaan
-            </small>
-
-          </button>
-
-
-          <!-- NOTIFIKASI -->
-
-          <button
-            class="action"
-            type="button"
-            onclick="PAG.Router.go('notification')"
-          >
-
-            🔔
-
-            <br>
-
-            Notifikasi
-
-            <small>
-              Informasi pekerjaan
-            </small>
-
-          </button>
+        </div>
 
 
-          <!-- AKTIVITAS -->
+        <!-- =============================================
+             KATEGORI 3: MANAJEMEN PROYEK
+             ============================================= -->
 
-          <button
-            class="action"
-            type="button"
-            onclick="PAG.Router.go('activity')"
-          >
+        <div class="dashboard-section">
 
-            ◷
+          <h4 class="section-title">
+            ⚙️ Manajemen Proyek
+          </h4>
 
-            <br>
+          <div class="grid dashboard-grid">
 
-            Aktivitas
+            <!-- INSTRUKSI -->
+            <button
+              class="action"
+              type="button"
+              onclick="PAG.Router.go('instruksi')"
+            >
+              <span class="action-icon">📢</span>
+              <span class="action-label">Instruksi</span>
+              <small>Perintah Kerja</small>
+            </button>
 
-            <small>
-              Riwayat kegiatan
-            </small>
+            <!-- MEMO -->
+            <button
+              class="action"
+              type="button"
+              onclick="PAG.Router.go('memo')"
+            >
+              <span class="action-icon">📝</span>
+              <span class="action-label">Memo</span>
+              <small>Nota Dinas</small>
+            </button>
 
-          </button>
+            <!-- TEMUAN -->
+            <button
+              class="action"
+              type="button"
+              onclick="PAG.Router.go('temuan')"
+            >
+              <span class="action-icon">⚠️</span>
+              <span class="action-label">Temuan</span>
+              <small>Masalah &amp; Deviasi</small>
+            </button>
 
+            <!-- TINDAK LANJUT -->
+            <button
+              class="action"
+              type="button"
+              onclick="PAG.Router.go('tindaklanjut')"
+            >
+              <span class="action-icon">🔄</span>
+              <span class="action-label">Tindak Lanjut</span>
+              <small>Perbaikan &amp; Closure</small>
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <!-- =============================================
+             KATEGORI 4: REVISI & PERSETUJUAN
+             ============================================= -->
+
+        <div class="dashboard-section">
+
+          <h4 class="section-title">
+            ✍️ Revisi &amp; Persetujuan
+          </h4>
+
+          <div class="grid dashboard-grid">
+
+            <!-- REVISION -->
+            <button
+              class="action"
+              type="button"
+              onclick="PAG.Router.go('revision')"
+            >
+              <span class="action-icon">📄</span>
+              <span class="action-label">Revisi</span>
+              <small>Versi Dokumen</small>
+            </button>
+
+            <!-- APPROVAL -->
+            <button
+              class="action"
+              type="button"
+              onclick="PAG.Router.go('approval')"
+            >
+              <span class="action-icon">✅</span>
+              <span class="action-label">Approval</span>
+              <small>Persetujuan</small>
+            </button>
+
+            <!-- SIGNATURE -->
+            <button
+              class="action"
+              type="button"
+              onclick="PAG.Router.go('signature')"
+            >
+              <span class="action-icon">✍️</span>
+              <span class="action-label">Tanda Tangan</span>
+              <small>Digital Signature</small>
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <!-- =============================================
+             KATEGORI 5: SISTEM & DOKUMEN
+             ============================================= -->
+
+        <div class="dashboard-section">
+
+          <h4 class="section-title">
+            🖥️ Sistem &amp; Dokumen
+          </h4>
+
+          <div class="grid dashboard-grid">
+
+            <!-- NOTIFIKASI -->
+            <button
+              class="action"
+              type="button"
+              onclick="PAG.Router.go('notification')"
+            >
+              <span class="action-icon">🔔</span>
+              <span class="action-label">Notifikasi</span>
+              <small>Pemberitahuan</small>
+            </button>
+
+            <!-- AKTIVITAS -->
+            <button
+              class="action"
+              type="button"
+              onclick="PAG.Router.go('activity')"
+            >
+              <span class="action-icon">⌛</span>
+              <span class="action-label">Aktivitas</span>
+              <small>Riwayat</small>
+            </button>
+
+            <!-- QR VERIFY -->
+            <button
+              class="action"
+              type="button"
+              onclick="PAG.Router.go('qrverify')"
+            >
+              <span class="action-icon">📱</span>
+              <span class="action-label">QR Verify</span>
+              <small>Verifikasi Dokumen</small>
+            </button>
+
+            <!-- AUDIT LOG -->
+            <button
+              class="action"
+              type="button"
+              onclick="PAG.Router.go('auditlog')"
+            >
+              <span class="action-icon">📜</span>
+              <span class="action-label">Audit Log</span>
+              <small>Jejak Aktivitas</small>
+            </button>
+
+            <!-- GENERATE PDF -->
+            <button
+              class="action"
+              type="button"
+              onclick="PAG.Router.go('pdf')"
+            >
+              <span class="action-icon">📑</span>
+              <span class="action-label">Generate PDF</span>
+              <small>Cetak Laporan</small>
+            </button>
+
+            <!-- PROFIL -->
+            <button
+              class="action"
+              type="button"
+              onclick="PAG.Router.go('profile')"
+            >
+              <span class="action-icon">👤</span>
+              <span class="action-label">Profil</span>
+              <small>Data Personil</small>
+            </button>
+
+          </div>
 
         </div>
 
@@ -323,42 +523,77 @@ PAG.Dashboard = {
           style="
             display:flex;
             align-items:center;
-            gap:12px;
+            justify-content:space-between;
+            flex-wrap:wrap;
+            gap:8px;
           "
         >
 
-          <span
+          <div
             style="
-              width:10px;
-              height:10px;
-              border-radius:50%;
-              background:${online ? "#22c55e" : "#ef4444"};
-              display:block;
+              display:flex;
+              align-items:center;
+              gap:12px;
             "
-          ></span>
+          >
 
-
-          <div>
-
-            <b
+            <span
               style="
-                font-size:13px;
+                width:10px;
+                height:10px;
+                border-radius:50%;
+                background:${online ? "#22c55e" : "#ef4444"};
+                display:block;
               "
-            >
-              ${online ? "Online" : "Offline"}
-            </b>
+            ></span>
 
-            <div
-              style="
-                font-size:11px;
-                color:#64748b;
-                margin-top:2px;
-              "
-            >
-              ${paket.length} paket tersinkron
+            <div>
+
+              <b
+                style="
+                  font-size:13px;
+                "
+              >
+                ${online ? "Online" : "Offline"}
+              </b>
+
+              <div
+                style="
+                  font-size:11px;
+                  color:#64748b;
+                  margin-top:2px;
+                "
+              >
+                ${paket.length} paket tersinkron
+              </div>
+
             </div>
 
           </div>
+
+
+          <button
+            class="btn"
+            type="button"
+            style="
+              padding:6px 14px;
+              font-size:12px;
+            "
+            onclick="
+              (async function(){
+                try {
+                  await PAG.WebUtamaSync.pull();
+                  await PAG.OfflineSync.run();
+                  PAG.UI.toast('Sinkronisasi selesai');
+                  PAG.Router.go('home');
+                } catch(e) {
+                  PAG.UI.toast('Sinkronisasi gagal');
+                }
+              })()
+            "
+          >
+            🔄 Sinkron Sekarang
+          </button>
 
         </div>
 
