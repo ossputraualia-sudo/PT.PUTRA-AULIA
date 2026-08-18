@@ -281,37 +281,7 @@ PAG.Dashboard = {
         </div>
 
 
-        <!-- ============================================
-             STATUS SISTEM
-             ============================================ -->
-
-        <div class="card">
-
-          <h3>
-            Status Sistem
-          </h3>
-
-          <p>
-            ${
-              navigator.onLine
-                ? "🟢 Online"
-                : "🔴 Offline"
-            }
-          </p>
-
-          <p>
-
-            Paket:
-
-            <b>
-              ${paket.length}
-            </b>
-
-          </p>
-
-        </div>
-
-      `;
+        `;
 
 
     } catch (error) {
