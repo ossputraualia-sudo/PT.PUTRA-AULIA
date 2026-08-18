@@ -1,467 +1,676 @@
 /* =====================================================
    PAG DOCS FIELD
+   Profile.js
    PROFILE
-   Data Personil
-   Paket
-   Catatan Pekerjaan
-   Sinkronisasi
-   Pengaturan
-   Keluar
    ===================================================== */
+
+window.PAG = window.PAG || {};
 
 PAG.Profile = {
 
+  /* =====================================================
+     RENDER PROFILE
+     ===================================================== */
+
   async render(v) {
+
+    if (!v) {
+      console.error("PAG.Profile: view tidak ditemukan.");
+      return;
+    }
 
     try {
 
-      const u = PAG.Auth.get() || {};
+      /* =================================================
+         USER
+         ================================================= */
+
+      const u =
+        PAG.Auth && typeof PAG.Auth.get === "function"
+          ? (PAG.Auth.get() || {})
+          : {};
+
+
+      /* =================================================
+         MASTER
+         ================================================= */
 
       let master = {};
 
       try {
-        master = await PAG.WebUtamaSync.getMaster();
-      } catch (e) {
-        console.warn("Master Profil tidak tersedia:", e);
+
+        if (
+          PAG.WebUtamaSync &&
+          typeof PAG.WebUtamaSync.getMaster === "function"
+        ) {
+
+          master =
+            await PAG.WebUtamaSync.getMaster() || {};
+
+        }
+
+      } catch (error) {
+
+        console.warn(
+          "Profile master tidak tersedia:",
+          error
+        );
+
       }
 
-      const paket = Array.isArray(master?.paket)
-        ? master.paket
-        : [];
 
-      const activePackage = paket[0] || null;
+      /* =================================================
+         PACKAGE
+         ================================================= */
 
-      const online = navigator.onLine;
+      const paket =
+        Array.isArray(master.paket)
+          ? master.paket
+          : [];
+
+      const activePackage =
+        paket.length
+          ? paket[0]
+          : null;
+
+
+      /* =================================================
+         ONLINE
+         ================================================= */
+
+      const online =
+        navigator.onLine;
+
+
+      /* =================================================
+         USER DATA
+         ================================================= */
+
+      const name =
+        u.name ||
+        u.nama ||
+        u.displayName ||
+        "Personil";
+
+
+      const userId =
+        u.userId ||
+        u.id ||
+        u.uid ||
+        "-";
+
+
+      const role =
+        u.jabatan ||
+        u.role ||
+        "Personil Lapangan";
+
+
+      const email =
+        u.email ||
+        "-";
+
+
+      /* =================================================
+         PACKAGE DATA
+         ================================================= */
+
+      let packageName = "-";
+
+      let packageId = "";
+
+      if (activePackage) {
+
+        packageName =
+          activePackage.nama ||
+          activePackage.namaPaket ||
+          activePackage.name ||
+          activePackage.paket ||
+          "-";
+
+        packageId =
+          activePackage.id ||
+          activePackage.packageId ||
+          activePackage.paketId ||
+          "";
+
+      }
+
+
+      /* =================================================
+         RENDER
+         ================================================= */
 
       v.innerHTML = `
 
-        <!-- =================================================
-             PROFILE HEADER
-             ================================================= -->
+        <div class="profile-page">
 
-        <div class="profile-head">
 
-          <div class="profile-avatar">
-            ${PAG.Profile.initials(u.name)}
-          </div>
+          <!-- ===========================================
+               PROFILE HEADER
+               =========================================== -->
 
-          <div class="profile-identity">
+          <section class="profile-header-card">
 
-            <div class="profile-name">
-              ${PAG.UI.escape(u.name || "Personil")}
+            <div class="profile-avatar">
+              ${PAG.Profile.initials(name)}
             </div>
 
-            <div class="profile-role">
-              ${PAG.UI.escape(
-                u.role ||
-                u.jabatan ||
-                "Personil Lapangan"
-              )}
+
+            <div class="profile-header-info">
+
+              <h2 class="profile-name">
+                ${PAG.Profile.escape(name)}
+              </h2>
+
+              <div class="profile-role">
+                ${PAG.Profile.escape(role)}
+              </div>
+
+              <div class="profile-online">
+
+                <span
+                  class="
+                    profile-status-dot
+                    ${online ? "online" : "offline"}
+                  "
+                ></span>
+
+                ${
+                  online
+                    ? "Online"
+                    : "Offline"
+                }
+
+              </div>
+
             </div>
 
-            <div class="profile-status">
-              <span class="profile-status-dot"></span>
-              ${online ? "Online" : "Offline"}
-            </div>
-
-          </div>
-
-        </div>
+          </section>
 
 
-        <!-- =================================================
-             DATA PERSONIL
-             ================================================= -->
+          <!-- ===========================================
+               DATA PERSONIL
+               =========================================== -->
 
-        <div class="profile-section">
+          <section class="profile-section">
 
-          <div class="profile-section-title">
-            <span>👤</span>
-            Data Personil
-          </div>
+            <div class="profile-section-title">
 
-          <div class="profile-card">
+              <span>👤</span>
 
-            <div class="profile-row">
-              <span>Nama</span>
-              <b>
-                ${PAG.UI.escape(u.name || "-")}
-              </b>
-            </div>
-
-            <div class="profile-row">
-              <span>ID Personil</span>
-              <b>
-                ${PAG.UI.escape(
-                  u.userId ||
-                  u.id ||
-                  "-"
-                )}
-              </b>
-            </div>
-
-            <div class="profile-row">
-              <span>Jabatan</span>
-              <b>
-                ${PAG.UI.escape(
-                  u.jabatan ||
-                  u.role ||
-                  "-"
-                )}
-              </b>
-            </div>
-
-            <div class="profile-row">
-              <span>Email</span>
-              <b>
-                ${PAG.UI.escape(
-                  u.email ||
-                  "-"
-                )}
-              </b>
-            </div>
-
-          </div>
-
-        </div>
-
-
-        <!-- =================================================
-             PAKET
-             ================================================= -->
-
-        <div class="profile-section">
-
-          <div class="profile-section-title">
-            <span>📦</span>
-            Paket Pekerjaan
-          </div>
-
-          <div class="profile-card">
-
-            ${
-              activePackage
-
-              ? `
-
-                <div class="package-title">
-
-                  ${PAG.UI.escape(
-                    activePackage.nama ||
-                    activePackage.name ||
-                    "Paket Pekerjaan"
-                  )}
-
-                </div>
-
-                <div class="package-info">
-
-                  ${
-                    activePackage.id
-                      ? `ID: ${PAG.UI.escape(
-                          activePackage.id
-                        )}`
-                      : ""
-                  }
-
-                </div>
-
-                <div class="package-badge">
-                  Paket Aktif
-                </div>
-
-              `
-
-              : `
-
-                <div class="empty-state">
-
-                  <div class="empty-icon">
-                    📦
-                  </div>
-
-                  <b>
-                    Paket belum tersedia
-                  </b>
-
-                  <span>
-                    Data paket belum tersinkron.
-                  </span>
-
-                </div>
-
-              `
-
-            }
-
-          </div>
-
-        </div>
-
-
-        <!-- =================================================
-             CATATAN PEKERJAAN
-             ================================================= -->
-
-        <div class="profile-section">
-
-          <div class="profile-section-title">
-
-            <span>📁</span>
-
-            Catatan Pekerjaan
-
-          </div>
-
-
-          <div class="profile-card documents-card">
-
-            <div class="document-description">
-
-              Seluruh catatan dan dokumen pekerjaan
-              yang berkaitan dengan personil dan paket.
+              <span>
+                Data Personil
+              </span>
 
             </div>
 
 
-            <div class="document-tabs">
+            <div class="profile-card profile-data-card">
 
-              <button
-                class="document-tab active"
-                data-source="all"
-              >
-                Semua
-              </button>
-
-              <button
-                class="document-tab"
-                data-source="self"
-              >
-                Saya
-              </button>
-
-              <button
-                class="document-tab"
-                data-source="se"
-              >
-                SE
-              </button>
-
-              <button
-                class="document-tab"
-                data-source="admin"
-              >
-                Admin
-              </button>
-
-            </div>
-
-
-            <div class="document-search">
-
-              <input
-                id="profileDocumentSearch"
-                type="search"
-                placeholder="Cari catatan atau dokumen..."
-              >
-
-            </div>
-
-
-            <div id="profileDocuments">
-
-              <div class="empty-state">
-
-                <div class="empty-icon">
-                  📂
-                </div>
-
-                <b>
-                  Catatan pekerjaan
-                </b>
+              <div class="profile-data-row">
 
                 <span>
-                  Belum ada catatan yang tersedia.
+                  Nama
+                </span>
+
+                <strong>
+                  ${PAG.Profile.escape(name)}
+                </strong>
+
+              </div>
+
+
+              <div class="profile-data-row">
+
+                <span>
+                  ID Personil
+                </span>
+
+                <strong>
+                  ${PAG.Profile.escape(userId)}
+                </strong>
+
+              </div>
+
+
+              <div class="profile-data-row">
+
+                <span>
+                  Jabatan
+                </span>
+
+                <strong>
+                  ${PAG.Profile.escape(role)}
+                </strong>
+
+              </div>
+
+
+              <div class="profile-data-row">
+
+                <span>
+                  Email
+                </span>
+
+                <strong>
+                  ${PAG.Profile.escape(email)}
+                </strong>
+
+              </div>
+
+            </div>
+
+          </section>
+
+
+          <!-- ===========================================
+               PAKET PEKERJAAN
+               =========================================== -->
+
+          <section class="profile-section">
+
+            <div class="profile-section-title">
+
+              <span>📦</span>
+
+              <span>
+                Paket Pekerjaan
+              </span>
+
+            </div>
+
+
+            <div class="profile-card">
+
+              ${
+                activePackage
+
+                  ? `
+
+                    <div class="profile-package">
+
+                      <div class="profile-package-icon">
+                        📦
+                      </div>
+
+
+                      <div class="profile-package-content">
+
+                        <strong>
+                          ${PAG.Profile.escape(
+                            packageName
+                          )}
+                        </strong>
+
+
+                        ${
+                          packageId
+                            ? `
+                              <small>
+                                ID:
+                                ${PAG.Profile.escape(
+                                  packageId
+                                )}
+                              </small>
+                            `
+                            : ""
+                        }
+
+
+                        <span class="profile-package-badge">
+                          Paket Aktif
+                        </span>
+
+                      </div>
+
+                    </div>
+
+                  `
+
+                  : `
+
+                    <div class="profile-empty">
+
+                      <div class="profile-empty-icon">
+                        📦
+                      </div>
+
+                      <strong>
+                        Paket belum tersedia
+                      </strong>
+
+                      <small>
+                        Data paket belum tersinkron.
+                      </small>
+
+                    </div>
+
+                  `
+              }
+
+            </div>
+
+          </section>
+
+
+          <!-- ===========================================
+               CATATAN PEKERJAAN
+               =========================================== -->
+
+          <section class="profile-section">
+
+            <div class="profile-section-title">
+
+              <span>📁</span>
+
+              <span>
+                Catatan Pekerjaan
+              </span>
+
+            </div>
+
+
+            <div class="profile-card profile-documents-card">
+
+
+              <div class="profile-documents-description">
+
+                Seluruh catatan dan dokumen pekerjaan
+                yang berkaitan dengan personil dan paket.
+
+              </div>
+
+
+              <!-- TABS -->
+
+              <div class="profile-document-tabs">
+
+                <button
+                  type="button"
+                  class="profile-document-tab active"
+                  data-source="all"
+                >
+                  Semua
+                </button>
+
+
+                <button
+                  type="button"
+                  class="profile-document-tab"
+                  data-source="self"
+                >
+                  Saya
+                </button>
+
+
+                <button
+                  type="button"
+                  class="profile-document-tab"
+                  data-source="se"
+                >
+                  SE
+                </button>
+
+
+                <button
+                  type="button"
+                  class="profile-document-tab"
+                  data-source="admin"
+                >
+                  Admin
+                </button>
+
+              </div>
+
+
+              <!-- SEARCH -->
+
+              <div class="profile-document-search">
+
+                <input
+                  id="profileDocumentSearch"
+                  type="search"
+                  placeholder="Cari catatan atau dokumen..."
+                  autocomplete="off"
+                >
+
+              </div>
+
+
+              <!-- DOCUMENT LIST -->
+
+              <div id="profileDocuments">
+
+                <div class="profile-document-loading">
+                  Memuat catatan...
+                </div>
+
+              </div>
+
+
+            </div>
+
+          </section>
+
+
+          <!-- ===========================================
+               SINKRONISASI
+               =========================================== -->
+
+          <section class="profile-section">
+
+            <div class="profile-section-title">
+
+              <span>🔄</span>
+
+              <span>
+                Sinkronisasi
+              </span>
+
+            </div>
+
+
+            <div class="profile-card">
+
+              <div class="profile-sync-row">
+
+                <div>
+
+                  <strong>
+                    Status koneksi
+                  </strong>
+
+                  <small>
+
+                    ${
+                      online
+                        ? "Terhubung ke internet"
+                        : "Tidak ada koneksi internet"
+                    }
+
+                  </small>
+
+                </div>
+
+
+                <span
+                  class="
+                    profile-sync-badge
+                    ${online ? "online" : "offline"}
+                  "
+                >
+
+                  ${
+                    online
+                      ? "Online"
+                      : "Offline"
+                  }
+
                 </span>
 
               </div>
 
-            </div>
 
-          </div>
-
-        </div>
-
-
-        <!-- =================================================
-             SINKRONISASI
-             ================================================= -->
-
-        <div class="profile-section">
-
-          <div class="profile-section-title">
-
-            <span>🔄</span>
-
-            Sinkronisasi
-
-          </div>
-
-
-          <div class="profile-card">
-
-            <div class="sync-status-row">
-
-              <div>
-
-                <b>Status koneksi</b>
-
-                <small>
-                  ${
-                    online
-                      ? "Terhubung ke internet"
-                      : "Tidak ada koneksi internet"
-                  }
-                </small>
-
-              </div>
-
-              <span
-                class="sync-indicator ${
-                  online ? "online" : "offline"
-                }"
+              <button
+                type="button"
+                class="btn"
+                id="profileSync"
               >
-                ${online ? "Online" : "Offline"}
+                🔄 Sinkronkan Sekarang
+              </button>
+
+            </div>
+
+          </section>
+
+
+          <!-- ===========================================
+               PENGATURAN
+               =========================================== -->
+
+          <section class="profile-section">
+
+            <div class="profile-section-title">
+
+              <span>⚙️</span>
+
+              <span>
+                Pengaturan
               </span>
 
             </div>
 
 
+            <div class="profile-card profile-settings-card">
+
+
+              <button
+                type="button"
+                class="profile-setting-row"
+                id="profileNotificationSetting"
+              >
+
+                <span>
+
+                  <span class="profile-setting-icon">
+                    🔔
+                  </span>
+
+                  <strong>
+                    Notifikasi
+                  </strong>
+
+                </span>
+
+                <span>
+                  ›
+                </span>
+
+              </button>
+
+
+              <button
+                type="button"
+                class="profile-setting-row"
+                id="profileStorageSetting"
+              >
+
+                <span>
+
+                  <span class="profile-setting-icon">
+                    💾
+                  </span>
+
+                  <strong>
+                    Data Lokal
+                  </strong>
+
+                </span>
+
+                <span>
+                  ›
+                </span>
+
+              </button>
+
+
+              <button
+                type="button"
+                class="profile-setting-row"
+                id="profileAbout"
+              >
+
+                <span>
+
+                  <span class="profile-setting-icon">
+                    ℹ️
+                  </span>
+
+                  <strong>
+                    Tentang PAG Docs
+                  </strong>
+
+                </span>
+
+                <span>
+                  ›
+                </span>
+
+              </button>
+
+
+            </div>
+
+          </section>
+
+
+          <!-- ===========================================
+               LOGOUT
+               =========================================== -->
+
+          <section class="profile-section">
+
             <button
-              class="btn"
-              id="profileSync"
               type="button"
+              class="profile-logout"
+              id="profileLogout"
             >
-              🔄 Sinkronkan Sekarang
+              Keluar dari PAG Docs
             </button>
 
-          </div>
+          </section>
 
-        </div>
-
-
-        <!-- =================================================
-             PENGATURAN
-             ================================================= -->
-
-        <div class="profile-section">
-
-          <div class="profile-section-title">
-
-            <span>⚙️</span>
-
-            Pengaturan
-
-          </div>
-
-
-          <div class="profile-card">
-
-            <button
-              class="profile-menu"
-              type="button"
-              id="profileNotificationSetting"
-            >
-
-              <span>
-                🔔
-                <b>Notifikasi</b>
-              </span>
-
-              <span>
-                ›
-              </span>
-
-            </button>
-
-
-            <button
-              class="profile-menu"
-              type="button"
-              id="profileStorageSetting"
-            >
-
-              <span>
-                💾
-                <b>Data Lokal</b>
-              </span>
-
-              <span>
-                ›
-              </span>
-
-            </button>
-
-
-            <button
-              class="profile-menu"
-              type="button"
-              id="profileAbout"
-            >
-
-              <span>
-                ℹ️
-                <b>Tentang PAG Docs</b>
-              </span>
-
-              <span>
-                ›
-              </span>
-
-            </button>
-
-          </div>
-
-        </div>
-
-
-        <!-- =================================================
-             LOGOUT
-             ================================================= -->
-
-        <div class="profile-section profile-logout-section">
-
-          <button
-            class="profile-logout"
-            id="profileLogout"
-            type="button"
-          >
-            Keluar dari PAG Docs
-          </button>
 
         </div>
 
       `;
 
 
-      /* =====================================================
+      /* =================================================
          LOAD DOCUMENTS
-         ===================================================== */
+         ================================================= */
 
-      await PAG.Profile.loadDocuments(
+      const documentContainer =
         document.getElementById(
           "profileDocuments"
-        ),
+        );
+
+
+      await PAG.Profile.loadDocuments(
+        documentContainer,
         "all"
       );
 
 
-      /* =====================================================
-         DOCUMENT TABS
-         ===================================================== */
+      /* =================================================
+         TABS
+         ================================================= */
 
       document
-        .querySelectorAll(".document-tab")
+        .querySelectorAll(
+          ".profile-document-tab"
+        )
         .forEach(tab => {
 
           tab.addEventListener(
@@ -469,19 +678,40 @@ PAG.Profile = {
             async function () {
 
               document
-                .querySelectorAll(".document-tab")
-                .forEach(x =>
-                  x.classList.remove("active")
-                );
+                .querySelectorAll(
+                  ".profile-document-tab"
+                )
+                .forEach(x => {
 
-              this.classList.add("active");
+                  x.classList.remove(
+                    "active"
+                  );
+
+                });
+
+
+              this.classList.add(
+                "active"
+              );
+
 
               await PAG.Profile.loadDocuments(
-                document.getElementById(
-                  "profileDocuments"
-                ),
+                documentContainer,
                 this.dataset.source
               );
+
+
+              const search =
+                document.getElementById(
+                  "profileDocumentSearch"
+                );
+
+
+              if (search) {
+
+                search.value = "";
+
+              }
 
             }
           );
@@ -489,14 +719,15 @@ PAG.Profile = {
         });
 
 
-      /* =====================================================
+      /* =================================================
          SEARCH
-         ===================================================== */
+         ================================================= */
 
       const search =
         document.getElementById(
           "profileDocumentSearch"
         );
+
 
       if (search) {
 
@@ -514,18 +745,20 @@ PAG.Profile = {
       }
 
 
-      /* =====================================================
+      /* =================================================
          SYNC
-         ===================================================== */
+         ================================================= */
 
       const sync =
         document.getElementById(
           "profileSync"
         );
 
+
       if (sync) {
 
-        sync.onclick =
+        sync.addEventListener(
+          "click",
           async function () {
 
             try {
@@ -535,31 +768,50 @@ PAG.Profile = {
               sync.textContent =
                 "⏳ Menyinkronkan...";
 
-              await PAG.WebUtamaSync.pull();
 
-              await PAG.OfflineSync.run();
+              if (
+                PAG.WebUtamaSync &&
+                typeof PAG.WebUtamaSync.pull === "function"
+              ) {
 
-              PAG.UI.toast(
+                await PAG.WebUtamaSync.pull();
+
+              }
+
+
+              if (
+                PAG.OfflineSync &&
+                typeof PAG.OfflineSync.run === "function"
+              ) {
+
+                await PAG.OfflineSync.run();
+
+              }
+
+
+              PAG.Profile.toast(
                 "Sinkronisasi selesai"
               );
 
+
               await PAG.Profile.loadDocuments(
-                document.getElementById(
-                  "profileDocuments"
-                ),
+                documentContainer,
                 "all"
               );
+
 
             } catch (error) {
 
               console.error(
-                "Profile sync error:",
+                "Profile sync:",
                 error
               );
 
-              PAG.UI.toast(
+
+              PAG.Profile.toast(
                 "Sinkronisasi gagal"
               );
+
 
             } finally {
 
@@ -570,23 +822,26 @@ PAG.Profile = {
 
             }
 
-          };
+          }
+        );
 
       }
 
 
-      /* =====================================================
+      /* =================================================
          LOGOUT
-         ===================================================== */
+         ================================================= */
 
       const logout =
         document.getElementById(
           "profileLogout"
         );
 
+
       if (logout) {
 
-        logout.onclick =
+        logout.addEventListener(
+          "click",
           function () {
 
             if (
@@ -595,18 +850,26 @@ PAG.Profile = {
               )
             ) {
 
-              PAG.Auth.logout();
+              if (
+                PAG.Auth &&
+                typeof PAG.Auth.logout === "function"
+              ) {
+
+                PAG.Auth.logout();
+
+              }
 
             }
 
-          };
+          }
+        );
 
       }
 
 
-      /* =====================================================
+      /* =================================================
          SETTINGS
-         ===================================================== */
+         ================================================= */
 
       document
         .getElementById(
@@ -616,7 +879,7 @@ PAG.Profile = {
           "click",
           function () {
 
-            PAG.UI.toast(
+            PAG.Profile.toast(
               "Pengaturan notifikasi akan tersedia."
             );
 
@@ -632,7 +895,7 @@ PAG.Profile = {
           "click",
           function () {
 
-            PAG.UI.toast(
+            PAG.Profile.toast(
               "Pengaturan data lokal akan tersedia."
             );
 
@@ -648,7 +911,7 @@ PAG.Profile = {
           "click",
           function () {
 
-            PAG.UI.toast(
+            PAG.Profile.toast(
               "PAG Docs Field"
             );
 
@@ -663,6 +926,7 @@ PAG.Profile = {
         error
       );
 
+
       v.innerHTML = `
 
         <div class="card">
@@ -672,7 +936,7 @@ PAG.Profile = {
           </h3>
 
           <p>
-            ${PAG.UI.escape(
+            ${PAG.Profile.escape(
               error.message ||
               String(error)
             )}
@@ -696,142 +960,314 @@ PAG.Profile = {
     const text =
       String(name || "P");
 
+
     const parts =
       text
         .trim()
         .split(/\s+/)
+        .filter(Boolean)
         .slice(0, 2);
 
+
+    if (!parts.length) {
+      return "P";
+    }
+
+
     return parts
-      .map(x => x.charAt(0))
-      .join("")
-      .toUpperCase();
+      .map(
+        x =>
+          x
+            .charAt(0)
+            .toUpperCase()
+      )
+      .join("");
 
   },
 
 
   /* =====================================================
-     DOCUMENT DATA
+     GET DOCUMENTS
      ===================================================== */
 
   async getDocuments() {
 
     const result = [];
 
+
+    /* =================================================
+       1. LOCAL STORAGE
+       ================================================= */
+
     try {
 
-      /*
-       * MASTER DARI WEB UTAMA
-       */
+      if (
+        PAG.Storage &&
+        typeof PAG.Storage.getAll === "function"
+      ) {
 
-      const master =
-        await PAG.WebUtamaSync.getMaster();
-
-      /*
-       * Ambil koleksi dokumen jika tersedia.
-       * Tidak mengganggu aplikasi apabila
-       * backend belum mengirim koleksi tersebut.
-       */
-
-      const collections = [
-
-        ...(Array.isArray(master?.documents)
-          ? master.documents
-          : []),
-
-        ...(Array.isArray(master?.dokumen)
-          ? master.dokumen
-          : []),
-
-        ...(Array.isArray(master?.catatan)
-          ? master.catatan
-          : []),
-
-        ...(Array.isArray(master?.laporan)
-          ? master.laporan
-          : []),
-
-        ...(Array.isArray(master?.laporanHarian)
-          ? master.laporanHarian
-          : []),
-
-        ...(Array.isArray(master?.instruksi)
-          ? master.instruksi
-          : []),
-
-        ...(Array.isArray(master?.memo)
-          ? master.memo
-          : []),
-
-        ...(Array.isArray(master?.temuan)
-          ? master.temuan
-          : []),
-
-        ...(Array.isArray(master?.tindaklanjut)
-          ? master.tindaklanjut
-          : []),
-
-        ...(Array.isArray(master?.rfi)
-          ? master.rfi
-          : []),
-
-        ...(Array.isArray(master?.inspection)
-          ? master.inspection
-          : [])
-
-      ];
+        const stored =
+          await PAG.Storage.getAll(
+            "reports"
+          );
 
 
-      collections.forEach(item => {
+        if (Array.isArray(stored)) {
 
-        if (!item) return;
+          stored.forEach(
+            item => {
 
-        result.push(
-          PAG.Profile.normalizeDocument(item)
-        );
+              if (!item) return;
 
-      });
+
+              const data =
+                item.data ||
+                item.reportData ||
+                item;
+
+
+              if (
+                data &&
+                (
+                  data.type === "laporan_harian" ||
+                  item.type === "laporan_harian"
+                )
+              ) {
+
+                result.push(
+                  PAG.Profile.normalizeDocument(
+                    data
+                  )
+                );
+
+              }
+
+            }
+          );
+
+        }
+
+      }
 
     } catch (error) {
 
       console.warn(
-        "Dokumen master tidak tersedia:",
+        "Profile reports storage:",
         error
       );
 
     }
 
 
-    /*
-     * HAPUS DUPLIKAT
-     */
+    /* =================================================
+       2. ALTERNATIVE STORAGE METHOD
+       ================================================= */
 
-    const unique =
-      new Map();
-
-    result.forEach(item => {
+    try {
 
       if (
-        item &&
-        item.id
+        PAG.Storage &&
+        typeof PAG.Storage.list === "function"
       ) {
 
-        unique.set(
-          item.id,
-          item
+        const stored =
+          await PAG.Storage.list(
+            "reports"
+          );
+
+
+        if (Array.isArray(stored)) {
+
+          stored.forEach(
+            item => {
+
+              if (!item) return;
+
+
+              const data =
+                item.data ||
+                item;
+
+
+              if (
+                data &&
+                (
+                  data.type === "laporan_harian" ||
+                  item.type === "laporan_harian"
+                )
+              ) {
+
+                result.push(
+                  PAG.Profile.normalizeDocument(
+                    data
+                  )
+                );
+
+              }
+
+            }
+          );
+
+        }
+
+      }
+
+    } catch (error) {
+
+      console.warn(
+        "Profile reports list:",
+        error
+      );
+
+    }
+
+
+    /* =================================================
+       3. MASTER
+       ================================================= */
+
+    try {
+
+      if (
+        PAG.WebUtamaSync &&
+        typeof PAG.WebUtamaSync.getMaster === "function"
+      ) {
+
+        const master =
+          await PAG.WebUtamaSync.getMaster() || {};
+
+
+        const collections = [
+
+          master.documents,
+
+          master.dokumen,
+
+          master.catatan,
+
+          master.laporan,
+
+          master.laporanHarian,
+
+          master.instruksi,
+
+          master.memo,
+
+          master.temuan,
+
+          master.tindaklanjut,
+
+          master.rfi,
+
+          master.inspection
+
+        ];
+
+
+        collections.forEach(
+          collection => {
+
+            if (
+              !Array.isArray(collection)
+            ) {
+
+              return;
+
+            }
+
+
+            collection.forEach(
+              item => {
+
+                if (!item) return;
+
+
+                result.push(
+                  PAG.Profile.normalizeDocument(
+                    item
+                  )
+                );
+
+              }
+            );
+
+          }
         );
 
       }
 
-    });
+    } catch (error) {
 
+      console.warn(
+        "Profile master documents:",
+        error
+      );
+
+    }
+
+
+    /* =================================================
+       4. DEDUPLICATE
+       ================================================= */
+
+    const unique =
+      new Map();
+
+
+    result.forEach(
+      item => {
+
+        if (!item) return;
+
+
+        const id =
+          item.id ||
+          (
+            item.type +
+            "_" +
+            item.date +
+            "_" +
+            item.title
+          );
+
+
+        if (!unique.has(id)) {
+
+          unique.set(
+            id,
+            item
+          );
+
+        }
+
+      }
+    );
+
+
+    /* =================================================
+       5. SORT
+       ================================================= */
 
     return Array
       .from(unique.values())
       .sort(
-        (a, b) =>
-          new Date(b.date || 0) -
-          new Date(a.date || 0)
+        (a, b) => {
+
+          const da =
+            new Date(
+              a.date || 0
+            ).getTime();
+
+
+          const db =
+            new Date(
+              b.date || 0
+            ).getTime();
+
+
+          return db - da;
+
+        }
       );
 
   },
@@ -843,6 +1279,10 @@ PAG.Profile = {
 
   normalizeDocument(item) {
 
+    item =
+      item || {};
+
+
     const type =
       String(
         item.type ||
@@ -853,74 +1293,160 @@ PAG.Profile = {
       );
 
 
+    /* =================================================
+       SOURCE
+       ================================================= */
+
     const sourceRaw =
       String(
         item.source ||
         item.sumber ||
         item.createdByRole ||
+        item.dibuatOlehRole ||
         ""
-      ).toLowerCase();
+      )
+      .toLowerCase();
 
 
-    let source = "self";
+    let source =
+      "self";
+
 
     if (
       sourceRaw.includes("admin")
     ) {
 
-      source = "admin";
+      source =
+        "admin";
 
     } else if (
       sourceRaw.includes("se") ||
       sourceRaw.includes("supervisor") ||
-      sourceRaw.includes("engineer")
+      sourceRaw.includes("engineer") ||
+      sourceRaw.includes("tl")
     ) {
 
-      source = "se";
+      source =
+        "se";
 
     }
 
+
+    /* =================================================
+       TITLE
+       ================================================= */
+
+    let title =
+      item.title ||
+      item.judul ||
+      item.nama ||
+      "";
+
+
+    if (!title) {
+
+      title =
+        PAG.Profile.documentTitle(
+          type
+        );
+
+    }
+
+
+    /* =================================================
+       CREATED BY
+       ================================================= */
 
     const createdBy =
       item.createdByName ||
       item.namaPembuat ||
       item.createdBy ||
       item.author ||
+      item.dibuat ||
       "";
 
+
+    /* =================================================
+       DATE
+       ================================================= */
+
+    const date =
+      item.createdAt ||
+      item.tanggal ||
+      item.date ||
+      item.updatedAt ||
+      "";
+
+
+    /* =================================================
+       PACKAGE
+       ================================================= */
+
+    const packageId =
+      item.packageId ||
+      item.paketId ||
+      "";
+
+
+    /* =================================================
+       REPORT DATA
+       ================================================= */
 
     return {
 
       id:
         item.id ||
         item.documentId ||
-        `DOC-${Date.now()}-${Math.random()}`,
+        (
+          "DOC-" +
+          Date.now() +
+          "-" +
+          Math.random()
+            .toString(36)
+            .slice(2)
+        ),
 
-      type,
+
+      type:
+
+
+        type,
+
 
       title:
-        item.title ||
-        item.judul ||
-        item.nama ||
-        PAG.Profile.documentTitle(type),
 
-      source,
 
-      createdBy,
+        title,
+
+
+      source:
+
+
+        source,
+
+
+      createdBy:
+
+
+        createdBy,
+
 
       date:
-        item.createdAt ||
-        item.tanggal ||
-        item.date ||
-        item.updatedAt ||
-        "",
+
+
+        date,
+
 
       packageId:
-        item.packageId ||
-        item.paketId ||
-        "",
 
-      raw: item
+
+        packageId,
+
+
+      raw:
+
+
+        item
 
     };
 
@@ -934,50 +1460,71 @@ PAG.Profile = {
   documentTitle(type) {
 
     const t =
-      String(type)
+      String(type || "")
         .toLowerCase();
 
 
     if (
       t.includes("laporan")
-    )
+    ) {
+
       return "Laporan Harian";
+
+    }
 
 
     if (
       t.includes("instruksi")
-    )
+    ) {
+
       return "Instruksi Lapangan";
+
+    }
 
 
     if (
       t.includes("memo")
-    )
+    ) {
+
       return "Memo";
+
+    }
 
 
     if (
       t.includes("temuan")
-    )
+    ) {
+
       return "Temuan";
+
+    }
 
 
     if (
       t.includes("tindak")
-    )
+    ) {
+
       return "Tindak Lanjut";
+
+    }
 
 
     if (
       t.includes("rfi")
-    )
+    ) {
+
       return "RFI";
+
+    }
 
 
     if (
       t.includes("inspection")
-    )
+    ) {
+
       return "Inspection";
+
+    }
 
 
     return "Dokumen Pekerjaan";
@@ -989,47 +1536,92 @@ PAG.Profile = {
      LOAD DOCUMENTS
      ===================================================== */
 
-  async loadDocuments(container, source = "all") {
+  async loadDocuments(
+    container,
+    source = "all"
+  ) {
 
-    if (!container) return;
+    if (!container) {
+      return;
+    }
+
 
     container.innerHTML = `
 
-      <div class="document-loading">
+      <div class="profile-document-loading">
+
         Memuat catatan...
+
       </div>
 
     `;
 
 
-    const documents =
-      await PAG.Profile.getDocuments();
+    try {
+
+      const documents =
+        await PAG.Profile.getDocuments();
 
 
-    let filtered =
-      documents;
+      let filtered =
+        documents;
 
 
-    if (
-      source !== "all"
-    ) {
+      if (
+        source !== "all"
+      ) {
 
-      filtered =
-        documents.filter(
-          x => x.source === source
-        );
+        filtered =
+          documents.filter(
+            doc =>
+              doc.source === source
+          );
+
+      }
+
+
+      PAG.Profile._documents =
+        filtered;
+
+
+      PAG.Profile.renderDocuments(
+        container,
+        filtered
+      );
+
+
+    } catch (error) {
+
+      console.error(
+        "Profile load documents:",
+        error
+      );
+
+
+      container.innerHTML = `
+
+        <div class="profile-empty">
+
+          <div class="profile-empty-icon">
+            📂
+          </div>
+
+          <strong>
+            Gagal memuat catatan
+          </strong>
+
+          <small>
+            ${PAG.Profile.escape(
+              error.message ||
+              String(error)
+            )}
+          </small>
+
+        </div>
+
+      `;
 
     }
-
-
-    PAG.Profile._documents =
-      filtered;
-
-
-    PAG.Profile.renderDocuments(
-      container,
-      filtered
-    );
 
   },
 
@@ -1038,29 +1630,37 @@ PAG.Profile = {
      RENDER DOCUMENTS
      ===================================================== */
 
-  renderDocuments(container, documents) {
+  renderDocuments(
+    container,
+    documents
+  ) {
 
-    if (!documents.length) {
+    if (
+      !Array.isArray(documents) ||
+      !documents.length
+    ) {
 
       container.innerHTML = `
 
-        <div class="empty-state">
+        <div class="profile-empty">
 
-          <div class="empty-icon">
+          <div class="profile-empty-icon">
             📂
           </div>
 
-          <b>
+          <strong>
             Belum ada catatan
-          </b>
+          </strong>
 
-          <span>
-            Tidak ada dokumen pada kategori ini.
-          </span>
+          <small>
+            Laporan dan dokumen pekerjaan
+            yang tersimpan akan muncul di sini.
+          </small>
 
         </div>
 
       `;
+
 
       return;
 
@@ -1069,163 +1669,909 @@ PAG.Profile = {
 
     container.innerHTML =
       documents
-        .map(doc => `
+        .map(
+          (doc, index) => {
 
-          <div
-            class="document-item"
-            data-search="
-              ${PAG.UI.escape(
-                (
-                  doc.title +
-                  " " +
-                  doc.type +
-                  " " +
-                  doc.createdBy
-                ).toLowerCase()
-              )}
-            "
+            const searchText =
+              (
+                doc.title +
+                " " +
+                doc.type +
+                " " +
+                doc.createdBy
+              )
+              .toLowerCase();
+
+
+            return `
+
+              <button
+                type="button"
+                class="profile-document-item"
+                data-index="${index}"
+                data-search="${PAG.Profile.escape(
+                  searchText
+                )}"
+              >
+
+
+                <div class="profile-document-icon">
+
+                  ${PAG.Profile.documentIcon(
+                    doc.type
+                  )}
+
+                </div>
+
+
+                <div class="profile-document-content">
+
+                  <strong>
+
+                    ${PAG.Profile.escape(
+                      doc.title
+                    )}
+
+                  </strong>
+
+
+                  <small>
+
+                    ${PAG.Profile.escape(
+                      PAG.Profile.typeLabel(
+                        doc.type
+                      )
+                    )}
+
+                    ${
+                      doc.createdBy
+                        ? `
+                          •
+                          ${PAG.Profile.escape(
+                            doc.createdBy
+                          )}
+                        `
+                        : ""
+                    }
+
+                  </small>
+
+
+                  ${
+                    doc.date
+                      ? `
+                        <small
+                          class="profile-document-date"
+                        >
+                          ${PAG.Profile.formatDate(
+                            doc.date
+                          )}
+                        </small>
+                      `
+                      : ""
+                  }
+
+                </div>
+
+
+                <span
+                  class="
+                    profile-document-source
+                    ${doc.source}
+                  "
+                >
+
+                  ${PAG.Profile.sourceLabel(
+                    doc.source
+                  )}
+
+                </span>
+
+
+                <span class="profile-document-arrow">
+                  ›
+                </span>
+
+
+              </button>
+
+            `;
+
+          }
+        )
+        .join("");
+
+
+    /* =================================================
+       CLICK DOCUMENT
+       ================================================= */
+
+    container
+      .querySelectorAll(
+        ".profile-document-item"
+      )
+      .forEach(
+        item => {
+
+          item.addEventListener(
+            "click",
+            function () {
+
+              const index =
+                Number(
+                  this.dataset.index
+                );
+
+
+              const doc =
+                PAG.Profile._documents &&
+                PAG.Profile._documents[index];
+
+
+              if (!doc) {
+                return;
+              }
+
+
+              PAG.Profile.openDocument(
+                doc
+              );
+
+            }
+          );
+
+        }
+      );
+
+  },
+
+
+  /* =====================================================
+     OPEN DOCUMENT
+     ===================================================== */
+
+  openDocument(doc) {
+
+    if (!doc) {
+      return;
+    }
+
+
+    /* ================================================
+       LAPORAN HARIAN
+       ================================================ */
+
+    if (
+      String(doc.type)
+        .toLowerCase()
+        .includes("laporan")
+    ) {
+
+      PAG.Profile.showReport(
+        doc.raw || doc
+      );
+
+
+      return;
+
+    }
+
+
+    /* ================================================
+       OTHER DOCUMENT
+       ================================================ */
+
+    PAG.Profile.toast(
+      doc.title ||
+      "Dokumen pekerjaan"
+    );
+
+  },
+
+
+  /* =====================================================
+     SHOW REPORT
+     ===================================================== */
+
+  showReport(report) {
+
+    report =
+      report || {};
+
+
+    const items =
+      Array.isArray(report.items)
+        ? report.items
+        : [];
+
+
+    let html = `
+
+      <div class="profile-report-view">
+
+
+        <div class="profile-report-header">
+
+          <div>
+
+            <small>
+              PAG DOCS FIELD
+            </small>
+
+            <h3>
+              Laporan Harian
+            </h3>
+
+          </div>
+
+
+          <button
+            type="button"
+            class="profile-report-close"
+            id="profileReportClose"
           >
+            ✕
+          </button>
 
-            <div class="document-icon">
-              ${PAG.Profile.documentIcon(
-                doc.type
-              )}
-            </div>
+        </div>
 
 
-            <div class="document-content">
+        <div class="profile-report-info">
 
-              <b>
-                ${PAG.UI.escape(
-                  doc.title
-                )}
-              </b>
+          ${
+            report.paket
+              ? `
+                <div>
+                  <span>Paket</span>
+                  <strong>
+                    ${PAG.Profile.escape(
+                      report.paket
+                    )}
+                  </strong>
+                </div>
+              `
+              : ""
+          }
 
-              <small>
 
-                ${PAG.UI.escape(
-                  doc.type
-                )}
+          ${
+            report.konsultan
+              ? `
+                <div>
+                  <span>Konsultan</span>
+                  <strong>
+                    ${PAG.Profile.escape(
+                      report.konsultan
+                    )}
+                  </strong>
+                </div>
+              `
+              : ""
+          }
+
+
+          ${
+            report.kontraktor
+              ? `
+                <div>
+                  <span>Kontraktor</span>
+                  <strong>
+                    ${PAG.Profile.escape(
+                      report.kontraktor
+                    )}
+                  </strong>
+                </div>
+              `
+              : ""
+          }
+
+
+          ${
+            report.noKontrak
+              ? `
+                <div>
+                  <span>No. Kontrak</span>
+                  <strong>
+                    ${PAG.Profile.escape(
+                      report.noKontrak
+                    )}
+                  </strong>
+                </div>
+              `
+              : ""
+          }
+
+        </div>
+
+
+        <div class="profile-report-items">
+
+    `;
+
+
+    if (!items.length) {
+
+      html += `
+
+        <div class="profile-empty">
+
+          <div class="profile-empty-icon">
+            📋
+          </div>
+
+          <strong>
+            Tidak ada kegiatan
+          </strong>
+
+        </div>
+
+      `;
+
+    } else {
+
+      items.forEach(
+        (item, index) => {
+
+          html += `
+
+            <div class="profile-report-item">
+
+              <div class="profile-report-item-header">
+
+                <strong>
+                  Kegiatan ${index + 1}
+                </strong>
 
                 ${
-                  doc.createdBy
-                    ? " • " +
-                      PAG.UI.escape(
-                        doc.createdBy
-                      )
+                  item.tanggal
+                    ? `
+                      <span>
+                        ${PAG.Profile.escape(
+                          item.tanggal
+                        )}
+                      </span>
+                    `
                     : ""
                 }
 
-              </small>
+              </div>
 
 
               ${
-                doc.date
+                item.devisi
                   ? `
-                    <small class="document-date">
-                      ${PAG.Profile.formatDate(
-                        doc.date
-                      )}
-                    </small>
+                    <div class="profile-report-field">
+
+                      <span>Divisi</span>
+
+                      <strong>
+                        ${PAG.Profile.escape(
+                          item.devisi
+                        )}
+                      </strong>
+
+                    </div>
+                  `
+                  : ""
+              }
+
+
+              ${
+                item.sta
+                  ? `
+                    <div class="profile-report-field">
+
+                      <span>STA</span>
+
+                      <strong>
+                        ${PAG.Profile.escape(
+                          item.sta
+                        )}
+                      </strong>
+
+                    </div>
+                  `
+                  : ""
+              }
+
+
+              ${
+                item.cuaca
+                  ? `
+                    <div class="profile-report-field">
+
+                      <span>Cuaca</span>
+
+                      <strong>
+                        ${PAG.Profile.escape(
+                          item.cuaca
+                        )}
+                      </strong>
+
+                    </div>
+                  `
+                  : ""
+              }
+
+
+              ${
+                item.uraian
+                  ? `
+                    <div class="profile-report-text">
+
+                      <span>
+                        Uraian Pekerjaan
+                      </span>
+
+                      <p>
+                        ${PAG.Profile.escape(
+                          item.uraian
+                        )}
+                      </p>
+
+                    </div>
+                  `
+                  : ""
+              }
+
+
+              ${
+                item.tenaga
+                  ? `
+                    <div class="profile-report-text">
+
+                      <span>
+                        Tenaga Kerja
+                      </span>
+
+                      <p>
+                        ${PAG.Profile.escape(
+                          item.tenaga
+                        )}
+                      </p>
+
+                    </div>
+                  `
+                  : ""
+              }
+
+
+              ${
+                item.peralatan
+                  ? `
+                    <div class="profile-report-text">
+
+                      <span>
+                        Peralatan
+                      </span>
+
+                      <p>
+                        ${PAG.Profile.escape(
+                          item.peralatan
+                        )}
+                      </p>
+
+                    </div>
+                  `
+                  : ""
+              }
+
+
+              ${
+                item.material
+                  ? `
+                    <div class="profile-report-text">
+
+                      <span>
+                        Material
+                      </span>
+
+                      <p>
+                        ${PAG.Profile.escape(
+                          item.material
+                        )}
+                      </p>
+
+                    </div>
+                  `
+                  : ""
+              }
+
+
+              ${
+                item.kendala
+                  ? `
+                    <div class="profile-report-text">
+
+                      <span>
+                        Kendala
+                      </span>
+
+                      <p>
+                        ${PAG.Profile.escape(
+                          item.kendala
+                        )}
+                      </p>
+
+                    </div>
+                  `
+                  : ""
+              }
+
+
+              ${
+                item.dokumentasi
+                  ? `
+                    <div class="profile-report-field">
+
+                      <span>
+                        Dokumentasi
+                      </span>
+
+                      <strong>
+                        📷
+                        ${PAG.Profile.escape(
+                          item.dokumentasi
+                        )}
+                      </strong>
+
+                    </div>
                   `
                   : ""
               }
 
             </div>
 
+          `;
 
-            <span
-              class="
-                document-source
-                ${doc.source}
-              "
-            >
+        }
+      );
 
-              ${PAG.Profile.sourceLabel(
-                doc.source
-              )}
+    }
 
-            </span>
 
-          </div>
+    html += `
 
-        `)
-        .join("");
+        </div>
+
+
+        <div class="profile-report-signature">
+
+          ${
+            report.dibuat
+              ? `
+                <div>
+                  <span>Dibuat oleh</span>
+                  <strong>
+                    ${PAG.Profile.escape(
+                      report.dibuat
+                    )}
+                  </strong>
+                </div>
+              `
+              : ""
+          }
+
+
+          ${
+            report.diketahui
+              ? `
+                <div>
+                  <span>Diketahui oleh</span>
+                  <strong>
+                    ${PAG.Profile.escape(
+                      report.diketahui
+                    )}
+                  </strong>
+                </div>
+              `
+              : ""
+          }
+
+        </div>
+
+
+      </div>
+
+    `;
+
+
+    /* =================================================
+       MODAL
+       ================================================= */
+
+    let modal =
+      document.getElementById(
+        "profileReportModal"
+      );
+
+
+    if (!modal) {
+
+      modal =
+        document.createElement(
+          "div"
+        );
+
+      modal.id =
+        "profileReportModal";
+
+      modal.className =
+        "profile-report-modal";
+
+      document.body.appendChild(
+        modal
+      );
+
+    }
+
+
+    modal.innerHTML =
+      html;
+
+
+    modal.style.display =
+      "flex";
+
+
+    modal
+      .querySelector(
+        "#profileReportClose"
+      )
+      ?.addEventListener(
+        "click",
+        function () {
+
+          modal.style.display =
+            "none";
+
+        }
+      );
+
+
+    modal.addEventListener(
+      "click",
+      function (event) {
+
+        if (
+          event.target === modal
+        ) {
+
+          modal.style.display =
+            "none";
+
+        }
+
+      }
+    );
 
   },
 
 
   /* =====================================================
-     SEARCH FILTER
+     FILTER DOCUMENTS
      ===================================================== */
 
   filterDocuments(keyword) {
 
     const value =
-      String(keyword || "")
-        .trim()
-        .toLowerCase();
+      String(
+        keyword || ""
+      )
+      .trim()
+      .toLowerCase();
 
 
     document
       .querySelectorAll(
-        "#profileDocuments .document-item"
+        "#profileDocuments .profile-document-item"
       )
-      .forEach(item => {
+      .forEach(
+        item => {
 
-        const text =
-          item.dataset.search || "";
+          const text =
+            item.dataset.search ||
+            "";
 
-        item.style.display =
-          !value ||
-          text.includes(value)
-            ? ""
-            : "none";
 
-      });
+          item.style.display =
+            !value ||
+            text.includes(value)
+              ? ""
+              : "none";
+
+        }
+      );
 
   },
 
 
   /* =====================================================
-     ICON
+     DOCUMENT ICON
      ===================================================== */
 
   documentIcon(type) {
 
     const t =
-      String(type)
-        .toLowerCase();
+      String(
+        type || ""
+      )
+      .toLowerCase();
 
 
-    if (t.includes("foto"))
-      return "📷";
+    if (
+      t.includes("laporan")
+    ) {
 
-    if (t.includes("laporan"))
       return "📋";
 
-    if (t.includes("instruksi"))
+    }
+
+
+    if (
+      t.includes("foto") ||
+      t.includes("photo")
+    ) {
+
+      return "📷";
+
+    }
+
+
+    if (
+      t.includes("instruksi")
+    ) {
+
       return "📢";
 
-    if (t.includes("memo"))
+    }
+
+
+    if (
+      t.includes("memo")
+    ) {
+
       return "📝";
 
-    if (t.includes("temuan"))
+    }
+
+
+    if (
+      t.includes("temuan")
+    ) {
+
       return "⚠️";
 
-    if (t.includes("rfi"))
+    }
+
+
+    if (
+      t.includes("tindak")
+    ) {
+
+      return "🔧";
+
+    }
+
+
+    if (
+      t.includes("rfi")
+    ) {
+
       return "❓";
 
-    if (t.includes("inspection"))
+    }
+
+
+    if (
+      t.includes("inspection")
+    ) {
+
       return "🔎";
 
-    if (t.includes("approval"))
+    }
+
+
+    if (
+      t.includes("approval")
+    ) {
+
       return "✓";
 
-    if (t.includes("signature"))
+    }
+
+
+    if (
+      t.includes("signature")
+    ) {
+
       return "✍️";
 
+    }
+
+
     return "📄";
+
+  },
+
+
+  /* =====================================================
+     TYPE LABEL
+     ===================================================== */
+
+  typeLabel(type) {
+
+    const t =
+      String(
+        type || ""
+      )
+      .toLowerCase();
+
+
+    if (
+      t.includes("laporan")
+    ) {
+
+      return "Laporan Harian";
+
+    }
+
+
+    if (
+      t.includes("instruksi")
+    ) {
+
+      return "Instruksi Lapangan";
+
+    }
+
+
+    if (
+      t.includes("memo")
+    ) {
+
+      return "Memo";
+
+    }
+
+
+    if (
+      t.includes("temuan")
+    ) {
+
+      return "Temuan";
+
+    }
+
+
+    if (
+      t.includes("tindak")
+    ) {
+
+      return "Tindak Lanjut";
+
+    }
+
+
+    if (
+      t.includes("rfi")
+    ) {
+
+      return "RFI";
+
+    }
+
+
+    if (
+      t.includes("inspection")
+    ) {
+
+      return "Inspection";
+
+    }
+
+
+    return "Dokumen Pekerjaan";
 
   },
 
@@ -1258,7 +2604,27 @@ PAG.Profile = {
 
   formatDate(value) {
 
+    if (!value) {
+      return "";
+    }
+
+
     try {
+
+      const date =
+        new Date(value);
+
+
+      if (
+        isNaN(
+          date.getTime()
+        )
+      ) {
+
+        return String(value);
+
+      }
+
 
       return new Intl.DateTimeFormat(
         "id-ID",
@@ -1269,16 +2635,124 @@ PAG.Profile = {
           hour: "2-digit",
           minute: "2-digit"
         }
-      ).format(
-        new Date(value)
-      );
+      ).format(date);
 
-    } catch (e) {
+
+    } catch (error) {
 
       return String(value);
 
     }
 
+  },
+
+
+  /* =====================================================
+     ESCAPE
+     ===================================================== */
+
+  escape(value) {
+
+    return String(
+      value == null
+        ? ""
+        : value
+    )
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+    .replace(
+      /</g,
+      "&lt;"
+    )
+    .replace(
+      />/g,
+      "&gt;"
+    )
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+    .replace(
+      /'/g,
+      "&#039;"
+    );
+
+  },
+
+
+  /* =====================================================
+     TOAST
+     ===================================================== */
+
+  toast(message) {
+
+    try {
+
+      if (
+        PAG.UI &&
+        typeof PAG.UI.toast === "function"
+      ) {
+
+        PAG.UI.toast(
+          message
+        );
+
+        return;
+
+      }
+
+    } catch (error) {
+
+      console.warn(
+        error
+      );
+
+    }
+
+
+    const toast =
+      document.getElementById(
+        "toast"
+      );
+
+
+    if (!toast) {
+      return;
+    }
+
+
+    toast.textContent =
+      message;
+
+
+    toast.style.display =
+      "block";
+
+
+    clearTimeout(
+      PAG.Profile._toastTimer
+    );
+
+
+    PAG.Profile._toastTimer =
+      setTimeout(
+        function () {
+
+          toast.style.display =
+            "none";
+
+        },
+        2500
+      );
+
   }
 
 };
+
+
+console.log(
+  "PAG Profile loaded:",
+  !!PAG.Profile
+);
