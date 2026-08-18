@@ -1,7 +1,7 @@
 /* =====================================================
    PAG DOCS FIELD
+   30_LaporanHarian.js
    LAPORAN HARIAN
-   MOBILE FIRST
    ===================================================== */
 
 window.PAG = window.PAG || {};
@@ -11,10 +11,13 @@ PAG.LaporanHarian = {
   async render(v) {
 
     if (!v) {
+
       console.error(
         "PAG.LaporanHarian: view tidak ditemukan."
       );
+
       return;
+
     }
 
 
@@ -39,7 +42,7 @@ PAG.LaporanHarian = {
     } catch (error) {
 
       console.warn(
-        "Laporan Harian: master tidak tersedia.",
+        "Laporan Harian Master:",
         error
       );
 
@@ -49,20 +52,8 @@ PAG.LaporanHarian = {
     var konsultan =
       master.konsultan || "";
 
-    var paket =
-      "";
-
-    if (
-      Array.isArray(master.paket) &&
-      master.paket.length > 0
-    ) {
-
-      paket =
-        master.paket[0].nama ||
-        master.paket[0].namaPaket ||
-        "";
-
-    }
+    var kontraktor =
+      master.kontraktor || "";
 
     var noKontrak =
       master.noKontrak || "";
@@ -70,8 +61,24 @@ PAG.LaporanHarian = {
     var tglKontrak =
       master.tglKontrak || "";
 
-    var kontraktor =
-      master.kontraktor || "";
+    var paket =
+      "";
+
+    if (
+      Array.isArray(master.paket) &&
+      master.paket.length
+    ) {
+
+      var p =
+        master.paket[0] || {};
+
+      paket =
+        p.nama ||
+        p.namaPaket ||
+        p.paket ||
+        "";
+
+    }
 
 
     /* ===================================================
@@ -97,91 +104,43 @@ PAG.LaporanHarian = {
       </section>
 
 
-      <!-- =============================================
-           INFORMASI PEKERJAAN
-           ============================================= -->
-
       <section class="card laporan-card">
 
         <div class="laporan-section-title">
           Informasi Pekerjaan
         </div>
 
-
         <div class="laporan-info-grid">
 
           <div class="laporan-info-item">
-
-            <span>
-              Konsultan
-            </span>
-
-            <b>
-              ${laporanEscape(konsultan || "-")}
-            </b>
-
+            <span>Konsultan</span>
+            <b>${laporanEscape(konsultan || "-")}</b>
           </div>
 
-
           <div class="laporan-info-item">
-
-            <span>
-              Kontraktor
-            </span>
-
-            <b>
-              ${laporanEscape(kontraktor || "-")}
-            </b>
-
+            <span>Kontraktor</span>
+            <b>${laporanEscape(kontraktor || "-")}</b>
           </div>
 
-
           <div class="laporan-info-item">
-
-            <span>
-              Paket
-            </span>
-
-            <b>
-              ${laporanEscape(paket || "-")}
-            </b>
-
+            <span>Paket</span>
+            <b>${laporanEscape(paket || "-")}</b>
           </div>
 
-
           <div class="laporan-info-item">
-
-            <span>
-              No. Kontrak
-            </span>
-
-            <b>
-              ${laporanEscape(noKontrak || "-")}
-            </b>
-
+            <span>No. Kontrak</span>
+            <b>${laporanEscape(noKontrak || "-")}</b>
           </div>
 
-
           <div class="laporan-info-item">
-
-            <span>
-              Tanggal Kontrak
-            </span>
-
-            <b>
-              ${laporanEscape(tglKontrak || "-")}
-            </b>
-
+            <span>Tanggal Kontrak</span>
+            <b>${laporanEscape(tglKontrak || "-")}</b>
           </div>
 
         </div>
 
       </section>
 
-
-      <!-- =============================================
-           DATA KEGIATAN
-           ============================================= -->
 
       <section class="card laporan-card">
 
@@ -218,10 +177,6 @@ PAG.LaporanHarian = {
       </section>
 
 
-      <!-- =============================================
-           PENYUSUN
-           ============================================= -->
-
       <section class="card laporan-card">
 
         <div class="laporan-section-title">
@@ -231,7 +186,7 @@ PAG.LaporanHarian = {
 
         <div class="field">
 
-          <label>
+          <label for="lh_dibuat">
             Dibuat oleh
           </label>
 
@@ -246,7 +201,7 @@ PAG.LaporanHarian = {
 
         <div class="field">
 
-          <label>
+          <label for="lh_diketahui">
             Diketahui oleh
           </label>
 
@@ -277,23 +232,28 @@ PAG.LaporanHarian = {
        =================================================== */
 
     var itemsContainer =
-      document.getElementById(
-        "lh_items"
-      );
+      document.getElementById("lh_items");
 
     var addBtn =
-      document.getElementById(
-        "lh_add_row"
-      );
+      document.getElementById("lh_add_row");
 
     var saveBtn =
-      document.getElementById(
-        "lh_save"
+      document.getElementById("lh_save");
+
+
+    if (!itemsContainer || !addBtn || !saveBtn) {
+
+      console.error(
+        "Laporan Harian: elemen UI tidak lengkap."
       );
+
+      return;
+
+    }
 
 
     /* ===================================================
-       TAMBAH KEGIATAN
+       ADD ITEM
        =================================================== */
 
     function addItem(data) {
@@ -333,10 +293,6 @@ PAG.LaporanHarian = {
 
         </div>
 
-
-        <!-- =========================================
-             DATA UTAMA
-             ========================================= -->
 
         <div class="laporan-main-grid">
 
@@ -430,10 +386,6 @@ PAG.LaporanHarian = {
         </div>
 
 
-        <!-- =========================================
-             DETAIL PEKERJAAN
-             ========================================= -->
-
         <details class="laporan-detail">
 
           <summary>
@@ -524,9 +476,7 @@ PAG.LaporanHarian = {
               class="lh_dokumentasi"
             >
 
-            <small
-              class="laporan-file-name"
-            >
+            <small class="laporan-file-name">
               ${laporanEscape(
                 data.dokumentasi || "Belum ada foto"
               )}
@@ -543,18 +493,14 @@ PAG.LaporanHarian = {
 
 
       /* =================================================
-         FILE NAME
+         FILE
          ================================================= */
 
       var fileInput =
-        item.querySelector(
-          ".lh_dokumentasi"
-        );
+        item.querySelector(".lh_dokumentasi");
 
       var fileName =
-        item.querySelector(
-          ".laporan-file-name"
-        );
+        item.querySelector(".laporan-file-name");
 
       if (fileInput) {
 
@@ -579,24 +525,26 @@ PAG.LaporanHarian = {
 
 
       /* =================================================
-         HAPUS
+         REMOVE
          ================================================= */
 
       var removeBtn =
-        item.querySelector(
-          ".laporan-remove"
+        item.querySelector(".laporan-remove");
+
+      if (removeBtn) {
+
+        removeBtn.addEventListener(
+          "click",
+          function () {
+
+            item.remove();
+
+            updateNumbers();
+
+          }
         );
 
-      removeBtn.addEventListener(
-        "click",
-        function () {
-
-          item.remove();
-
-          updateNumbers();
-
-        }
-      );
+      }
 
 
       updateNumbers();
@@ -605,7 +553,7 @@ PAG.LaporanHarian = {
 
 
     /* ===================================================
-       UPDATE NOMOR
+       NUMBER
        =================================================== */
 
     function updateNumbers() {
@@ -637,7 +585,7 @@ PAG.LaporanHarian = {
 
 
     /* ===================================================
-       BARIS AWAL
+       DEFAULT ITEM
        =================================================== */
 
     addItem({
@@ -649,7 +597,7 @@ PAG.LaporanHarian = {
 
 
     /* ===================================================
-       TAMBAH
+       ADD
        =================================================== */
 
     addBtn.addEventListener(
@@ -685,7 +633,7 @@ PAG.LaporanHarian = {
 
 
     /* ===================================================
-       SIMPAN
+       SAVE
        =================================================== */
 
     saveBtn.addEventListener(
@@ -713,10 +661,6 @@ PAG.LaporanHarian = {
               .trim();
 
 
-          /* ===========================================
-             VALIDASI
-             =========================================== */
-
           var itemElements =
             itemsContainer.querySelectorAll(
               ".laporan-item"
@@ -731,12 +675,11 @@ PAG.LaporanHarian = {
           }
 
 
-          /* ===========================================
-             KUMPULKAN ITEM
-             =========================================== */
+          /* =========================================
+             COLLECT
+             ========================================= */
 
           var items = [];
-
 
           itemElements.forEach(
             function (item) {
@@ -763,49 +706,58 @@ PAG.LaporanHarian = {
               items.push({
 
                 tanggal:
-                  item.querySelector(
+                  getInputValue(
+                    item,
                     ".lh_tanggal"
-                  ).value,
+                  ),
 
                 devisi:
-                  item.querySelector(
+                  getInputValue(
+                    item,
                     ".lh_devisi"
-                  ).value.trim(),
+                  ),
 
                 sta:
-                  item.querySelector(
+                  getInputValue(
+                    item,
                     ".lh_sta"
-                  ).value.trim(),
+                  ),
 
                 cuaca:
-                  item.querySelector(
+                  getInputValue(
+                    item,
                     ".lh_cuaca"
-                  ).value.trim(),
-
-                tenaga:
-                  item.querySelector(
-                    ".lh_tenaga"
-                  ).value.trim(),
-
-                peralatan:
-                  item.querySelector(
-                    ".lh_peralatan"
-                  ).value.trim(),
-
-                material:
-                  item.querySelector(
-                    ".lh_material"
-                  ).value.trim(),
-
-                kendala:
-                  item.querySelector(
-                    ".lh_kendala"
-                  ).value.trim(),
+                  ),
 
                 uraian:
-                  item.querySelector(
+                  getInputValue(
+                    item,
                     ".lh_uraian"
-                  ).value.trim(),
+                  ),
+
+                tenaga:
+                  getInputValue(
+                    item,
+                    ".lh_tenaga"
+                  ),
+
+                peralatan:
+                  getInputValue(
+                    item,
+                    ".lh_peralatan"
+                  ),
+
+                material:
+                  getInputValue(
+                    item,
+                    ".lh_material"
+                  ),
+
+                kendala:
+                  getInputValue(
+                    item,
+                    ".lh_kendala"
+                  ),
 
                 dokumentasi:
                   dokumentasi
@@ -816,9 +768,9 @@ PAG.LaporanHarian = {
           );
 
 
-          /* ===========================================
-             REPORT DATA
-             =========================================== */
+          /* =========================================
+             REPORT
+             ========================================= */
 
           var reportData = {
 
@@ -858,9 +810,9 @@ PAG.LaporanHarian = {
           };
 
 
-          /* ===========================================
+          /* =========================================
              STORAGE
-             =========================================== */
+             ========================================= */
 
           if (
             PAG.Storage &&
@@ -870,7 +822,6 @@ PAG.LaporanHarian = {
             await PAG.Storage.put(
               "reports",
               {
-
                 id:
                   reportData.id,
 
@@ -882,16 +833,15 @@ PAG.LaporanHarian = {
 
                 createdAt:
                   reportData.createdAt
-
               }
             );
 
           }
 
 
-          /* ===========================================
+          /* =========================================
              OFFLINE QUEUE
-             =========================================== */
+             ========================================= */
 
           if (
             PAG.OfflineSync &&
@@ -906,9 +856,9 @@ PAG.LaporanHarian = {
           }
 
 
-          /* ===========================================
+          /* =========================================
              AUTO SYNC
-             =========================================== */
+             ========================================= */
 
           if (
             navigator.onLine &&
@@ -923,7 +873,7 @@ PAG.LaporanHarian = {
             } catch (syncError) {
 
               console.warn(
-                "Auto sync gagal, data tetap tersimpan.",
+                "Auto sync gagal.",
                 syncError
               );
 
@@ -931,10 +881,6 @@ PAG.LaporanHarian = {
 
           }
 
-
-          /* ===========================================
-             BERHASIL
-             =========================================== */
 
           laporanToast(
             "Laporan harian tersimpan"
@@ -959,7 +905,6 @@ PAG.LaporanHarian = {
           saveBtn.textContent =
             "Simpan & Kirim";
 
-
         } finally {
 
           saveBtn.disabled = false;
@@ -972,6 +917,26 @@ PAG.LaporanHarian = {
   }
 
 };
+
+
+/* =====================================================
+   GET INPUT
+   ===================================================== */
+
+function getInputValue(parent, selector) {
+
+  var element =
+    parent.querySelector(selector);
+
+  if (!element) {
+    return "";
+  }
+
+  return String(
+    element.value || ""
+  ).trim();
+
+}
 
 
 /* =====================================================
@@ -998,6 +963,7 @@ function laporanToast(message) {
 
   }
 
+
   var toast =
     document.getElementById("toast");
 
@@ -1011,26 +977,35 @@ function laporanToast(message) {
   toast.style.display =
     "block";
 
-  setTimeout(
-    function () {
-
-      toast.style.display =
-        "none";
-
-    },
-    2500
+  clearTimeout(
+    laporanToast.timer
   );
+
+  laporanToast.timer =
+    setTimeout(
+      function () {
+
+        toast.style.display =
+          "none";
+
+      },
+      2500
+    );
 
 }
 
 
 /* =====================================================
-   ESCAPE HTML
+   ESCAPE
    ===================================================== */
 
 function laporanEscape(value) {
 
-  return String(value || "")
+  return String(
+    value == null
+      ? ""
+      : value
+  )
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
@@ -1045,6 +1020,6 @@ function laporanEscape(value) {
    ===================================================== */
 
 console.log(
-  "PAG.LaporanHarian loaded:",
+  "PAG 30_LaporanHarian loaded:",
   !!PAG.LaporanHarian
 );
