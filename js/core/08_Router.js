@@ -6,9 +6,13 @@ PAG.Router = {
 
     home: "home",
     report: "report",
+
+    // Tetap tersedia untuk dipanggil dari Dashboard
     photo: "photo",
-    profile: "profile",
+
     notification: "notification",
+    profile: "profile",
+
     rfi: "rfi",
     inspection: "inspection",
     inspectionResult: "inspectionResult",
@@ -28,21 +32,45 @@ PAG.Router = {
 
     drive: "drive",
     pdf: "pdf"
+
   },
 
 
   async go(route) {
 
-    route =
-      this.routes[route]
-        ? route
-        : "home";
+    /* ================================================
+       VALIDASI ROUTE
+       ================================================ */
+
+    if (!this.routes[route]) {
+
+      console.warn(
+        "Route tidak ditemukan:",
+        route
+      );
+
+      route = "home";
+
+    }
+
+
+    /* ================================================
+       SIMPAN ROUTE AKTIF
+       ================================================ */
 
     this.current = route;
 
+
+    /* ================================================
+       RENDER
+       ================================================ */
+
     try {
 
-      await PAG.UI.render(route);
+      await PAG.UI.render(
+        route
+      );
+
 
     } catch (error) {
 
@@ -52,8 +80,12 @@ PAG.Router = {
         error
       );
 
+
       const view =
-        document.getElementById("view");
+        document.getElementById(
+          "view"
+        );
+
 
       if (view) {
 
@@ -74,7 +106,9 @@ PAG.Router = {
 
             <button
               class="btn"
-              onclick="PAG.Router.go('home')"
+              onclick="
+                PAG.Router.go('home')
+              "
             >
               Kembali ke Beranda
             </button>
@@ -92,13 +126,39 @@ PAG.Router = {
 };
 
 
+/* =====================================================
+   ESCAPE HTML
+   ===================================================== */
+
 function escapeRouterHtml(value) {
 
-  return String(value ?? "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+  return String(
+    value ?? ""
+  )
+
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+
+    .replace(
+      /</g,
+      "&lt;"
+    )
+
+    .replace(
+      />/g,
+      "&gt;"
+    )
+
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+
+    .replace(
+      /'/g,
+      "&#039;"
+    );
 
 }
