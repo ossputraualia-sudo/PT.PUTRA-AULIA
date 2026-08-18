@@ -1,3 +1,4 @@
+```javascript
 /* =====================================================
    PAG DOCS FIELD
    90_Dashboard.js
@@ -21,6 +22,10 @@ PAG.Dashboard = {
     }
 
 
+    /* ===================================================
+       DEFAULT
+       =================================================== */
+
     var userName =
       "Personil Lapangan";
 
@@ -41,6 +46,7 @@ PAG.Dashboard = {
 
         var u =
           await PAG.Auth.ensure();
+
 
         if (u) {
 
@@ -78,6 +84,7 @@ PAG.Dashboard = {
 
         var master =
           await PAG.WebUtamaSync.getMaster();
+
 
         if (master) {
 
@@ -131,15 +138,59 @@ PAG.Dashboard = {
           PAG DOCS FIELD
         </small>
 
+
         <h2>
           ${dashboardEscape(userName)}
         </h2>
+
 
         <div>
           ${dashboardEscape(namaPaket)}
         </div>
 
       </section>
+
+
+      <!-- =================================================
+           SOP
+           ================================================= -->
+
+      <a
+        class="card dashboard-sop"
+        href="https://drive.google.com/drive/folders/17D9uxcnayGFmWLk5mX0C-fckW2Cc5RJu?usp=sharing"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+
+        <div class="dashboard-sop-icon">
+          📘
+        </div>
+
+
+        <div class="dashboard-sop-content">
+
+          <h3>
+            SOP Pekerjaan
+          </h3>
+
+
+          <p>
+            Standar Operasional Prosedur
+          </p>
+
+
+          <small>
+            Buka dokumen SOP
+          </small>
+
+        </div>
+
+
+        <div class="dashboard-arrow">
+          ›
+        </div>
+
+      </a>
 
 
       <!-- =================================================
@@ -168,57 +219,17 @@ PAG.Dashboard = {
               📍
             </span>
 
+
             <span class="action-label">
               Absensi
             </span>
+
 
             <small>
               Selfie + GPS
             </small>
 
           </button>
-
-
-          <!-- PROGRESS -->
-
-          <button
-            type="button"
-            class="action dashboard-action"
-            id="dashboardProgress"
-          >
-
-            <span class="action-icon">
-              📊
-            </span>
-
-            <span class="action-label">
-              Progress
-            </span>
-
-            <small>
-              Kemajuan pekerjaan
-            </small>
-
-          </button>
-
-
-        </div>
-
-      </section>
-
-
-      <!-- =================================================
-           INFORMASI PEKERJAAN
-           ================================================= -->
-
-      <section class="dashboard-section">
-
-        <h4 class="section-title">
-          Informasi Pekerjaan
-        </h4>
-
-
-        <div class="grid dashboard-grid">
 
 
           <!-- INSTRUKSI -->
@@ -233,9 +244,11 @@ PAG.Dashboard = {
               📢
             </span>
 
+
             <span class="action-label">
               Instruksi
             </span>
+
 
             <small>
               Instruksi pekerjaan
@@ -256,15 +269,36 @@ PAG.Dashboard = {
               📝
             </span>
 
+
             <span class="action-label">
               Memo
             </span>
 
+
             <small>
-              Catatan dan pemberitahuan
+              Catatan & memo
             </small>
 
           </button>
+
+
+        </div>
+
+      </section>
+
+
+      <!-- =================================================
+           PELAPORAN
+           ================================================= -->
+
+      <section class="dashboard-section">
+
+        <h4 class="section-title">
+          Pelaporan
+        </h4>
+
+
+        <div class="grid dashboard-grid">
 
 
           <!-- RFI -->
@@ -279,12 +313,39 @@ PAG.Dashboard = {
               ❓
             </span>
 
+
             <span class="action-label">
               RFI
             </span>
 
+
             <small>
               Request for Information
+            </small>
+
+          </button>
+
+
+          <!-- PROGRESS -->
+
+          <button
+            type="button"
+            class="action dashboard-action"
+            id="dashboardProgress"
+          >
+
+            <span class="action-icon">
+              📊
+            </span>
+
+
+            <span class="action-label">
+              Progress
+            </span>
+
+
+            <small>
+              Progress pekerjaan
             </small>
 
           </button>
@@ -329,26 +390,6 @@ PAG.Dashboard = {
 
 
     /* ===================================================
-       PROGRESS
-       =================================================== */
-
-    bindDashboardButton(
-      "dashboardProgress",
-      function () {
-
-        dashboardOpenModule(
-          "progress",
-          [
-            "Progress",
-            "LaporanProgress"
-          ]
-        );
-
-      }
-    );
-
-
-    /* ===================================================
        INSTRUKSI
        =================================================== */
 
@@ -360,7 +401,7 @@ PAG.Dashboard = {
           "instruksi",
           [
             "Instruksi",
-            "Instruction"
+            "InstruksiLapangan"
           ]
         );
 
@@ -379,7 +420,8 @@ PAG.Dashboard = {
         dashboardOpenModule(
           "memo",
           [
-            "Memo"
+            "Memo",
+            "MemoLapangan"
           ]
         );
 
@@ -405,6 +447,25 @@ PAG.Dashboard = {
       }
     );
 
+
+    /* ===================================================
+       PROGRESS
+       =================================================== */
+
+    bindDashboardButton(
+      "dashboardProgress",
+      function () {
+
+        dashboardOpenModule(
+          "progress",
+          [
+            "Progress"
+          ]
+        );
+
+      }
+    );
+
   }
 
 };
@@ -424,7 +485,9 @@ function bindDashboardButton(
 
 
   if (!button) {
+
     return;
+
   }
 
 
@@ -461,14 +524,23 @@ function bindDashboardButton(
    OPEN MODULE
    ===================================================== */
 
-function dashboardOpenModule(
+async function dashboardOpenModule(
   route,
   names
 ) {
 
+  /* ---------------------------------------------------
+     NORMALISASI
+     --------------------------------------------------- */
+
+  names =
+    Array.isArray(names)
+      ? names
+      : [];
+
 
   /* ---------------------------------------------------
-     1. ROUTER UTAMA
+     1. ROUTER
      --------------------------------------------------- */
 
   try {
@@ -483,7 +555,8 @@ function dashboardOpenModule(
 
 
       /*
-       * Router bisa bekerja async
+       * Router bisa synchronous
+       * atau asynchronous.
        */
 
       if (
@@ -491,16 +564,7 @@ function dashboardOpenModule(
         typeof result.then === "function"
       ) {
 
-        result.catch(
-          function (error) {
-
-            console.warn(
-              "Router async:",
-              error
-            );
-
-          }
-        );
+        await result;
 
       }
 
@@ -512,7 +576,8 @@ function dashboardOpenModule(
   } catch (error) {
 
     console.warn(
-      "Router:",
+      "Dashboard Router:",
+      route,
       error
     );
 
@@ -520,14 +585,8 @@ function dashboardOpenModule(
 
 
   /* ---------------------------------------------------
-     2. CARI RENDERER LANGSUNG
+     2. DIRECT MODULE
      --------------------------------------------------- */
-
-  names =
-    Array.isArray(names)
-      ? names
-      : [];
-
 
   for (
     var i = 0;
@@ -545,14 +604,14 @@ function dashboardOpenModule(
     ) {
 
       var view =
-        document.getElementById(
-          "view"
-        );
+        document.getElementById("view");
 
 
       if (view) {
 
-        module.render(view);
+        await module.render(
+          view
+        );
 
         return;
 
@@ -578,7 +637,9 @@ function dashboardOpenModule(
    LEGACY ROUTER HELPER
    ===================================================== */
 
-function dashboardGo(route) {
+function dashboardGo(
+  route
+) {
 
   dashboardOpenModule(
     route,
@@ -613,7 +674,10 @@ function dashboardToast(
 
   } catch (error) {
 
-    console.warn(error);
+    console.warn(
+      "Dashboard Toast:",
+      error
+    );
 
   }
 
@@ -625,7 +689,9 @@ function dashboardToast(
 
 
   if (!toast) {
+
     return;
+
   }
 
 
@@ -669,27 +735,22 @@ function dashboardEscape(
       ? ""
       : value
   )
-
     .replace(
       /&/g,
       "&amp;"
     )
-
     .replace(
       /</g,
       "&lt;"
     )
-
     .replace(
       />/g,
       "&gt;"
     )
-
     .replace(
       /"/g,
       "&quot;"
     )
-
     .replace(
       /'/g,
       "&#039;"
@@ -706,3 +767,4 @@ console.log(
   "PAG 90_Dashboard loaded:",
   !!PAG.Dashboard
 );
+```
