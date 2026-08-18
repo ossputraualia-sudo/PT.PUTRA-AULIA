@@ -16,6 +16,7 @@ PAG.LaporanHarian = {
     var master = {};
 
     try {
+
       if (
         PAG.WebUtamaSync &&
         typeof PAG.WebUtamaSync.getMaster === "function"
@@ -23,40 +24,89 @@ PAG.LaporanHarian = {
         master =
           await PAG.WebUtamaSync.getMaster() || {};
       }
+
     } catch (error) {
-      console.warn("Laporan Harian Master:", error);
+
+      console.warn(
+        "Laporan Harian Master:",
+        error
+      );
+
     }
 
-    var konsultan = master.konsultan || "";
-    var kontraktor = master.kontraktor || "";
-    var noKontrak = master.noKontrak || "";
-    var tglKontrak = master.tglKontrak || "";
 
-    var paket = "";
+    /* ===================================================
+       MASTER
+       =================================================== */
+
+    var konsultan =
+      master.konsultan || "";
+
+    var kontraktor =
+      master.kontraktor || "";
+
+    var noKontrak =
+      master.noKontrak || "";
+
+    var tglKontrak =
+      normalDate(master.tglKontrak || "");
+
+
+    var paket =
+      "";
 
     if (
       Array.isArray(master.paket) &&
       master.paket.length
     ) {
-      var p = master.paket[0] || {};
+
+      var p =
+        master.paket[0] || {};
 
       paket =
         p.nama ||
         p.namaPaket ||
         p.paket ||
         "";
+
     }
 
-    var user =
-      PAG.Auth &&
-      typeof PAG.Auth.get === "function"
-        ? PAG.Auth.get() || {}
-        : {};
+
+    /* ===================================================
+       USER
+       =================================================== */
+
+    var user = {};
+
+    try {
+
+      if (
+        PAG.Auth &&
+        typeof PAG.Auth.get === "function"
+      ) {
+
+        user =
+          PAG.Auth.get() || {};
+
+      }
+
+    } catch (error) {
+
+      console.warn(
+        "Laporan Harian User:",
+        error
+      );
+
+    }
+
 
     var namaPersonil =
       user.name ||
       user.nama ||
+      user.namaPersonil ||
+      user.displayName ||
       "";
+
 
     var today =
       new Date()
@@ -97,9 +147,7 @@ PAG.LaporanHarian = {
           Informasi Pekerjaan
         </div>
 
-
         <div class="laporan-info-grid">
-
 
           <div class="field">
 
@@ -174,13 +222,10 @@ PAG.LaporanHarian = {
             <input
               id="lh_tglKontrak"
               type="date"
-              value="${laporanEscape(
-                normalDate(tglKontrak)
-              )}"
+              value="${laporanEscape(tglKontrak)}"
             >
 
           </div>
-
 
         </div>
 
@@ -282,17 +327,33 @@ PAG.LaporanHarian = {
 
 
     var itemsContainer =
-      document.getElementById("lh_items");
+      document.getElementById(
+        "lh_items"
+      );
 
     var addBtn =
-      document.getElementById("lh_add_row");
+      document.getElementById(
+        "lh_add_row"
+      );
 
     var saveBtn =
-      document.getElementById("lh_save");
+      document.getElementById(
+        "lh_save"
+      );
 
 
-    if (!itemsContainer || !addBtn || !saveBtn) {
+    if (
+      !itemsContainer ||
+      !addBtn ||
+      !saveBtn
+    ) {
+
+      console.error(
+        "Laporan Harian: UI tidak lengkap."
+      );
+
       return;
+
     }
 
 
@@ -302,17 +363,18 @@ PAG.LaporanHarian = {
 
     function addItem(data) {
 
-      data = data || {};
+      data =
+        data || {};
+
 
       var item =
-        document.createElement("div");
+        document.createElement(
+          "div"
+        );
+
 
       item.className =
         "laporan-item";
-
-
-      var nomor =
-        itemsContainer.children.length + 1;
 
 
       item.innerHTML = `
@@ -322,7 +384,7 @@ PAG.LaporanHarian = {
           <div>
 
             <span class="laporan-item-number">
-              ${nomor}
+              1
             </span>
 
             <b>
@@ -379,12 +441,14 @@ PAG.LaporanHarian = {
 
               ${Array.from(
                 { length: 10 },
-                (_, i) => {
+                function (_, index) {
 
                   var value =
-                    "Divisi " + (i + 1);
+                    "Divisi " +
+                    (index + 1);
 
                   return `
+
                     <option
                       value="${value}"
                       ${
@@ -395,6 +459,7 @@ PAG.LaporanHarian = {
                     >
                       ${value}
                     </option>
+
                   `;
 
                 }
@@ -436,10 +501,11 @@ PAG.LaporanHarian = {
             <select class="lh_cuaca">
 
               <option value="">
-                Pilih
+                Pilih Cuaca
               </option>
 
-              <option value="Cerah"
+              <option
+                value="Cerah"
                 ${
                   data.cuaca === "Cerah"
                     ? "selected"
@@ -449,7 +515,8 @@ PAG.LaporanHarian = {
                 Cerah
               </option>
 
-              <option value="Berawan"
+              <option
+                value="Berawan"
                 ${
                   data.cuaca === "Berawan"
                     ? "selected"
@@ -459,7 +526,8 @@ PAG.LaporanHarian = {
                 Berawan
               </option>
 
-              <option value="Hujan"
+              <option
+                value="Hujan"
                 ${
                   data.cuaca === "Hujan"
                     ? "selected"
@@ -469,7 +537,8 @@ PAG.LaporanHarian = {
                 Hujan
               </option>
 
-              <option value="Hujan Lebat"
+              <option
+                value="Hujan Lebat"
                 ${
                   data.cuaca === "Hujan Lebat"
                     ? "selected"
@@ -486,7 +555,9 @@ PAG.LaporanHarian = {
         </div>
 
 
-        <!-- DETAIL -->
+        <!-- =================================================
+             DETAIL
+             ================================================= -->
 
         <details class="laporan-detail">
 
@@ -575,7 +646,9 @@ PAG.LaporanHarian = {
           </div>
 
 
-          <!-- DOKUMENTASI -->
+          <!-- =================================================
+               DOKUMENTASI
+               ================================================= -->
 
           <div class="field">
 
@@ -591,7 +664,7 @@ PAG.LaporanHarian = {
             >
 
             <small class="laporan-file-name">
-              Belum ada foto
+              📷 Ambil foto dokumentasi
             </small>
 
             <img
@@ -602,6 +675,7 @@ PAG.LaporanHarian = {
                 margin-top:10px;
                 border-radius:12px;
               "
+              alt="Preview dokumentasi"
             >
 
           </div>
@@ -611,11 +685,13 @@ PAG.LaporanHarian = {
       `;
 
 
-      itemsContainer.appendChild(item);
+      itemsContainer.appendChild(
+        item
+      );
 
 
       /* =================================================
-         FOTO + WATERMARK
+         FOTO
          ================================================= */
 
       var fileInput =
@@ -648,47 +724,139 @@ PAG.LaporanHarian = {
             }
 
 
-            var file =
+            var originalFile =
               fileInput.files[0];
 
 
             try {
 
               fileName.textContent =
-                "Memproses foto...";
+                "⏳ Mengambil GPS...";
 
 
-              var result =
-                await PAG.LaporanHarian.createWatermarkPhoto(
-                  file,
-                  {
-                    personil:
-                      namaPersonil,
+              /* =========================================
+                 GPS
+                 ========================================= */
 
-                    paket:
-                      document.getElementById(
-                        "lh_paket"
-                      )?.value || "",
+              var gps = null;
 
-                    sta:
-                      item.querySelector(
-                        ".lh_sta"
-                      )?.value || ""
-                  }
+
+              if (
+                PAG.GPSPhoto &&
+                typeof PAG.GPSPhoto.capturePosition ===
+                  "function"
+              ) {
+
+                gps =
+                  await PAG.GPSPhoto.capturePosition();
+
+              } else if (
+                PAG.GPS &&
+                typeof PAG.GPS.get === "function"
+              ) {
+
+                gps =
+                  await PAG.GPS.get();
+
+              }
+
+
+              fileName.textContent =
+                "⏳ Membuat watermark...";
+
+
+              /* =========================================
+                 WATERMARK
+                 ========================================= */
+
+              var watermarkedBlob =
+                originalFile;
+
+
+              if (
+                PAG.Watermark &&
+                typeof PAG.Watermark.apply ===
+                  "function"
+              ) {
+
+                watermarkedBlob =
+                  await PAG.Watermark.apply(
+                    originalFile,
+                    {
+                      gps:
+                        gps,
+
+                      title:
+                        "PAG DOCS FIELD",
+
+                      date:
+                        new Date()
+                    }
+                  );
+
+              } else if (
+                PAG["43_Watermark"] &&
+                typeof PAG["43_Watermark"].apply ===
+                  "function"
+              ) {
+
+                watermarkedBlob =
+                  await PAG["43_Watermark"].apply(
+                    originalFile,
+                    {
+                      gps:
+                        gps,
+
+                      title:
+                        "PAG DOCS FIELD",
+
+                      date:
+                        new Date()
+                    }
+                  );
+
+              }
+
+
+              /* =========================================
+                 DATA URL
+                 ========================================= */
+
+              var dataUrl =
+                await PAG.LaporanHarian.blobToDataUrl(
+                  watermarkedBlob
                 );
 
 
-              item._watermarkedPhoto =
-                result.dataUrl;
+              item._photo = {
 
-              item._watermarkedFileName =
-                result.fileName;
+                dataUrl:
+                  dataUrl,
 
+                fileName:
+                  "PAG_" +
+                  new Date()
+                    .toISOString()
+                    .replace(
+                      /[:.]/g,
+                      "-"
+                    ) +
+                  ".jpg",
+
+                gps:
+                  gps || null
+
+              };
+
+
+              /* =========================================
+                 PREVIEW
+                 ========================================= */
 
               if (preview) {
 
                 preview.src =
-                  result.dataUrl;
+                  dataUrl;
 
                 preview.style.display =
                   "block";
@@ -697,19 +865,23 @@ PAG.LaporanHarian = {
 
 
               fileName.textContent =
-                "✓ " +
-                result.fileName;
+                "✓ Foto siap disimpan";
 
 
             } catch (error) {
 
               console.error(
-                "Watermark foto:",
+                "Dokumentasi:",
                 error
               );
 
+
               fileName.textContent =
-                "Gagal memproses foto";
+                "❌ Gagal memproses foto: " +
+                (
+                  error.message ||
+                  "Kesalahan"
+                );
 
             }
 
@@ -751,7 +923,7 @@ PAG.LaporanHarian = {
 
 
     /* ===================================================
-       UPDATE NUMBER
+       NUMBER
        =================================================== */
 
     function updateNumbers() {
@@ -771,8 +943,10 @@ PAG.LaporanHarian = {
             );
 
           if (number) {
+
             number.textContent =
               index + 1;
+
           }
 
         }
@@ -786,7 +960,8 @@ PAG.LaporanHarian = {
        =================================================== */
 
     addItem({
-      tanggal: today
+      tanggal:
+        today
     });
 
 
@@ -799,7 +974,8 @@ PAG.LaporanHarian = {
       function () {
 
         addItem({
-          tanggal: today
+          tanggal:
+            today
         });
 
 
@@ -810,14 +986,18 @@ PAG.LaporanHarian = {
 
 
         var last =
-          items[items.length - 1];
+          items[
+            items.length - 1
+          ];
 
 
         if (last) {
 
           last.scrollIntoView({
-            behavior: "smooth",
-            block: "center"
+            behavior:
+              "smooth",
+            block:
+              "center"
           });
 
         }
@@ -834,7 +1014,8 @@ PAG.LaporanHarian = {
       "click",
       async function () {
 
-        saveBtn.disabled = true;
+        saveBtn.disabled =
+          true;
 
         saveBtn.textContent =
           "Menyimpan...";
@@ -845,36 +1026,64 @@ PAG.LaporanHarian = {
           var reportData = {
 
             id:
-              "LH-" + Date.now(),
+              "LH-" +
+              Date.now(),
 
             type:
               "laporan_harian",
 
+            title:
+              "Laporan Harian",
+
             konsultan:
-              getValue("lh_konsultan"),
+              getValue(
+                "lh_konsultan"
+              ),
 
             kontraktor:
-              getValue("lh_kontraktor"),
+              getValue(
+                "lh_kontraktor"
+              ),
 
             paket:
-              getValue("lh_paket"),
+              getValue(
+                "lh_paket"
+              ),
 
             noKontrak:
-              getValue("lh_noKontrak"),
+              getValue(
+                "lh_noKontrak"
+              ),
 
             tglKontrak:
-              getValue("lh_tglKontrak"),
+              getValue(
+                "lh_tglKontrak"
+              ),
 
             dibuat:
-              getValue("lh_dibuat"),
+              getValue(
+                "lh_dibuat"
+              ),
 
             diketahui:
-              getValue("lh_diketahui"),
+              getValue(
+                "lh_diketahui"
+              ),
 
-            items: [],
+            personil:
+              namaPersonil,
+
+            items:
+              [],
 
             createdAt:
-              new Date().toISOString()
+              new Date().toISOString(),
+
+            updatedAt:
+              new Date().toISOString(),
+
+            status:
+              "tersimpan"
 
           };
 
@@ -885,10 +1094,14 @@ PAG.LaporanHarian = {
             );
 
 
-          if (!itemElements.length) {
+          if (
+            !itemElements.length
+          ) {
+
             throw new Error(
               "Minimal satu kegiatan harus diisi."
             );
+
           }
 
 
@@ -896,7 +1109,7 @@ PAG.LaporanHarian = {
             function (item) {
 
               var photo =
-                item._watermarkedPhoto || "";
+                item._photo || null;
 
 
               reportData.items.push({
@@ -956,10 +1169,19 @@ PAG.LaporanHarian = {
                   ),
 
                 dokumentasi:
-                  item._watermarkedFileName || "",
+                  photo
+                    ? photo.fileName
+                    : "",
 
                 dokumentasiDataUrl:
                   photo
+                    ? photo.dataUrl
+                    : "",
+
+                gps:
+                  photo
+                    ? photo.gps
+                    : null
 
               });
 
@@ -977,8 +1199,17 @@ PAG.LaporanHarian = {
               JSON.parse(
                 localStorage.getItem(
                   "PAG_FIELD_REPORTS"
-                ) || "[]"
+                ) ||
+                "[]"
               );
+
+
+            reports =
+              Array.isArray(
+                reports
+              )
+                ? reports
+                : [];
 
 
             reports.unshift(
@@ -989,7 +1220,10 @@ PAG.LaporanHarian = {
             localStorage.setItem(
               "PAG_FIELD_REPORTS",
               JSON.stringify(
-                reports.slice(0, 50)
+                reports.slice(
+                  0,
+                  50
+                )
               )
             );
 
@@ -1009,7 +1243,8 @@ PAG.LaporanHarian = {
 
           if (
             PAG.Storage &&
-            typeof PAG.Storage.put === "function"
+            typeof PAG.Storage.put ===
+              "function"
           ) {
 
             await PAG.Storage.put(
@@ -1020,6 +1255,9 @@ PAG.LaporanHarian = {
 
                 type:
                   "laporan_harian",
+
+                title:
+                  "Laporan Harian",
 
                 data:
                   reportData,
@@ -1038,7 +1276,8 @@ PAG.LaporanHarian = {
 
           if (
             PAG.OfflineSync &&
-            typeof PAG.OfflineSync.add === "function"
+            typeof PAG.OfflineSync.add ===
+              "function"
           ) {
 
             await PAG.OfflineSync.add(
@@ -1056,7 +1295,8 @@ PAG.LaporanHarian = {
           if (
             navigator.onLine &&
             PAG.OfflineSync &&
-            typeof PAG.OfflineSync.run === "function"
+            typeof PAG.OfflineSync.run ===
+              "function"
           ) {
 
             try {
@@ -1076,7 +1316,7 @@ PAG.LaporanHarian = {
 
 
           laporanToast(
-            "Laporan harian tersimpan"
+            "✓ Laporan harian tersimpan"
           );
 
 
@@ -1085,7 +1325,7 @@ PAG.LaporanHarian = {
 
 
           /* =================================================
-             PINDAH KE PROFIL
+             KE PROFILE
              ================================================= */
 
           setTimeout(
@@ -1093,15 +1333,18 @@ PAG.LaporanHarian = {
 
               if (
                 PAG.Router &&
-                typeof PAG.Router.go === "function"
+                typeof PAG.Router.go ===
+                  "function"
               ) {
 
-                PAG.Router.go("profile");
+                PAG.Router.go(
+                  "profile"
+                );
 
               }
 
             },
-            700
+            600
           );
 
 
@@ -1122,9 +1365,9 @@ PAG.LaporanHarian = {
           saveBtn.textContent =
             "Simpan & Kirim";
 
-        } finally {
 
-          saveBtn.disabled = false;
+          saveBtn.disabled =
+            false;
 
         }
 
@@ -1135,249 +1378,42 @@ PAG.LaporanHarian = {
 
 
   /* =====================================================
-     WATERMARK PHOTO
+     BLOB → DATA URL
      ===================================================== */
 
-  async createWatermarkPhoto(
-    file,
-    info
-  ) {
+  blobToDataUrl(blob) {
 
-    info =
-      info || {};
+    return new Promise(
+      function (resolve, reject) {
 
-
-    var image =
-      await readImage(file);
+        var reader =
+          new FileReader();
 
 
-    var canvas =
-      document.createElement("canvas");
+        reader.onload =
+          function () {
+
+            resolve(
+              reader.result
+            );
+
+          };
 
 
-    var maxWidth =
-      1600;
+        reader.onerror =
+          reject;
 
 
-    var scale =
-      Math.min(
-        1,
-        maxWidth / image.width
-      );
-
-
-    canvas.width =
-      Math.round(
-        image.width * scale
-      );
-
-
-    canvas.height =
-      Math.round(
-        image.height * scale
-      );
-
-
-    var ctx =
-      canvas.getContext("2d");
-
-
-    ctx.drawImage(
-      image,
-      0,
-      0,
-      canvas.width,
-      canvas.height
-    );
-
-
-    /* =================================================
-       WATERMARK
-       ================================================= */
-
-    var dateText =
-      new Intl.DateTimeFormat(
-        "id-ID",
-        {
-          dateStyle: "medium",
-          timeStyle: "medium"
-        }
-      ).format(
-        new Date()
-      );
-
-
-    var lines = [
-
-      "PAG DOCS FIELD",
-
-      info.personil
-        ? "Personil: " + info.personil
-        : "",
-
-      info.paket
-        ? "Paket: " + info.paket
-        : "",
-
-      info.sta
-        ? "STA: " + info.sta
-        : "",
-
-      dateText
-
-    ].filter(Boolean);
-
-
-    var fontSize =
-      Math.max(
-        18,
-        Math.round(
-          canvas.width / 55
-        )
-      );
-
-
-    var padding =
-      Math.round(
-        fontSize * 0.7
-      );
-
-
-    var lineHeight =
-      Math.round(
-        fontSize * 1.4
-      );
-
-
-    var boxHeight =
-      padding * 2 +
-      lineHeight * lines.length;
-
-
-    var boxY =
-      canvas.height -
-      boxHeight;
-
-
-    ctx.fillStyle =
-      "rgba(0,0,0,0.62)";
-
-
-    ctx.fillRect(
-      0,
-      boxY,
-      canvas.width,
-      boxHeight
-    );
-
-
-    ctx.fillStyle =
-      "#ffffff";
-
-
-    ctx.font =
-      "600 " +
-      fontSize +
-      "px Arial";
-
-
-    lines.forEach(
-      function (line, index) {
-
-        ctx.fillText(
-          line,
-          padding,
-          boxY +
-          padding +
-          lineHeight *
-            (index + 0.8)
+        reader.readAsDataURL(
+          blob
         );
 
       }
     );
 
-
-    var dataUrl =
-      canvas.toDataURL(
-        "image/jpeg",
-        0.82
-      );
-
-
-    return {
-
-      dataUrl:
-
-        dataUrl,
-
-      fileName:
-
-        "PAG_" +
-        new Date()
-          .toISOString()
-          .replace(
-            /[:.]/g,
-            "-"
-          ) +
-        ".jpg"
-
-    };
-
   }
 
 };
-
-
-/* =====================================================
-   READ IMAGE
-   ===================================================== */
-
-function readImage(file) {
-
-  return new Promise(
-    function(resolve, reject) {
-
-      var reader =
-        new FileReader();
-
-
-      reader.onload =
-        function(event) {
-
-          var img =
-            new Image();
-
-
-          img.onload =
-            function() {
-
-              resolve(img);
-
-            };
-
-
-          img.onerror =
-            reject;
-
-
-          img.src =
-            event.target.result;
-
-        };
-
-
-      reader.onerror =
-        reject;
-
-
-      reader.readAsDataURL(
-        file
-      );
-
-    }
-  );
-
-}
 
 
 /* =====================================================
@@ -1387,7 +1423,9 @@ function readImage(file) {
 function getValue(id) {
 
   var element =
-    document.getElementById(id);
+    document.getElementById(
+      id
+    );
 
 
   if (!element) {
@@ -1396,7 +1434,8 @@ function getValue(id) {
 
 
   return String(
-    element.value || ""
+    element.value ||
+    ""
   ).trim();
 
 }
@@ -1423,7 +1462,8 @@ function getInputValue(
 
 
   return String(
-    element.value || ""
+    element.value ||
+    ""
   ).trim();
 
 }
@@ -1457,7 +1497,10 @@ function normalDate(value) {
 
   return d
     .toISOString()
-    .slice(0, 10);
+    .slice(
+      0,
+      10
+    );
 
 }
 
@@ -1466,13 +1509,16 @@ function normalDate(value) {
    TOAST
    ===================================================== */
 
-function laporanToast(message) {
+function laporanToast(
+  message
+) {
 
   try {
 
     if (
       PAG.UI &&
-      typeof PAG.UI.toast === "function"
+      typeof PAG.UI.toast ===
+        "function"
     ) {
 
       PAG.UI.toast(
@@ -1512,7 +1558,7 @@ function laporanToast(message) {
 
   laporanToast.timer =
     setTimeout(
-      function() {
+      function () {
 
         toast.style.display =
           "none";
@@ -1528,7 +1574,9 @@ function laporanToast(message) {
    ESCAPE
    ===================================================== */
 
-function laporanEscape(value) {
+function laporanEscape(
+  value
+) {
 
   return String(
     value == null
